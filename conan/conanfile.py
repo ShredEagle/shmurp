@@ -15,7 +15,10 @@ class ShpongConan(ConanFile):
     build_policy = "missing"
 
     requires = (
-        #("glfw/3.3@bincrafters/stable"),
+        ("glad/0.1.29@bincrafters/stable"),
+        #Aunteater
+        #Graphics
+        #Math
     )
 
     default_options = {

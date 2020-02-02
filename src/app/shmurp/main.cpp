@@ -1,3 +1,5 @@
+#include "Game.h"
+
 #include <engine/Application.h>
 #include <engine/Timer.h>
 
@@ -9,11 +11,14 @@ int main(int argc, const char * argv[])
     try
     {
         Application application("Shmurp", 600, 800);
-        ad::Timer timer{glfwGetTime(), 0.};
+        Timer timer{glfwGetTime(), 0.};
+
+        shmurp::Game game(application);
 
         while(application.nextFrame())
         {
             timer.mark(glfwGetTime());
+            game.update(timer);
         }
     }
     catch(const std::exception & e)

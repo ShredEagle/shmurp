@@ -16,6 +16,8 @@ set(${PROJECT_NAME}_HEADERS
     System/KeyboardControl.h
     System/Rendering.h
     System/RenderingShaders.h
+
+    utils/Periodic.h
 )
 
 set(${PROJECT_NAME}_SOURCES

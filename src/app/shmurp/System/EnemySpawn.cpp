@@ -34,11 +34,8 @@ EnemySpawn::EnemySpawn(aunteater::Engine &aEngine) :
 
 void EnemySpawn::update(double time)
 {
-    mTimeSinceLastSpawn += time;
-
-    while((mTimeSinceLastSpawn - mSpawnPeriod) >= 0.)
+    for(auto count = mSpawnPeriod.countEvents(time); count; --count)
     {
-        mTimeSinceLastSpawn -= mSpawnPeriod;
         spawn(mEngine);
     }
 

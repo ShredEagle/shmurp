@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Utils/Periodic.h>
+
 #include <aunteater/System.h>
 
 namespace ad {
@@ -15,8 +17,7 @@ public:
 private:
     aunteater::Engine & mEngine;
     const aunteater::Family & mEnemies;
-    const float mSpawnPeriod{0.2};
-    double mTimeSinceLastSpawn{0.};
+    Periodic mSpawnPeriod{0.1f};
 };
 
 } // namespace ad

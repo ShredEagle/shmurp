@@ -1,6 +1,7 @@
 build*/
 .clangd/
 compile_commands.json
+.DS_store
 
 # Vim
 *.swp

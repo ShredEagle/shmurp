@@ -2,7 +2,8 @@
 
 #include "../configuration.h"
 
-#include <Components/Position.h>
+#include <Components/Faction.h>
+#include <Components/Geometry.h>
 #include <Components/Shape.h>
 #include <Components/Speed.h>
 
@@ -10,7 +11,7 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<Position, Shape, Speed> Enemy;
+typedef aunteater::Archetype<Geometry, Shape, Speed> Enemy;
 
 void spawn(aunteater::Engine & aEngine)
 {
@@ -18,8 +19,10 @@ void spawn(aunteater::Engine & aEngine)
 
     using aunteater::Entity;
 
-    aEngine.addEntity(Entity().add<Position>(randomX(),
-                                             conf::gWindowWorldHeight + conf::gViewportOffset)
+    aEngine.addEntity(Entity().add<Faction>(Faction::Democrats)
+                              .add<Geometry>(randomX(),
+                                             conf::gWindowWorldHeight + conf::gViewportOffset,
+                                             conf::squareRadius)
                               .add<Shape>(Shape::Square)
                               .add<Speed>(0.f, -5.f));
 }
@@ -39,13 +42,11 @@ void EnemySpawn::update(double time)
         spawn(mEngine);
     }
 
-    // TODO Cannot use auto for loop atm, removal invalidate the current iterator (so ++it fails)
-    for (auto it = mEnemies.begin(); it != mEnemies.end();)
+    for (const auto enemy : mEnemies)
     {
-        auto enemy = *(it++);
-        if (enemy->get<Position>().position.y() < -conf::gViewportOffset)
+        if (enemy->get<Geometry>().position.y() < -conf::gViewportOffset)
         {
-            mEngine.removeEntity(enemy);
+            mEngine.markToRemove(enemy);
         }
     }
 }

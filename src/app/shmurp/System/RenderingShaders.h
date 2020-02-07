@@ -8,13 +8,14 @@ static const char* gVertexShader = R"#(
 
 layout(location=0) in vec2 in_Position;
 layout(location=1) in vec2 in_InstancePosition;
+uniform vec4 u_Color;
 uniform mat4 u_WorldToDevice;
 out vec4 ex_Color;
 
 void main(void)
 {
     gl_Position = vec4(in_Position+in_InstancePosition, 0, 1) * u_WorldToDevice;
-    ex_Color = vec4(0.1, 0.1, 0.85, 1.0);
+    ex_Color = u_Color;
 }
 )#";
 

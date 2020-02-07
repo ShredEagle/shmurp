@@ -26,13 +26,15 @@ class Rendering : public aunteater::System
             Spec(AttributeDescriptionList aVertexDescription,
                  gsl::span<const T_vertex> aVertexData,
                  AttributeDescriptionList aInstanceDescription,
-                 gsl::span<const T_instance> aInstanceData);
+                 gsl::span<const T_instance> aInstanceData,
+                 Vec<4, GLfloat> aColor);
 
             VertexArrayObject mVAO;
             VertexBufferObject mVBO;
             VertexBufferObject mInstanceBO;
             GLsizei mVertexCount{0};
             GLsizei mInstanceCount{0};
+            Vec<4, GLfloat> mColor{Vec<4, GLfloat>::Zero()};
         };
 
         std::map<Shape::Value, Spec> mShapeToSpecification;

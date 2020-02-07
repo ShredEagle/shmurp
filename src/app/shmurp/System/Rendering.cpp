@@ -4,12 +4,12 @@
 #include "RenderingShaders.h"
 #include "transformations.h"
 
-#include <Components/Position.h>
+#include <Components/Geometry.h>
 #include <Components/Shape.h>
 
 namespace ad {
 
-typedef aunteater::Archetype<Position, Shape> Renderable;
+typedef aunteater::Archetype<Geometry, Shape> Renderable;
 
 Rendering::Rendering(aunteater::Engine &aEngine) :
     mRenderables(aEngine.getFamily<Renderable>())
@@ -25,7 +25,7 @@ void Rendering::update(double time)
     for (const auto & renderable : mRenderables)
     {
         mShapeToInstanceData.at(renderable->get<Shape>().enumerator)
-                                .push_back(renderable->get<Position>().position);
+                                .push_back(renderable->get<Geometry>().position);
     }
 
     for (auto & [shape, instanceData] : mShapeToInstanceData)
@@ -43,11 +43,13 @@ template <class T_vertex, class T_instance>
 Rendering::Impl::Spec::Spec(AttributeDescriptionList aVertexDescription,
                             gsl::span<const T_vertex> aVertexData,
                             AttributeDescriptionList aInstanceDescription,
-                            gsl::span<const T_instance> aInstanceData) :
+                            gsl::span<const T_instance> aInstanceData,
+                            Vec<4, GLfloat> aColor) :
     mVAO(),
     mVBO(loadVertexBuffer(mVAO, aVertexDescription, aVertexData)),
     mInstanceBO(loadVertexBuffer(mVAO, aInstanceDescription, aInstanceData, 1)),
-    mVertexCount(aVertexData.size())
+    mVertexCount(aVertexData.size()),
+    mColor(aColor)
 {}
 
 Matrix<4, GLfloat> worldToDevice()
@@ -66,13 +68,15 @@ Rendering::Impl::Impl() :
                                   Spec(gVertexDescription,
                                        gsl::span<const VertexShape>(triangle::gVertices),
                                        instance::gDescription,
-                                       gsl::span<const instance::Data>()));
+                                       gsl::span<const instance::Data>(),
+                                       Vec<4, GLfloat>(0.1, 0.1, 0.85, 1.0)));
 
     mShapeToSpecification.emplace(Shape::Square,
                                   Spec(gVertexDescription,
                                        gsl::span<const VertexShape>(square::gVertices),
                                        instance::gDescription,
-                                       gsl::span<const instance::Data>()));
+                                       gsl::span<const instance::Data>(),
+                                       Vec<4, GLfloat>(0.96, 0.14, 0.97, 1.0)));
 
     glProgramUniformMatrix4fv(mProgram, glGetUniformLocation(mProgram, "u_WorldToDevice"),
                               1, true, mWorldToDevice.data());
@@ -86,6 +90,8 @@ void Rendering::Impl::draw()
 
     for (const auto & [shape, specification] : mShapeToSpecification)
     {
+        glProgramUniform4fv(mProgram, glGetUniformLocation(mProgram, "u_Color"),
+                            1, specification.mColor.data());
         glBindVertexArray(specification.mVAO);
         glDrawArraysInstanced(GL_LINE_LOOP, 0, specification.mVertexCount, specification.mInstanceCount);
     }

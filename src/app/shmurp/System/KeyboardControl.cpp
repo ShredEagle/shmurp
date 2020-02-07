@@ -1,7 +1,7 @@
 #include "KeyboardControl.h"
 
 #include "Components/ControlDevice.h"
-#include "Components/Position.h"
+#include "Components/Geometry.h"
 
 #include <GLFW/glfw3.h>
 
@@ -43,7 +43,7 @@ void KeyboardControl::update(double time)
 {
     for (auto & movable : mPlayerMovable)
     {
-        Vec<2, GLfloat> & position = movable->get<Position>().position;
+        Vec<2, GLfloat> & position = movable->get<Geometry>().position;
         if (mCallback->mDirection & Up)
         {
             position.y() += 0.5f;

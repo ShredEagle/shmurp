@@ -6,10 +6,11 @@ set(${PROJECT_NAME}_HEADERS
     shapes.h
 
     Components/ControlDevice.h
-    Components/Position.h
+    Components/Geometry.h
     Components/Shape.h
     Components/Speed.h
 
+    System/Collision.h
     System/Displace.h
     System/EnemySpawn.h
     System/KeyboardControl.h
@@ -20,6 +21,7 @@ set(${PROJECT_NAME}_HEADERS
 set(${PROJECT_NAME}_SOURCES
     Game.cpp
 
+    System/Collision.cpp
     System/Displace.cpp
     System/EnemySpawn.cpp
     System/Rendering.cpp

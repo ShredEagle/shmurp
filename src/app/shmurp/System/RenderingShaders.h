@@ -6,14 +6,15 @@ namespace ad {
 static const char* gVertexShader = R"#(
 #version 400
 
-layout(location=0) in vec4 in_Position;
-uniform mat4 u_WorldToScreen;
+layout(location=0) in vec2 in_Position;
+layout(location=1) in vec2 in_InstancePosition;
+uniform mat4 u_WorldToDevice;
 out vec4 ex_Color;
 
 void main(void)
 {
-    gl_Position = in_Position * u_WorldToScreen;
-    ex_Color = vec4(0.0, 0.0, 0.8, 1.0);
+    gl_Position = vec4(in_Position+in_InstancePosition, 0, 1) * u_WorldToDevice;
+    ex_Color = vec4(0.1, 0.1, 0.85, 1.0);
 }
 )#";
 

@@ -6,7 +6,7 @@
 
 namespace ad {
 
-struct Position : public aunteater::ComponentBase<Position>
+struct Position : public aunteater::Component<Position>
 {
     Position(GLfloat x, GLfloat y) :
         position(x, y)

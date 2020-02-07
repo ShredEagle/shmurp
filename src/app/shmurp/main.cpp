@@ -1,3 +1,4 @@
+#include "configuration.h"
 #include "Game.h"
 
 #include <engine/Application.h>
@@ -10,7 +11,8 @@ int main(int argc, const char * argv[])
 {
     try
     {
-        Application application("Shmurp", 600, 800);
+        Application application("Shmurp", conf::gWindowWidth, conf::gWindowHeight,
+                                Application::Window_Keep_Ratio);
         Timer timer{glfwGetTime(), 0.};
 
         shmurp::Game game(application);

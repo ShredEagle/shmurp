@@ -2,6 +2,10 @@
 
 #include "commons.h"
 
+#include "../shapes.h"
+
+#include <Components/Shape.h>
+
 #include <aunteater/System.h>
 
 #include <renderer/VertexSpecification.h>
@@ -16,22 +20,37 @@ class Rendering : public aunteater::System
         Impl();
         void draw();
 
-        VertexArrayObject mVAO;
-        VertexBufferObject mVBO;
+        struct Spec
+        {
+            template <class T_vertex, class T_instance>
+            Spec(AttributeDescriptionList aVertexDescription,
+                 gsl::span<const T_vertex> aVertexData,
+                 AttributeDescriptionList aInstanceDescription,
+                 gsl::span<const T_instance> aInstanceData);
+
+            VertexArrayObject mVAO;
+            VertexBufferObject mVBO;
+            VertexBufferObject mInstanceBO;
+            GLsizei mVertexCount{0};
+            GLsizei mInstanceCount{0};
+        };
+
+        std::map<Shape::Value, Spec> mShapeToSpecification;
         Program mProgram;
 
-        Matrix<4, GLfloat> mWorldToScreen;
+        Matrix<4, GLfloat> mWorldToDevice;
     };
 
 public:
-    Rendering() = default;
+    Rendering(aunteater::Engine &aEngine);
 
-    virtual void addedToEngine(aunteater::Engine &aEngine) override;
-    virtual void update(double time) override;
+    void update(double time) override;
 
 private:
-    aunteater::Family * mRenderables;
+    const aunteater::Family & mRenderables;
     Impl mImpl;
+
+    std::map<Shape::Value, std::vector<instance::Data>> mShapeToInstanceData;
 };
 
 } // namespace ad

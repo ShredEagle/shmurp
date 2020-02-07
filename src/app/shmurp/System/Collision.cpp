@@ -9,17 +9,21 @@ Collision::Collision(aunteater::Engine &aEngine) :
 
 void Collision::update(double aDelta)
 {
-    mColliders.forEach([this](Faction & attackerFaction, Geometry & attackerGeometry)
+    for(auto attacker : mColliders)
     {
         for(auto defender : mColliders)
         {
-            if(   (attackerFaction.isAttacking(defender->get<Faction>()))
-               && (attackerGeometry.isColliding(defender->get<Geometry>())) )
+            if(   (attacker->get<Faction>().isAttacking(defender->get<Faction>()))
+               && (attacker->get<Geometry>().isColliding(defender->get<Geometry>())) )
             {
                 mEngine.markToRemove(defender);
+                if (defender->get<Faction>().isAttacking(attacker->get<Faction>()))
+                {
+                    mEngine.markToRemove(attacker);
+                }
             }
         }
-    });
+    }
 }
 
 } // namespace ad

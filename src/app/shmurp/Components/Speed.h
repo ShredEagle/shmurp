@@ -8,6 +8,10 @@ namespace ad {
 
 struct Speed : public aunteater::Component<Speed>
 {
+    Speed(Vec<2, GLfloat> aSpeed) :
+        speed(aSpeed)
+    {}
+
     Speed(GLfloat x, GLfloat y) :
         speed(x, y)
     {}

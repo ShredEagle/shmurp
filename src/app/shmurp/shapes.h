@@ -6,9 +6,6 @@
 
 namespace ad {
 
-/// TODO move to Math lib
-constexpr double pi = 3.14159265358979323846;
-
 struct VertexShape
 {
     Vec<2, GLfloat> mPosition;

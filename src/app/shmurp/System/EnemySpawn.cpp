@@ -15,7 +15,7 @@ void spawn(aunteater::Engine & aEngine)
 
     using aunteater::Entity;
 
-    aEngine.addEntity(Entity().add<Faction>(Faction::Democrats)
+    aEngine.addEntity(Entity().add<Faction>(Faction::Democrats, Faction::TruthBullet)
                               .add<Geometry>(randomX(),
                                              conf::gWindowWorldHeight + conf::gViewportOffset,
                                              conf::squareRadius)

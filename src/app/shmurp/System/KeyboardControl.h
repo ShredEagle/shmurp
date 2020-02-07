@@ -39,7 +39,7 @@ private:
     std::shared_ptr<Callback> mCallback{std::make_shared<Callback>()};
     aunteater::Family & mPlayerMovable;
     aunteater::Engine & mEngine;
-    Periodic mBulletPeriod{0.02f};
+    Periodic mBulletPeriod{0.05f};
 };
 
 inline std::shared_ptr<KeyboardControl::Callback> KeyboardControl::getCallback()

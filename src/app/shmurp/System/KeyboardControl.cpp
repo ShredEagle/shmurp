@@ -1,7 +1,12 @@
 #include "KeyboardControl.h"
 
-#include "Components/ControlDevice.h"
-#include "Components/Geometry.h"
+#include "../configuration.h"
+
+#include <Components/ControlDevice.h>
+#include <Components/Faction.h>
+#include <Components/Geometry.h>
+#include <Components/Shape.h>
+#include <Components/Speed.h>
 
 #include <GLFW/glfw3.h>
 
@@ -26,18 +31,38 @@ void KeyboardControl::Callback::operator()(int key, int scancode, int action, in
     if (action == GLFW_PRESS)
     {
         mDirection |= mapKey(key);
+        if (key == GLFW_KEY_SPACE)
+        {
+            mFiring = true;
+        }
     }
     else if (action == GLFW_RELEASE)
     {
         mDirection &= ~mapKey(key);
+        if (key == GLFW_KEY_SPACE)
+        {
+            mFiring = false;
+        }
     }
 }
 
 typedef aunteater::Archetype<ControlDevice, ControlDevice> PlayerMovable;
 
 KeyboardControl::KeyboardControl(aunteater::Engine &aEngine) :
-    mPlayerMovable(aEngine.getFamily<PlayerMovable>())
+    mPlayerMovable(aEngine.getFamily<PlayerMovable>()),
+    mEngine(aEngine)
 {}
+
+void spawnBullet(aunteater::Engine & aEngine, Vec<2, GLfloat> aBasePosition)
+{
+    using aunteater::Entity;
+    aEngine.addEntity(Entity().add<Faction>(Faction::TruthBullet, Faction::Democrats)
+                              .add<Geometry>(aBasePosition.x(),
+                                             aBasePosition.y(),
+                                             conf::gBulletRadius)
+                              .add<Shape>(Shape::Circle)
+                              .add<Speed>(0.f, 12.f));
+}
 
 void KeyboardControl::update(double time)
 {
@@ -60,7 +85,13 @@ void KeyboardControl::update(double time)
         {
             position.x() += 0.5f;
         }
+
+        if (mCallback->mFiring)
+        {
+            mBulletPeriod.forEachEvent(time, spawnBullet, mEngine, position);
+        }
     }
+
 }
 
 } // namespace ad

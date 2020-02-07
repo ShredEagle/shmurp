@@ -23,6 +23,7 @@ constexpr float shipInitialX = gWindowWorldWidth/2.f;
 constexpr float shipInitialY = 1.f;
 constexpr float shipRadius = 0.2f;
 constexpr float squareRadius = 0.3f;
+constexpr float gBulletRadius = 0.1f;
 
 constexpr float gViewportOffset = 2.f; // how far from the viewport to spawn/discard entities
 

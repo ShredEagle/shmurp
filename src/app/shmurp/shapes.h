@@ -6,6 +6,9 @@
 
 namespace ad {
 
+/// TODO move to Math lib
+constexpr double pi = 3.14159265358979323846;
+
 struct VertexShape
 {
     Vec<2, GLfloat> mPosition;
@@ -53,6 +56,23 @@ static const std::array<VertexShape, 4> gVertices = {
 };
 
 } // namespace square
+
+namespace circle {
+
+template <GLsizei N_vertices>
+std::vector<VertexShape> makeVertices(GLfloat aRadius)
+{
+    std::vector<VertexShape> result;
+    result.reserve(N_vertices);
+    for(int i=0; i<N_vertices; ++i)
+    {
+        result.emplace_back(VertexShape{ {cos(2*pi*i/N_vertices) * aRadius,
+                                          sin(2*pi*i/N_vertices) * aRadius} });
+    }
+    return result;
+}
+
+} // namespace circle
 
 namespace instance {
 

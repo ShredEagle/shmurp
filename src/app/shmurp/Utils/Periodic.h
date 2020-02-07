@@ -17,6 +17,8 @@ public:
 
     constexpr std::size_t countEvents(timet aDelta);
 
+    template <class T_functor, class... VT_args>
+    void forEachEvent(timet aDelta, const T_functor & aFunctor, VT_args &&... aArgs);
 
 private:
     const float mPeriod;
@@ -38,5 +40,16 @@ constexpr std::size_t Periodic::countEvents(timet aDelta)
     return result;
 }
 
+template <class T_functor, class... VT_args>
+void Periodic::forEachEvent(timet aDelta, const T_functor & aFunctor, VT_args &&... aArgs)
+{
+    mTimeSinceLastEvent += aDelta;
+
+    while((mTimeSinceLastEvent - mPeriod) >= 0.)
+    {
+        mTimeSinceLastEvent -= mPeriod;
+        aFunctor(std::forward<VT_args>(aArgs)...);
+    }
+}
 
 } // namespace ad

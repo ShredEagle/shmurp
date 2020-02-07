@@ -14,9 +14,6 @@ typedef aunteater::Archetype<Geometry, Shape> Renderable;
 Rendering::Rendering(aunteater::Engine &aEngine) :
     mRenderables(aEngine.getFamily<Renderable>())
 {
-    mShapeToInstanceData.emplace(Shape::RocketShip, std::vector<instance::Data>{});
-    mShapeToInstanceData.emplace(Shape::Square,     std::vector<instance::Data>{});
-
     glClearColor(0.04f, 0.08f, 0.12f, 1.f);
 }
 
@@ -24,18 +21,11 @@ void Rendering::update(double time)
 {
     for (const auto & renderable : mRenderables)
     {
-        mShapeToInstanceData.at(renderable->get<Shape>().enumerator)
-                                .push_back(renderable->get<Geometry>().position);
+        mImpl.mShapeToSpecification.at(renderable->get<Shape>().enumerator)
+                                .mInstancesData.push_back(renderable->get<Geometry>().position);
     }
 
-    for (auto & [shape, instanceData] : mShapeToInstanceData)
-    {
-        respecifyBuffer(mImpl.mShapeToSpecification.at(shape).mInstanceBO,
-                        gsl::span<const instance::Data>(instanceData));
-        mImpl.mShapeToSpecification.at(shape).mInstanceCount = instanceData.size();
-        instanceData.clear();
-    }
-
+    mImpl.respecifyBuffers();
     mImpl.draw();
 }
 
@@ -51,6 +41,16 @@ Rendering::Impl::Spec::Spec(AttributeDescriptionList aVertexDescription,
     mVertexCount(aVertexData.size()),
     mColor(aColor)
 {}
+
+void Rendering::Impl::respecifyBuffers()
+{
+    for (auto & [shape, spec] : mShapeToSpecification)
+    {
+        respecifyBuffer(spec.mInstanceBO, gsl::span<const instance::Data>(spec.mInstancesData));
+        spec.mInstanceCount = spec.mInstancesData.size();
+        spec.mInstancesData.clear();
+    }
+}
 
 Matrix<4, GLfloat> worldToDevice()
 {
@@ -78,6 +78,14 @@ Rendering::Impl::Impl() :
                                        gsl::span<const instance::Data>(),
                                        Vec<4, GLfloat>(0.96, 0.14, 0.97, 1.0)));
 
+    mShapeToSpecification.emplace(Shape::Circle,
+                                  Spec(gVertexDescription,
+                                       gsl::span<const VertexShape>(
+                                           circle::makeVertices<20>(conf::gBulletRadius)),
+                                       instance::gDescription,
+                                       gsl::span<const instance::Data>(),
+                                       Vec<4, GLfloat>(0.2, 0.2, 0.98, 1.0)));
+
     glProgramUniformMatrix4fv(mProgram, glGetUniformLocation(mProgram, "u_WorldToDevice"),
                               1, true, mWorldToDevice.data());
 }
@@ -93,7 +101,10 @@ void Rendering::Impl::draw()
         glProgramUniform4fv(mProgram, glGetUniformLocation(mProgram, "u_Color"),
                             1, specification.mColor.data());
         glBindVertexArray(specification.mVAO);
-        glDrawArraysInstanced(GL_LINE_LOOP, 0, specification.mVertexCount, specification.mInstanceCount);
+        glDrawArraysInstanced(GL_LINE_LOOP,
+                              0,
+                              specification.mVertexCount,
+                              specification.mInstanceCount);
     }
 }
 

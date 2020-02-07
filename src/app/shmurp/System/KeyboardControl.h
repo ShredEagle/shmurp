@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Utils/Periodic.h>
+
 #include <aunteater/System.h>
 
 namespace ad {
@@ -24,6 +26,7 @@ class KeyboardControl : public aunteater::System
         void operator()(int key, int scancode, int action, int mods);
 
         short mDirection{0};
+        bool mFiring{false};
     };
 
 public:
@@ -34,8 +37,9 @@ public:
 
 private:
     std::shared_ptr<Callback> mCallback{std::make_shared<Callback>()};
-
     aunteater::Family & mPlayerMovable;
+    aunteater::Engine & mEngine;
+    Periodic mBulletPeriod{0.02f};
 };
 
 inline std::shared_ptr<KeyboardControl::Callback> KeyboardControl::getCallback()

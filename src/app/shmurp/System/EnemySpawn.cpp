@@ -3,15 +3,11 @@
 #include "../configuration.h"
 
 #include <Components/Faction.h>
-#include <Components/Geometry.h>
 #include <Components/Shape.h>
-#include <Components/Speed.h>
 
 #include <handy/random.h>
 
 namespace ad {
-
-typedef aunteater::Archetype<Geometry, Shape, Speed> Enemy;
 
 void spawn(aunteater::Engine & aEngine)
 {
@@ -29,7 +25,7 @@ void spawn(aunteater::Engine & aEngine)
 
 EnemySpawn::EnemySpawn(aunteater::Engine &aEngine) :
     mEngine(aEngine),
-    mEnemies(aEngine.getFamily<Enemy>())
+    mPrunables(aEngine)
 {}
 
 void EnemySpawn::update(double time)
@@ -39,11 +35,12 @@ void EnemySpawn::update(double time)
         spawn(mEngine);
     }
 
-    for (const auto enemy : mEnemies)
+    for (const auto candidate : mPrunables)
     {
-        if (enemy->get<Geometry>().position.y() < -conf::gViewportOffset)
+        if (candidate->get<Geometry>().position.y() < -conf::gViewportOffset
+            || candidate->get<Geometry>().position.y() > conf::gWindowWorldHeight+conf::gViewportOffset)
         {
-            mEngine.markToRemove(enemy);
+            mEngine.markToRemove(candidate);
         }
     }
 }

@@ -18,6 +18,7 @@ class Rendering : public aunteater::System
     struct Impl
     {
         Impl();
+        void respecifyBuffers();
         void draw();
 
         struct Spec
@@ -35,6 +36,8 @@ class Rendering : public aunteater::System
             GLsizei mVertexCount{0};
             GLsizei mInstanceCount{0};
             Vec<4, GLfloat> mColor{Vec<4, GLfloat>::Zero()};
+
+            std::vector<instance::Data> mInstancesData;
         };
 
         std::map<Shape::Value, Spec> mShapeToSpecification;
@@ -51,8 +54,6 @@ public:
 private:
     const aunteater::Family & mRenderables;
     Impl mImpl;
-
-    std::map<Shape::Value, std::vector<instance::Data>> mShapeToInstanceData;
 };
 
 } // namespace ad

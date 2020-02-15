@@ -17,6 +17,7 @@ set(${PROJECT_NAME}_HEADERS
     System/Rendering.h
     System/RenderingShaders.h
 
+    utils/interpolation.h
     utils/Periodic.h
 )
 

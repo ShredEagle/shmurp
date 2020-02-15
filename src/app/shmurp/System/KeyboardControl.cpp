@@ -17,6 +17,8 @@
 
 namespace ad {
 
+typedef aunteater::Archetype<ControlDevice, ControlDevice, Geometry, Speed> PlayerMovable;
+
 void KeyboardControl::Callback::operator()(int key, int scancode, int action, int mods)
 {
     auto mapKey = [](int aKey) -> Direction
@@ -49,8 +51,6 @@ void KeyboardControl::Callback::operator()(int key, int scancode, int action, in
     }
 }
 
-typedef aunteater::Archetype<ControlDevice, ControlDevice> PlayerMovable;
-
 KeyboardControl::KeyboardControl(aunteater::Engine &aEngine) :
     mPlayerMovable(aEngine.getFamily<PlayerMovable>()),
     mEngine(aEngine)
@@ -76,27 +76,39 @@ void KeyboardControl::update(double time)
 {
     for (auto & movable : mPlayerMovable)
     {
-        Vec<2, GLfloat> & position = movable->get<Geometry>().position;
+        auto newSpeed = Vec<2, GLfloat>::Zero();
+
         if (mCallback->mDirection & Up)
         {
-            position.y() += 0.5f;
+            newSpeed.y() = conf::gShipSpeed;
         }
         if (mCallback->mDirection & Down)
         {
-            position.y() -= 0.5f;
+            newSpeed.y() = -conf::gShipSpeed;
         }
         if (mCallback->mDirection & Left)
         {
-            position.x() -= 0.5f;
+            newSpeed.x() = -conf::gShipSpeed;
         }
         if (mCallback->mDirection & Right)
         {
-            position.x() += 0.5f;
+            newSpeed.x() = conf::gShipSpeed;
         }
+
+        if (newSpeed != mTargetSpeed)
+        {
+            mTargetSpeed = newSpeed;
+            mSpeedInterpolation.redirect(mTargetSpeed);
+        }
+
+        movable->get<Speed>().speed = mSpeedInterpolation(time);
 
         if (mCallback->mFiring)
         {
-            mBulletPeriod.forEachEvent(time, spawnBullet, mEngine, position);
+            mBulletPeriod.forEachEvent(time,
+                                       spawnBullet,
+                                       mEngine,
+                                       movable->get<Geometry>().position);
         }
     }
 

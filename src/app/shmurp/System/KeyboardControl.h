@@ -1,8 +1,13 @@
 #pragma once
 
+#include "../commons.h"
+#include "../configuration.h"
+
+#include <Utils/interpolation.h>
 #include <Utils/Periodic.h>
 
 #include <aunteater/System.h>
+
 
 namespace ad {
 
@@ -38,6 +43,10 @@ public:
 private:
     std::shared_ptr<Callback> mCallback{std::make_shared<Callback>()};
     aunteater::Family & mPlayerMovable;
+    Vec<2, GLfloat> mTargetSpeed{0.f, 0.f};
+    Interpolation<Vec<2, GLfloat>, GLfloat> mSpeedInterpolation{mTargetSpeed,
+                                                                mTargetSpeed,
+                                                                conf::gShipAccelerationFactor};
     aunteater::Engine & mEngine;
     Periodic mBulletPeriod{0.02f};
 };

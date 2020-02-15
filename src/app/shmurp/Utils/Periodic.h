@@ -22,19 +22,19 @@ public:
 
 private:
     const float mPeriod;
-    float mTimeSinceLastEvent{0.};
+    float mRemainingTime{0.};
 };
 
 
 constexpr std::size_t Periodic::countEvents(timet aDelta)
 {
     std::size_t result=0;
-    mTimeSinceLastEvent += aDelta;
+    mRemainingTime += aDelta;
 
     /// TODO once integral, go modulo
-    while((mTimeSinceLastEvent - mPeriod) >= 0.)
+    while((mRemainingTime - mPeriod) >= 0.)
     {
-        mTimeSinceLastEvent -= mPeriod;
+        mRemainingTime -= mPeriod;
         ++result;
     }
     return result;
@@ -43,12 +43,12 @@ constexpr std::size_t Periodic::countEvents(timet aDelta)
 template <class T_functor, class... VT_args>
 void Periodic::forEachEvent(timet aDelta, const T_functor & aFunctor, VT_args &&... aArgs)
 {
-    mTimeSinceLastEvent += aDelta;
+    mRemainingTime += aDelta;
 
-    while((mTimeSinceLastEvent - mPeriod) >= 0.)
+    while((mRemainingTime - mPeriod) >= 0.)
     {
-        mTimeSinceLastEvent -= mPeriod;
-        aFunctor(std::forward<VT_args>(aArgs)...);
+        mRemainingTime -= mPeriod;
+        aFunctor(mRemainingTime, std::forward<VT_args>(aArgs)...);
     }
 }
 

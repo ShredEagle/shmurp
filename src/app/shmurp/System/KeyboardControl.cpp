@@ -56,19 +56,18 @@ KeyboardControl::KeyboardControl(aunteater::Engine &aEngine) :
     mEngine(aEngine)
 {}
 
-void spawnBullet(aunteater::Engine & aEngine, Vec<2, GLfloat> aBasePosition)
+void spawnBullet(timet aRemainingTime, aunteater::Engine & aEngine, Vec<2, GLfloat> aBasePosition)
 {
-    static constexpr GLfloat gMaxAngle(pi/25);
-    static constexpr Vec<4, GLfloat> gSpeed(0.f, 15.f, 0.f, 1.f);
-    // TODO does not seem well distributed, and quid about 0?
-    static Randomizer randDenominator(-20, 20);
+    static constexpr Vec<4, GLfloat> gSpeed(0.f, conf::gBulletSpeed, 0.f, 1.f);
+    static constexpr GLfloat gAngleQuant(pi/180/4);
+    static Randomizer randFactor(-30, 30);
 
     using aunteater::Entity;
-    auto speed = gSpeed * transform::rotateMatrix(gMaxAngle/randDenominator());
+    auto speed = gSpeed * transform::rotateMatrix(gAngleQuant*randFactor());
+    Vec<2, GLfloat> startPosition = aBasePosition
+                                    + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
     aEngine.addEntity(Entity().add<Faction>(Faction::TruthBullet, Faction::Democrats)
-                              .add<Geometry>(aBasePosition.x(),
-                                             aBasePosition.y(),
-                                             conf::gBulletRadius)
+                              .add<Geometry>(startPosition, conf::gBulletRadius)
                               .add<Shape>(Shape::Circle)
                               .add<Speed>(speed.x(), speed.y()));
 }

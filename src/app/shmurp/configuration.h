@@ -27,5 +27,7 @@ constexpr float gBulletRadius = 0.1f;
 
 constexpr float gViewportOffset = 2.f; // how far from the viewport to spawn/discard entities
 
+constexpr float gBulletSpeed = 25.f;
+
 } // namespace conf
 } // namespace ad

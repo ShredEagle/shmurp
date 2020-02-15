@@ -69,7 +69,7 @@ Rendering::Impl::Impl() :
                                        gsl::span<const VertexShape>(triangle::gVertices),
                                        instance::gDescription,
                                        gsl::span<const instance::Data>(),
-                                       Vec<4, GLfloat>(0.1, 0.1, 0.85, 1.0)));
+                                       Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
 
     mShapeToSpecification.emplace(Shape::Square,
                                   Spec(gVertexDescription,
@@ -84,7 +84,7 @@ Rendering::Impl::Impl() :
                                            circle::makeVertices<20>(conf::gBulletRadius)),
                                        instance::gDescription,
                                        gsl::span<const instance::Data>(),
-                                       Vec<4, GLfloat>(0.2, 0.2, 0.98, 1.0)));
+                                       Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
 
     glProgramUniformMatrix4fv(mProgram, glGetUniformLocation(mProgram, "u_WorldToDevice"),
                               1, true, mWorldToDevice.data());

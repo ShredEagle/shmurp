@@ -8,6 +8,11 @@ namespace ad {
 
 struct Geometry : public aunteater::Component<Geometry>
 {
+    Geometry(Vec<2, GLfloat> aPosition, GLfloat aRadius = 0.) :
+        position(aPosition),
+        radius(aRadius)
+    {}
+
     Geometry(GLfloat x, GLfloat y, GLfloat aRadius = 0.) :
         position(x, y),
         radius(aRadius)

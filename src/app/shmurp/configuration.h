@@ -31,6 +31,7 @@ constexpr float gShipSpeed = 12.5f;
 constexpr float gShipAccelerationFactor = 20.f;
 
 constexpr float gBulletSpeed = 25.f;
+constexpr float gEnemyBulletSpeed = 8.f;
 
 } // namespace conf
 } // namespace ad

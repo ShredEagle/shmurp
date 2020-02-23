@@ -11,6 +11,7 @@ struct Faction : public aunteater::Component<Faction>
         SpaceForce = (1 << 0),
         Democrats  = (1 << 1),
         TruthBullet  = (1 << 2),
+        LibLies  = (1 << 3),
     };
 
     Faction(Bit aSide, short aTargets = 0) :

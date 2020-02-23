@@ -8,7 +8,8 @@
 namespace ad {
 
 /// TODO move to Math lib
-constexpr double pi = 3.14159265358979323846;
+template<class T>
+constexpr T pi = T(3.1415926535897932385L);
 
 template <int N, class T>
 using Vec = math::Vec<N, T>;

@@ -63,8 +63,8 @@ std::vector<VertexShape> makeVertices(GLfloat aRadius)
     result.reserve(N_vertices);
     for(int i=0; i<N_vertices; ++i)
     {
-        result.emplace_back(VertexShape{ {cos(2*pi*i/N_vertices) * aRadius,
-                                          sin(2*pi*i/N_vertices) * aRadius} });
+        result.emplace_back(VertexShape{ {cos(2*pi<float>*i/N_vertices) * aRadius,
+                                          sin(2*pi<float>*i/N_vertices) * aRadius} });
     }
     return result;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "commons.h"
+#include "DebugUI.h"
 
 #include <aunteater/Engine.h>
 
@@ -20,6 +21,7 @@ public:
 
 private:
     aunteater::Engine mEntityEngine;
+    DebugUI mUI;
 };
 
 

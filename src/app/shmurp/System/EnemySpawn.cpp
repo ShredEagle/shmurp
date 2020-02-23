@@ -7,6 +7,8 @@
 
 #include <handy/random.h>
 
+#include <math/Rectangle.h>
+
 namespace ad {
 
 void spawn(aunteater::Engine & aEngine)
@@ -37,8 +39,11 @@ void EnemySpawn::update(double time)
 
     for (const auto candidate : mPrunables)
     {
-        if (candidate->get<Geometry>().position.y() < -conf::gViewportOffset
-            || candidate->get<Geometry>().position.y() > conf::gWindowWorldHeight+conf::gViewportOffset)
+        static const math::Rectangle<GLfloat> gGameArea{
+            {-conf::gViewportOffset, -conf::gViewportOffset},
+            {conf::gWindowWorldWidth+2*conf::gViewportOffset, conf::gWindowWorldHeight+2*conf::gViewportOffset}};
+
+        if (!gGameArea.contains(static_cast<math::Position<2, GLfloat>>(candidate->get<Geometry>().position)))
         {
             mEngine.markToRemove(candidate);
         }

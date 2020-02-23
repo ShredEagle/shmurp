@@ -2,14 +2,17 @@ project(shmurp)
 
 set(${PROJECT_NAME}_HEADERS
     commons.h
+    DebugUI.h
     Game.h
     shapes.h
 
+    Components/FirePattern.h
     Components/ControlDevice.h
     Components/Geometry.h
     Components/Shape.h
     Components/Speed.h
 
+    System/BulletSpawn.h
     System/Collision.h
     System/Displace.h
     System/EnemySpawn.h
@@ -22,8 +25,10 @@ set(${PROJECT_NAME}_HEADERS
 )
 
 set(${PROJECT_NAME}_SOURCES
+    DebugUI.cpp
     Game.cpp
 
+    System/BulletSpawn.cpp
     System/Collision.cpp
     System/Displace.cpp
     System/EnemySpawn.cpp
@@ -34,6 +39,7 @@ set(${PROJECT_NAME}_SOURCES
 find_package(aunteater CONFIG REQUIRED)
 find_package(2d CONFIG REQUIRED COMPONENTS engine)
 find_package(math CONFIG REQUIRED)
+find_package(websocket CONFIG REQUIRED)
 
 find_package(glad CONFIG REQUIRED)
 
@@ -50,6 +56,7 @@ target_link_libraries(${PROJECT_NAME}
         ad::aunteater
         ad::engine
         ad::math
+        ad::websocket
 
         glad::glad
 )

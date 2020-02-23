@@ -19,6 +19,7 @@ class ShpongConan(ConanFile):
         #Aunteater
         #Graphics
         #Math
+        #Websockets
     )
 
     default_options = {

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Echo client</title>
+</head>
+<body>
+  <h1>Shmurp console</h1>
+
+  Server URI: <input class="draw-border" id="uri" size="47" value="ws://localhost:4321" style="margin-bottom: 5px;">
+  <button class="echo-button" id="connect">Connect</button>
+  <button class="echo-button" id="disconnect">Disconnect</button><br>
+
+  <div>
+      <span id="socket_status"></span>
+  </div>
+
+  <pre id="messages" style="width: 600px; height: 400px; border: solid 1px #cccccc; margin-bottom: 5px;"></pre>
+
+  <script>
+    var ws = null;
+
+    connect.onclick = function() {
+      ws = new WebSocket(uri.value);
+      ws.onopen = function(ev) {
+        socket_status.innerText = "[connection opened]\n";
+      };
+      ws.onclose = function(ev) {
+        socket_status.innerText = "[connection closed]\n";
+      };
+      ws.onmessage = function(ev) {
+        messages.innerText = ev.data + "\n";
+      };
+      ws.onerror = function(ev) {
+        socket_status.innerText += "[error]\n";
+        console.log(ev);
+      };
+    };
+    disconnect.onclick = function() {
+      ws.close();
+    };
+    send.onclick = function() {
+      ws.send(sendMessage.value);
+      sendMessage.value = "";
+    };
+    sendMessage.onkeyup = function(ev) {
+      ev.preventDefault();
+      if (event.keyCode === 13) {
+        send.click();
+      }
+    }
+  </script>
+</body>
+</html>

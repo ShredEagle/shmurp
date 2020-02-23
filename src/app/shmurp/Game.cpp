@@ -7,11 +7,14 @@
 #include "Components/Geometry.h"
 #include "Components/Shape.h"
 
+#include "System/BulletSpawn.h"
 #include "System/Collision.h"
 #include "System/Displace.h"
 #include "System/EnemySpawn.h"
 #include "System/KeyboardControl.h"
 #include "System/Rendering.h"
+
+#include <aunteater/UpdateTiming.h>
 
 using aunteater::Entity;
 
@@ -33,6 +36,8 @@ Game::Game(Application & aApplication)
 
     mEntityEngine.addSystem<EnemySpawn>();
 
+    mEntityEngine.addSystem<BulletSpawn>();
+
     mEntityEngine.addSystem<Rendering>();
 
 
@@ -45,11 +50,25 @@ Game::Game(Application & aApplication)
                                     .add<Shape>(Shape::RocketShip)
                                     .add<Speed>(0., 0.)
                                     );
+
+    mEntityEngine.addEntity(Entity().add<FirePattern>(0.05f, pi<float>)
+                                    .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
+                                    .add<Shape>(Shape::RocketShip)
+                                    .add<Speed>(0., 0.)
+                                    );
+    mEntityEngine.addEntity(Entity().add<FirePattern>(0.05f, pi<float>)
+                                    .add<Geometry>(conf::gWindowWorldWidth-5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
+                                    .add<Shape>(Shape::RocketShip)
+                                    .add<Speed>(0., 0.)
+                                    );
 }
 
 void Game::update(const Timer & aTimer)
 {
-    mEntityEngine.update(aTimer.delta());
+    aunteater::UpdateTiming timings;
+    mEntityEngine.update(aTimer.delta(), timings);
+
+    mUI.broadcast(timings);
 }
 
 } // namespace shmurp

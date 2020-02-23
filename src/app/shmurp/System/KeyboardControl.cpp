@@ -59,7 +59,7 @@ KeyboardControl::KeyboardControl(aunteater::Engine &aEngine) :
 void spawnBullet(timet aRemainingTime, aunteater::Engine & aEngine, Vec<2, GLfloat> aBasePosition)
 {
     static constexpr Vec<4, GLfloat> gSpeed(0.f, conf::gBulletSpeed, 0.f, 1.f);
-    static constexpr GLfloat gAngleQuant(pi/180/4);
+    static constexpr GLfloat gAngleQuant(pi<GLfloat>/180/4);
     static Randomizer randFactor(-30, 30);
 
     using aunteater::Entity;

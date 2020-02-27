@@ -57,8 +57,12 @@ Game::Game(Application & aApplication)
                                     .add<Speed>(0., 0.)
                                     );
     mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
-                                    .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
                                     .add<Geometry>(conf::gWindowWorldWidth-5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
+                                    .add<Shape>(Shape::RocketShip)
+                                    .add<Speed>(0., 0.)
+                                    );
+    mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Circle>(0.5f, 25))
+                                    .add<Geometry>(conf::gWindowWorldWidth/2.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
                                     .add<Shape>(Shape::RocketShip)
                                     .add<Speed>(0., 0.)
                                     );

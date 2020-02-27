@@ -2,14 +2,11 @@
 
 #include "../commons.h"
 #include "../configuration.h"
+#include "../Entities.h"
 #include "../transformations.h"
 
 #include <Utils/Periodic.h>
 
-#include <Components/Faction.h>
-#include <Components/Geometry.h>
-#include <Components/Shape.h>
-#include <Components/Speed.h>
 
 #include <aunteater/Component.h>
 #include <aunteater/Engine.h>
@@ -19,16 +16,26 @@ namespace ad {
 class FirePattern : public aunteater::Component<FirePattern>
 {
 public:
-    class Base
+    class Base_impl
     {
     public:
         virtual void fire(double aDelta,
                           aunteater::Engine & aEngine,
                           Vec<2, GLfloat> aBasePosition) = 0;
 
-        virtual std::unique_ptr<Base> clone() = 0;
-        virtual ~Base()
+        virtual std::unique_ptr<Base_impl> clone() = 0;
+        virtual ~Base_impl()
         {}
+    };
+
+    template <class T_derived>
+    class Base : public Base_impl
+    {
+    public:
+        std::unique_ptr<Base_impl> clone() final
+        {
+            return std::make_unique<T_derived>(*static_cast<T_derived*>(this));
+        }
     };
 
     /// TODO unusable with current Engine.add()
@@ -54,16 +61,16 @@ public:
     }
 
 private:
-    std::unique_ptr<Base> mImplementation;
+    std::unique_ptr<Base_impl> mImplementation;
 };
 
 namespace Fire {
 
-class Spiral : public FirePattern::Base
+class Spiral : public FirePattern::Base<Spiral>
 {
 public:
     Spiral(timet aPeriod, double aAngularSpeed) :
-        mPeriod(aPeriod),
+        mPeriod{aPeriod},
         mAngleIncrement(aAngularSpeed*aPeriod)
     {}
 
@@ -74,22 +81,13 @@ public:
         mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
         {
             static constexpr Vec<4, GLfloat> gSpeed(0.f, -conf::gEnemyBulletSpeed, 0.f, 1.f);
-
-            using aunteater::Entity;
             auto speed = gSpeed * transform::rotateMatrix(nextAngle());
-            Vec<2, GLfloat> startPosition = aBasePosition
-                                            + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
-            aEngine.addEntity(Entity().add<Faction>(Faction::LibLies,
-                                                    Faction::SpaceForce)
-                                      .add<Geometry>(startPosition, conf::gBulletRadius)
-                                      .add<Shape>(Shape::Circle)
-                                      .add<Speed>(speed.x(), speed.y()));
-        });
-    }
 
-    std::unique_ptr<Base> clone() override
-    {
-        return std::make_unique<Spiral>(*this);
+            Vec<2, GLfloat> startPosition =
+                aBasePosition
+                + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
+            aEngine.addEntity(entities::makeEnemyBullet(startPosition, speed));
+        });
     }
 
 private:
@@ -102,6 +100,40 @@ private:
     Periodic mPeriod;
     float mAngle{0};
     const float mAngleIncrement;
+};
+
+
+class Circle : public FirePattern::Base<Circle>
+{
+public:
+    Circle(timet aPeriod, int aCount) :
+        mPeriod{aPeriod},
+        mCount{aCount}
+    {}
+
+    void fire(double aDelta,
+              aunteater::Engine & aEngine,
+              Vec<2, GLfloat> aBasePosition) override
+    {
+        mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
+        {
+            static constexpr Vec<4, GLfloat> gSpeed(0.f, -conf::gEnemyBulletSpeed, 0.f, 1.f);
+
+            for (int bulletCount = 0; bulletCount != mCount; ++bulletCount)
+            {
+                auto speed = gSpeed * transform::rotateMatrix(bulletCount * 2*pi<GLfloat>/mCount);
+                Vec<2, GLfloat> startPosition =
+                    aBasePosition
+                    + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
+                aEngine.addEntity(entities::makeEnemyBullet(startPosition, speed));
+            }
+
+        });
+    }
+
+private:
+    Periodic mPeriod;
+    const int mCount{0};
 };
 
 } // namespace Fire

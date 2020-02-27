@@ -3,6 +3,7 @@ project(shmurp)
 set(${PROJECT_NAME}_HEADERS
     commons.h
     DebugUI.h
+    Entities.h
     Game.h
     shapes.h
 

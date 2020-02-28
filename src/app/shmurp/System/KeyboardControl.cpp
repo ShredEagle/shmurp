@@ -4,12 +4,7 @@
 #include "../transformations.h"
 
 #include <Components/ControlDevice.h>
-#include <Components/Faction.h>
-#include <Components/Geometry.h>
-#include <Components/Shape.h>
-#include <Components/Speed.h>
-
-#include <handy/random.h>
+#include <Components/FirePattern.h>
 
 #include <GLFW/glfw3.h>
 
@@ -38,7 +33,7 @@ void KeyboardControl::Callback::operator()(int key, int scancode, int action, in
         mDirection |= mapKey(key);
         if (key == GLFW_KEY_SPACE)
         {
-            mFiring = true;
+            mFiring = Edge::Press;
         }
     }
     else if (action == GLFW_RELEASE)
@@ -46,7 +41,7 @@ void KeyboardControl::Callback::operator()(int key, int scancode, int action, in
         mDirection &= ~mapKey(key);
         if (key == GLFW_KEY_SPACE)
         {
-            mFiring = false;
+            mFiring = Edge::Release;
         }
     }
 }
@@ -55,22 +50,6 @@ KeyboardControl::KeyboardControl(aunteater::Engine &aEngine) :
     mPlayerMovable(aEngine.getFamily<PlayerMovable>()),
     mEngine(aEngine)
 {}
-
-void spawnBullet(timet aRemainingTime, aunteater::Engine & aEngine, Vec<2, GLfloat> aBasePosition)
-{
-    static constexpr Vec<4, GLfloat> gSpeed(0.f, conf::gBulletSpeed, 0.f, 1.f);
-    static constexpr GLfloat gAngleQuant(pi<GLfloat>/180/4);
-    static Randomizer randFactor(-30, 30);
-
-    using aunteater::Entity;
-    auto speed = gSpeed * transform::rotateMatrix(gAngleQuant*randFactor());
-    Vec<2, GLfloat> startPosition = aBasePosition
-                                    + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
-    aEngine.addEntity(Entity().add<Faction>(Faction::TruthBullet, Faction::Democrats)
-                              .add<Geometry>(startPosition, conf::gBulletRadius)
-                              .add<Shape>(Shape::Circle)
-                              .add<Speed>(speed.x(), speed.y()));
-}
 
 void KeyboardControl::update(double time)
 {
@@ -103,12 +82,17 @@ void KeyboardControl::update(double time)
 
         movable->get<Speed>().speed = mSpeedInterpolation(time);
 
-        if (mCallback->mFiring)
+        switch(mCallback->mFiring)
         {
-            mBulletPeriod.forEachEvent(time,
-                                       spawnBullet,
-                                       mEngine,
-                                       movable->get<Geometry>().position);
+            case Edge::Press:
+                movable->add<FirePattern>(std::make_unique<Fire::Burst>(0.02f, pi<GLfloat>/180.f*7.5f));
+                mCallback->mFiring = Edge::None;
+                break;
+            case Edge::Release:
+                movable->removeComponent<FirePattern>();
+                mCallback->mFiring = Edge::None;
+                break;
+            default: break;
         }
     }
 

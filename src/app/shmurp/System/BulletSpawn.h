@@ -20,7 +20,7 @@ public:
 
 private:
     aunteater::Engine & mEngine;
-    const aunteater::FamilyHelp<Canon> mCanons;
+    aunteater::FamilyHelp<Canon> mCanons;
 };
 
 } // namespace ad

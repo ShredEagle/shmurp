@@ -3,8 +3,7 @@
 #include "../commons.h"
 #include "../configuration.h"
 
-#include <Utils/interpolation.h>
-#include <Utils/Periodic.h>
+#include "../Utils/interpolation.h"
 
 #include <aunteater/System.h>
 
@@ -26,12 +25,19 @@ class KeyboardControl : public aunteater::System
         Down_Right = (Down & Right),
     };
 
+    enum class Edge : short
+    {
+        None,
+        Press,
+        Release,
+    };
+
     struct Callback
     {
         void operator()(int key, int scancode, int action, int mods);
 
         short mDirection{0};
-        bool mFiring{false};
+        Edge mFiring{Edge::None};
     };
 
 public:
@@ -48,7 +54,6 @@ private:
                                                                 mTargetSpeed,
                                                                 conf::gShipAccelerationFactor};
     aunteater::Engine & mEngine;
-    Periodic mBulletPeriod{0.02f};
 };
 
 inline std::shared_ptr<KeyboardControl::Callback> KeyboardControl::getCallback()

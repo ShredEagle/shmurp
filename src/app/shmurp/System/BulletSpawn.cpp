@@ -13,9 +13,9 @@ BulletSpawn::BulletSpawn(aunteater::Engine &aEngine) :
 
 void BulletSpawn::update(double aDelta)
 {
-    for (const auto & canon : mCanons)
+    for (auto & [firePattern, geometry] : mCanons)
     {
-        canon->get<FirePattern>().fire(aDelta, mEngine, canon->get<Geometry>().position);
+        firePattern.fire(aDelta, mEngine, geometry.position);
     }
 }
 

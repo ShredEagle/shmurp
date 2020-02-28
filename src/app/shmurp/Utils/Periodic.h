@@ -11,7 +11,7 @@ typedef double timet;
 class Periodic
 {
 public:
-    Periodic(timet aPeriod) :
+    explicit Periodic(timet aPeriod) :
         mPeriod(aPeriod)
     {}
 

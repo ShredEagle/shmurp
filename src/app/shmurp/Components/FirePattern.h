@@ -5,11 +5,12 @@
 #include "../Entities.h"
 #include "../transformations.h"
 
-#include <Utils/Periodic.h>
-
+#include "../Utils/Periodic.h"
 
 #include <aunteater/Component.h>
 #include <aunteater/Engine.h>
+
+#include <handy/random.h>
 
 namespace ad {
 
@@ -38,7 +39,7 @@ public:
         }
     };
 
-    /// TODO unusable with current Engine.add()
+    /// TODO not reachable with current Engine.add()
     template <class T_base, class... VT_aArgs>
     FirePattern(VT_aArgs &&... aArgs) :
         mImplementation(new T_base(std::forward<VT_aArgs>(aArgs)...))
@@ -134,6 +135,38 @@ public:
 private:
     Periodic mPeriod;
     const int mCount{0};
+};
+
+class Burst : public FirePattern::Base<Burst>
+{
+public:
+    Burst(timet aPeriod, Radians aSpreadAngle) :
+        mPeriod{aPeriod},
+        mAngleQuant(aSpreadAngle/gDivisions)
+    {}
+
+    void fire(double aDelta,
+              aunteater::Engine & aEngine,
+              Vec<2, GLfloat> aBasePosition) override
+    {
+        static constexpr Vec<4, GLfloat> gSpeed(0.f, conf::gBulletSpeed, 0.f, 1.f);
+
+        mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
+        {
+            auto speed = gSpeed * transform::rotateMatrix(mAngleQuant*mRandomizer());
+            Vec<2, GLfloat> startPosition =
+                aBasePosition
+                + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
+            aEngine.addEntity(entities::makeFriendBullet(startPosition, speed));
+        });
+    }
+
+private:
+    static constexpr int gDivisions{30};
+    Randomizer<> mRandomizer{-gDivisions, gDivisions};
+    Periodic mPeriod;
+    const Radians mAngleQuant;
+
 };
 
 } // namespace Fire

@@ -20,5 +20,13 @@ inline aunteater::Entity makeEnemyBullet(Vec<2, GLfloat> aPosition, Vec<4, GLflo
                               .add<Speed>(aSpeed.x(), aSpeed.y());
 }
 
+inline aunteater::Entity makeFriendBullet(Vec<2, GLfloat> aPosition, Vec<4, GLfloat> aSpeed)
+{
+    return aunteater::Entity().add<Faction>(Faction::TruthBullet, Faction::Democrats)
+                              .add<Geometry>(aPosition, conf::gBulletRadius)
+                              .add<Shape>(Shape::Circle)
+                              .add<Speed>(aSpeed.x(), aSpeed.y());
+}
+
 } // namespace entities
 } // namespace ad

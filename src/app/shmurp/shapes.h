@@ -6,6 +6,14 @@
 
 namespace ad {
 
+template <class T_bufferData>
+class BufferData_trait;
+
+
+template <class T_bufferData>
+AttributeDescriptionList BufferData_trait_description =
+    BufferData_trait<T_bufferData>::description_value;
+
 struct VertexShape
 {
     Vec<2, GLfloat> mPosition;
@@ -13,6 +21,13 @@ struct VertexShape
 
 constexpr AttributeDescriptionList gVertexDescription = {
     { 0, 2, offsetof(VertexShape, mPosition), MappedGL<GLfloat>::enumerator},
+};
+
+template <>
+class BufferData_trait<VertexShape>
+{
+public:
+    static constexpr AttributeDescriptionList description_value = gVertexDescription;
 };
 
 namespace triangle {
@@ -87,5 +102,13 @@ constexpr AttributeDescriptionList gDescription = {
 };
 
 } // namespace instance
+
+template <>
+class BufferData_trait<instance::Data>
+{
+public:
+    static constexpr AttributeDescriptionList description_value = instance::gDescription;
+};
+
 
 } // namespace ad

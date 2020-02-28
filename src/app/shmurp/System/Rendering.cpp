@@ -19,37 +19,23 @@ Rendering::Rendering(aunteater::Engine &aEngine) :
 
 void Rendering::update(double time)
 {
+    std::map<Shape::Value, std::vector<instance::Data>> sorted;
+
     for (const auto & renderable : mRenderables)
     {
-        mImpl.mShapeToSpecification.at(renderable->get<Shape>().enumerator)
-                                .mInstancesData.push_back(renderable->get<Geometry>().position);
+        sorted[renderable->get<Shape>().enumerator]
+            .push_back(renderable->get<Geometry>().position);
     }
 
-    mImpl.respecifyBuffers();
-    mImpl.draw();
-}
-
-template <class T_vertex, class T_instance>
-Rendering::Impl::Spec::Spec(AttributeDescriptionList aVertexDescription,
-                            gsl::span<const T_vertex> aVertexData,
-                            AttributeDescriptionList aInstanceDescription,
-                            gsl::span<const T_instance> aInstanceData,
-                            Vec<4, GLfloat> aColor) :
-    mVAO(),
-    mVBO(loadVertexBuffer(mVAO, aVertexDescription, aVertexData)),
-    mInstanceBO(loadVertexBuffer(mVAO, aInstanceDescription, aInstanceData, 1)),
-    mVertexCount(aVertexData.size()),
-    mColor(aColor)
-{}
-
-void Rendering::Impl::respecifyBuffers()
-{
-    for (auto & [shape, spec] : mShapeToSpecification)
+    for (auto & [shape, instancing] : mImpl.mShapeToSpecification)
     {
-        respecifyBuffer(spec.mInstanceBO, gsl::span<const instance::Data>(spec.mInstancesData));
-        spec.mInstanceCount = spec.mInstancesData.size();
-        spec.mInstancesData.clear();
+        if (auto found = sorted.find(shape); found != sorted.end())
+        {
+            instancing.updateIBO(found->second);
+        }
     }
+
+    mImpl.draw();
 }
 
 Matrix<4, GLfloat> worldToDevice()
@@ -65,26 +51,23 @@ Rendering::Impl::Impl() :
     mWorldToDevice(worldToDevice())
 {
     mShapeToSpecification.emplace(Shape::RocketShip,
-                                  Spec(gVertexDescription,
-                                       gsl::span<const VertexShape>(triangle::gVertices),
-                                       instance::gDescription,
-                                       gsl::span<const instance::Data>(),
-                                       Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
+                                  ShapeInstancing(
+                                      gsl::span<const VertexShape>(triangle::gVertices),
+                                      gsl::span<const instance::Data>(),
+                                      Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
 
     mShapeToSpecification.emplace(Shape::Square,
-                                  Spec(gVertexDescription,
-                                       gsl::span<const VertexShape>(square::gVertices),
-                                       instance::gDescription,
-                                       gsl::span<const instance::Data>(),
-                                       Vec<4, GLfloat>(0.96, 0.14, 0.97, 1.0)));
+                                  ShapeInstancing(
+                                      gsl::span<const VertexShape>(square::gVertices),
+                                      gsl::span<const instance::Data>(),
+                                      Vec<4, GLfloat>(0.96, 0.14, 0.97, 1.0)));
 
     mShapeToSpecification.emplace(Shape::Circle,
-                                  Spec(gVertexDescription,
-                                       gsl::span<const VertexShape>(
-                                           circle::makeVertices<20>(conf::gBulletRadius)),
-                                       instance::gDescription,
-                                       gsl::span<const instance::Data>(),
-                                       Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
+                                  ShapeInstancing(
+                                      gsl::span<const VertexShape>(
+                                          circle::makeVertices<20>(conf::gBulletRadius)),
+                                      gsl::span<const instance::Data>(),
+                                      Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
 
     glProgramUniformMatrix4fv(mProgram, glGetUniformLocation(mProgram, "u_WorldToDevice"),
                               1, true, mWorldToDevice.data());
@@ -96,15 +79,11 @@ void Rendering::Impl::draw()
 
     glUseProgram(mProgram);
 
-    for (const auto & [shape, specification] : mShapeToSpecification)
+    for (const auto & [shape, instancing] : mShapeToSpecification)
     {
         glProgramUniform4fv(mProgram, glGetUniformLocation(mProgram, "u_Color"),
-                            1, specification.mColor.data());
-        glBindVertexArray(specification.mVAO);
-        glDrawArraysInstanced(GL_LINE_LOOP,
-                              0,
-                              specification.mVertexCount,
-                              specification.mInstanceCount);
+                            1, instancing.mColor.data());
+        instancing.draw();
     }
 }
 

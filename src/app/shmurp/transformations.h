@@ -33,5 +33,25 @@ inline Matrix<4, GLfloat> rotateMatrix(GLfloat aAngle)
     return result;
 }
 
+inline Matrix<4, GLfloat> rotateMatrix_X(GLfloat aAngle)
+{
+    auto result = Matrix<4, GLfloat>::Identity();
+    result[1][1] =  std::cos(aAngle);
+    result[1][2] = -std::sin(aAngle);
+    result[2][1] =  std::sin(aAngle);
+    result[2][2] =  std::cos(aAngle);
+    return result;
+}
+
+inline Matrix<4, GLfloat> rotateMatrix_Y(GLfloat aAngle)
+{
+    auto result = Matrix<4, GLfloat>::Identity();
+    result[0][0] =  std::cos(aAngle);
+    result[2][0] = -std::sin(aAngle);
+    result[0][2] =  std::sin(aAngle);
+    result[2][2] =  std::cos(aAngle);
+    return result;
+}
+
 } // namespace transform
 } // namespace ad

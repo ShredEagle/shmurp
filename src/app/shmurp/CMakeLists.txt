@@ -5,7 +5,9 @@ set(${PROJECT_NAME}_HEADERS
     DebugUI.h
     Entities.h
     Game.h
+    Instancing.h
     shapes.h
+    shapes3D.h
 
     Components/FirePattern.h
     Components/ControlDevice.h
@@ -19,6 +21,7 @@ set(${PROJECT_NAME}_HEADERS
     System/EnemySpawn.h
     System/KeyboardControl.h
     System/Rendering.h
+    System/Rendering3D.h
     System/RenderingShaders.h
 
     utils/interpolation.h
@@ -34,6 +37,7 @@ set(${PROJECT_NAME}_SOURCES
     System/Displace.cpp
     System/EnemySpawn.cpp
     System/Rendering.cpp
+    System/Rendering3D.cpp
     System/KeyboardControl.cpp
 )
 

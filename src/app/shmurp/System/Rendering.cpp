@@ -38,28 +38,23 @@ void Rendering::update(double time)
     mImpl.draw();
 }
 
-Matrix<4, GLfloat> worldToDevice()
-{
-    return transform::scaleMatrix(conf::getWorldToDeviceScale(conf::gWindowWidth),
-                                  conf::getWorldToDeviceScale(conf::gWindowHeight))
-           * transform::translateMatrix(-1., -1.);
-}
-
 Rendering::Impl::Impl() :
     mProgram(makeLinkedProgram({ {GL_VERTEX_SHADER,   gVertexShader},
                                  {GL_FRAGMENT_SHADER, gFragmentShader} })),
-    mWorldToDevice(worldToDevice())
+    mWorldToDevice(conf::worldToDevice())
 {
     mShapeToSpecification.emplace(Shape::RocketShip,
                                   ShapeInstancing(
                                       gsl::span<const VertexShape>(triangle::gVertices),
                                       gsl::span<const instance::Data>(),
+                                      GL_LINE_LOOP,
                                       Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
 
     mShapeToSpecification.emplace(Shape::Square,
                                   ShapeInstancing(
                                       gsl::span<const VertexShape>(square::gVertices),
                                       gsl::span<const instance::Data>(),
+                                      GL_LINE_LOOP,
                                       Vec<4, GLfloat>(0.96, 0.14, 0.97, 1.0)));
 
     mShapeToSpecification.emplace(Shape::Circle,
@@ -67,6 +62,7 @@ Rendering::Impl::Impl() :
                                       gsl::span<const VertexShape>(
                                           circle::makeVertices<20>(conf::gBulletRadius)),
                                       gsl::span<const instance::Data>(),
+                                      GL_LINE_LOOP,
                                       Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
 
     glProgramUniformMatrix4fv(mProgram, glGetUniformLocation(mProgram, "u_WorldToDevice"),

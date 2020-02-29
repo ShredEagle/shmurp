@@ -1,5 +1,6 @@
 #pragma once
 
+#include "transformations.h"
 
 namespace ad {
 namespace conf {
@@ -32,6 +33,14 @@ constexpr float gShipAccelerationFactor = 20.f;
 
 constexpr float gBulletSpeed = 25.f;
 constexpr float gEnemyBulletSpeed = 8.f;
+
+// TODO should be able to constexpr
+inline Matrix<4, GLfloat> worldToDevice()
+{
+    return transform::scaleMatrix(conf::getWorldToDeviceScale(conf::gWindowWidth),
+                                  conf::getWorldToDeviceScale(conf::gWindowHeight))
+           * transform::translateMatrix(-1., -1.);
+}
 
 } // namespace conf
 } // namespace ad

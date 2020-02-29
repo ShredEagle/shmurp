@@ -1,18 +1,11 @@
 #pragma once
 
 #include "commons.h"
+#include "Instancing.h"
 
 #include <renderer/VertexSpecification.h>
 
 namespace ad {
-
-template <class T_bufferData>
-class BufferData_trait;
-
-
-template <class T_bufferData>
-AttributeDescriptionList BufferData_trait_description =
-    BufferData_trait<T_bufferData>::description_value;
 
 struct VertexShape
 {

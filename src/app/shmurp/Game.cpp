@@ -13,6 +13,7 @@
 #include "System/EnemySpawn.h"
 #include "System/KeyboardControl.h"
 #include "System/Rendering.h"
+#include "System/Rendering3D.h"
 
 #include <aunteater/UpdateTiming.h>
 
@@ -38,7 +39,8 @@ Game::Game(Application & aApplication)
 
     mEntityEngine.addSystem<BulletSpawn>();
 
-    mEntityEngine.addSystem<Rendering>();
+    //mEntityEngine.addSystem<Rendering>();
+    mEntityEngine.addSystem<Rendering3D>();
 
 
     /*
@@ -51,21 +53,21 @@ Game::Game(Application & aApplication)
                                     .add<Speed>(0., 0.)
                                     );
 
-    mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
-                                    .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
-                                    .add<Shape>(Shape::RocketShip)
-                                    .add<Speed>(0., 0.)
-                                    );
-    mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
-                                    .add<Geometry>(conf::gWindowWorldWidth-5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
-                                    .add<Shape>(Shape::RocketShip)
-                                    .add<Speed>(0., 0.)
-                                    );
-    mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Circle>(0.5f, 25))
-                                    .add<Geometry>(conf::gWindowWorldWidth/2.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
-                                    .add<Shape>(Shape::RocketShip)
-                                    .add<Speed>(0., 0.)
-                                    );
+    //mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
+    //                                .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
+    //                                .add<Shape>(Shape::RocketShip)
+    //                                .add<Speed>(0., 0.)
+    //                                );
+    //mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
+    //                                .add<Geometry>(conf::gWindowWorldWidth-5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
+    //                                .add<Shape>(Shape::RocketShip)
+    //                                .add<Speed>(0., 0.)
+    //                                );
+    //mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Circle>(0.5f, 25))
+    //                                .add<Geometry>(conf::gWindowWorldWidth/2.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
+    //                                .add<Shape>(Shape::RocketShip)
+    //                                .add<Speed>(0., 0.)
+    //                                );
 }
 
 void Game::update(const Timer & aTimer)

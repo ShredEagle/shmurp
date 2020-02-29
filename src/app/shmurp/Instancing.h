@@ -1,13 +1,23 @@
 #pragma once
 
 #include "commons.h"
-#include "shapes.h"
 
 #include <renderer/VertexSpecification.h>
-#include <renderer/Shading.h>
 
 
 namespace ad {
+
+
+// TODO This trait is more general, should be moved in Engine or Render
+/// \brief Trait to get from a video card buffer data type to its description
+template <class T_bufferData>
+class BufferData_trait;
+
+
+template <class T_bufferData>
+AttributeDescriptionList BufferData_trait_description =
+    BufferData_trait<T_bufferData>::description_value;
+
 
 template <class T_vertex, class T_instance>
 class Instancing
@@ -16,6 +26,7 @@ public:
     Instancing(
             gsl::span<const T_vertex> aVertexData,
             gsl::span<const T_instance> aInstanceData,
+            GLenum aMode,
             Vec<4, GLfloat> aColor);
 
     template <class T_iterator, class T_unaryOperation>
@@ -29,6 +40,7 @@ private:
     VertexArrayObject mVAO;
     VertexBufferObject mVertexBO;
     VertexBufferObject mInstanceBO;
+    GLenum mMode;
 
     GLsizei mVertexCount{0};
     GLsizei mInstanceCount{0};
@@ -43,10 +55,12 @@ template <class T_vertex, class T_instance>
 Instancing<T_vertex, T_instance>::Instancing(
         gsl::span<const T_vertex> aVertexData,
         gsl::span<const T_instance> aInstanceData,
+        GLenum aMode,
         Vec<4, GLfloat> aColor) :
     mVAO(),
     mVertexBO(loadVertexBuffer(mVAO, BufferData_trait_description<T_vertex>, aVertexData)),
     mInstanceBO(loadVertexBuffer(mVAO, BufferData_trait_description<T_instance>, aInstanceData, 1)),
+    mMode{aMode},
     mVertexCount(aVertexData.size()),
     mColor(aColor)
 {}
@@ -79,7 +93,7 @@ template <class T_vertex, class T_instance>
 void Instancing<T_vertex, T_instance>::draw() const
 {
     glBindVertexArray(mVAO);
-    glDrawArraysInstanced(GL_LINE_LOOP,
+    glDrawArraysInstanced(mMode,
                           0,
                           mVertexCount,
                           mInstanceCount);

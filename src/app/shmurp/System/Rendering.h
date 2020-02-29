@@ -9,6 +9,8 @@
 
 #include <aunteater/System.h>
 
+#include <renderer/Shading.h>
+
 namespace ad {
 
 class Rendering : public aunteater::System

@@ -1,9 +1,7 @@
 #include "EnemySpawn.h"
 
 #include "../configuration.h"
-
-#include <Components/Faction.h>
-#include <Components/Shape.h>
+#include "../Entities.h"
 
 #include <handy/random.h>
 
@@ -14,15 +12,13 @@ namespace ad {
 void spawn(aunteater::Engine & aEngine)
 {
     static Randomizer randomX(0, conf::gWindowWorldWidth);
+    static Randomizer randomRotation(-20, 20);
+    static constexpr GLfloat rotationQuant = 2.5f/20.f;
 
-    using aunteater::Entity;
-
-    aEngine.addEntity(Entity().add<Faction>(Faction::Democrats, Faction::TruthBullet)
-                              .add<Geometry>(randomX(),
-                                             conf::gWindowWorldHeight + conf::gViewportOffset,
-                                             conf::squareRadius)
-                              .add<Shape>(Shape::Square)
-                              .add<Speed>(0.f, -5.f));
+    aEngine.addEntity(
+            entities::makeSquare({randomX(), conf::gWindowWorldHeight + conf::gViewportOffset},
+                                 {0.f, -5.f},
+                                 {rotationQuant*randomRotation(), rotationQuant*randomRotation(), 0.f}));
 }
 
 EnemySpawn::EnemySpawn(aunteater::Engine &aEngine) :

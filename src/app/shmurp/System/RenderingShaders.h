@@ -24,15 +24,14 @@ static const char* gVertexShader3D = R"#(
 
 layout(location=0) in vec4 in_Position;
 layout(location=1) in vec2 in_InstancePosition;
-//uniform float u_Time;
+layout(location=2) in mat4 in_InstanceOrientation;
 uniform vec4 u_Color;
-uniform mat4 u_RotationSpeed;
 uniform mat4 u_WorldToDevice;
 out vec4 ex_Color;
 
 void main(void)
 {
-    gl_Position = (in_Position * (u_RotationSpeed) + vec4(in_InstancePosition, 0, 0))
+    gl_Position = (in_Position * (in_InstanceOrientation) + vec4(in_InstancePosition, 0, 0))
         * u_WorldToDevice;
     ex_Color = u_Color;
 }

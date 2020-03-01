@@ -28,11 +28,6 @@ class Rendering3D : public aunteater::System
 
         std::map<Shape::Value, ShapeInstancing> mShapeToSpecification;
         Program mProgram;
-
-        Matrix<4, GLfloat> mWorldToDevice;
-
-        // TODO should be passed by aunteater
-        double mTotalTime{0};
     };
 
 public:

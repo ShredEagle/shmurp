@@ -20,7 +20,8 @@ void Rendering3D::update(double time)
     for (const auto & renderable : mRenderables)
     {
         sorted[renderable->get<Shape>().enumerator]
-            .push_back(renderable->get<Geometry>().position);
+            .push_back({renderable->get<Geometry>().position,
+                        renderable->get<Geometry>().orientation});
     }
 
     for (auto & [shape, instancing] : mImpl.mShapeToSpecification)
@@ -34,8 +35,7 @@ void Rendering3D::update(double time)
 
 Rendering3D::Impl::Impl() :
     mProgram(makeLinkedProgram({ {GL_VERTEX_SHADER,   gVertexShader3D},
-                                 {GL_FRAGMENT_SHADER, gFragmentShader} })),
-    mWorldToDevice(conf::worldToDevice())
+                                 {GL_FRAGMENT_SHADER, gFragmentShader} }))
 {
     mShapeToSpecification.emplace(Shape::RocketShip,
                                   ShapeInstancing(
@@ -59,7 +59,7 @@ Rendering3D::Impl::Impl() :
                                       Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
 
     glProgramUniformMatrix4fv(mProgram, glGetUniformLocation(mProgram, "u_WorldToDevice"),
-                              1, true, mWorldToDevice.data());
+                              1, true, conf::worldToDevice().data());
 }
 
 void Rendering3D::Impl::draw(double time)
@@ -68,31 +68,8 @@ void Rendering3D::Impl::draw(double time)
 
     glUseProgram(mProgram);
 
-    mTotalTime += time;
-    //glProgramUniform1f(mProgram,
-    //                   glGetUniformLocation(mProgram, "u_Time"),
-    //                   mTotalTime);
-
     for (const auto & [shape, instancing] : mShapeToSpecification)
     {
-        if (shape == Shape::Square)
-        {
-            glProgramUniformMatrix4fv(mProgram,
-                                      glGetUniformLocation(mProgram, "u_RotationSpeed"),
-                                      1,
-                                      true,
-                                      (transform::rotateMatrix_X(mTotalTime * 0.6f)
-                                        * transform::rotateMatrix_Y(mTotalTime * 1.f)).data());
-        }
-        else
-        {
-            glProgramUniformMatrix4fv(mProgram,
-                                      glGetUniformLocation(mProgram, "u_RotationSpeed"),
-                                      1,
-                                      true,
-                                      Matrix<4, GLfloat>::Identity().data());
-        }
-
         glProgramUniform4fv(mProgram, glGetUniformLocation(mProgram, "u_Color"),
                             1, instancing.mColor.data());
         instancing.draw();

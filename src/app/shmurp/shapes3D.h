@@ -155,15 +155,16 @@ namespace instance3D {
 
 struct Data
 {
-    Data(Vec<2, float> aPosition) :
-        mPosition(aPosition)
-    {}
-
     Vec<2, GLfloat> mPosition;
+    Matrix<4, GLfloat> mOrientation{Matrix<4, GLfloat>::Identity()};
 };
 
 constexpr AttributeDescriptionList gDescription = {
-    { 1, 2, offsetof(Data, mPosition), MappedGL<GLfloat>::enumerator},
+    {1, 2, offsetof(Data, mPosition),      MappedGL<GLfloat>::enumerator},
+    {2, 4, offsetof(Data, mOrientation),   MappedGL<GLfloat>::enumerator},
+    {3, 4, offsetof(Data, mOrientation) +  4*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
+    {4, 4, offsetof(Data, mOrientation) +  8*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
+    {5, 4, offsetof(Data, mOrientation) + 12*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
 };
 
 } // namespace instance3D

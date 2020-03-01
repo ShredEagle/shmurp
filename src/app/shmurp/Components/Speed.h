@@ -8,15 +8,21 @@ namespace ad {
 
 struct Speed : public aunteater::Component<Speed>
 {
-    Speed(Vec<2, GLfloat> aSpeed) :
-        speed(aSpeed)
+    Speed(Vec<2, GLfloat> aTranslation) :
+        translation{aTranslation}
+    {}
+
+    Speed(Vec<2, GLfloat> aTranslation, Vec<3, GLfloat> aRotation) :
+        translation{aTranslation},
+        rotation{aRotation}
     {}
 
     Speed(GLfloat x, GLfloat y) :
-        speed(x, y)
+        translation(x, y)
     {}
 
-    Vec<2, GLfloat> speed;
+    Vec<2, GLfloat> translation;
+    Vec<3, GLfloat> rotation{Vec<3, GLfloat>::Zero()};
 };
 
 

@@ -25,6 +25,7 @@ struct Geometry : public aunteater::Component<Geometry>
 
     Vec<2, GLfloat> position;
     GLfloat radius;
+    Matrix<4, GLfloat> orientation{Matrix<4, GLfloat>::Identity()};
 };
 
 } // namespace ad

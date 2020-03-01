@@ -1,22 +1,20 @@
 #include "Displace.h"
 
-#include <Components/Geometry.h>
-#include <Components/Speed.h>
+#include "../transformations.h"
 
 namespace ad {
 
-typedef aunteater::Archetype<Geometry, Speed> Movable;
-
 Displace::Displace(aunteater::Engine &aEngine) :
-    mMovables(aEngine.getFamily<Movable>())
+    mMovables(aEngine)
 {}
 
 void Displace::update(double aDelta)
 {
-    for (auto & movable : mMovables)
+    for (auto & [geometry, speed] : mMovables)
     {
-        movable->get<Geometry>().position +=
-            static_cast<GLfloat>(aDelta) * movable->get<Speed>().speed;
+        geometry.position += static_cast<GLfloat>(aDelta) * speed.translation;
+        geometry.orientation *= transform::rotateMatrix_X(aDelta * speed.rotation.x())
+                                * transform::rotateMatrix_Y(aDelta * speed.rotation.y());
     }
 }
 

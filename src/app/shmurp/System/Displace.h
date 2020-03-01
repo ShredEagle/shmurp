@@ -1,8 +1,14 @@
 #pragma once
 
+#include <Components/Geometry.h>
+#include <Components/Speed.h>
+
+#include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
 namespace ad {
+
+typedef aunteater::Archetype<Geometry, Speed> Movable;
 
 class Displace : public aunteater::System
 {
@@ -13,7 +19,7 @@ public:
     void update(double aDelta) override;
 
 private:
-    const aunteater::Family & mMovables;
+    aunteater::FamilyHelp<Movable> mMovables;
 };
 
 } // namespace ad

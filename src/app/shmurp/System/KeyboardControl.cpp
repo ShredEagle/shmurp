@@ -80,7 +80,7 @@ void KeyboardControl::update(double time)
             mSpeedInterpolation.redirect(mTargetSpeed);
         }
 
-        movable->get<Speed>().speed = mSpeedInterpolation(time);
+        movable->get<Speed>().translation = mSpeedInterpolation(time);
 
         switch(mCallback->mFiring)
         {

@@ -39,7 +39,7 @@ void EnemySpawn::update(double time)
             {-conf::gViewportOffset, -conf::gViewportOffset},
             {conf::gWindowWorldWidth+2*conf::gViewportOffset, conf::gWindowWorldHeight+2*conf::gViewportOffset}};
 
-        if (!gGameArea.contains(static_cast<math::Position<2, GLfloat>>(candidate->get<Geometry>().position)))
+        if (!gGameArea.contains(candidate->get<Geometry>().position.as<math::Position>()))
         {
             mEngine.markToRemove(candidate);
         }

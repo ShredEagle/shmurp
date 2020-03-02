@@ -1,15 +1,14 @@
 #pragma once
 
-#include <math/Vector.h>
+#include <math/Constants.h>
 #include <math/Matrix.h>
+#include <math/Vector.h>
 
 #include <glad/glad.h>
 
 namespace ad {
 
-/// TODO move to Math lib
-template<class T>
-constexpr T pi = T(3.1415926535897932385L);
+template <class T> T pi = math::pi<T>;
 
 template <int N, class T>
 using Vec = math::Vec<N, T>;

@@ -1,4 +1,5 @@
 #include "DebugUI.h"
+#include <sstream>
 
 
 namespace ad {

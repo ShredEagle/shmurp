@@ -16,6 +16,7 @@ class ShpongConan(ConanFile):
 
     requires = (
         ("glad/0.1.29@bincrafters/stable"),
+        ("boost/1.71.0@conan/stable"),
         #Aunteater
         #Graphics
         #Math

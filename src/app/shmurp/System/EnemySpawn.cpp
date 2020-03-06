@@ -16,7 +16,7 @@ void spawn(aunteater::Engine & aEngine)
     static constexpr GLfloat rotationQuant = 2.5f/20.f;
 
     aEngine.addEntity(
-            entities::makeSquare({randomX(), conf::gWindowWorldHeight + conf::gViewportOffset},
+            entities::makeSquare({(GLfloat)randomX(), (GLfloat)(conf::gWindowWorldHeight + conf::gViewportOffset)},
                                  {0.f, -5.f},
                                  {rotationQuant*randomRotation(), rotationQuant*randomRotation(), 0.f}));
 }
@@ -36,8 +36,8 @@ void EnemySpawn::update(double time)
     for (const auto candidate : mPrunables)
     {
         static const math::Rectangle<GLfloat> gGameArea{
-            {-conf::gViewportOffset, -conf::gViewportOffset},
-            {conf::gWindowWorldWidth+2*conf::gViewportOffset, conf::gWindowWorldHeight+2*conf::gViewportOffset}};
+            {(GLfloat)(-conf::gViewportOffset), (GLfloat)(-conf::gViewportOffset)},
+            {(GLfloat)(conf::gWindowWorldWidth+2*conf::gViewportOffset), (GLfloat)(conf::gWindowWorldHeight+2*conf::gViewportOffset)}};
 
         if (!gGameArea.contains(static_cast<math::Position<2, GLfloat>>(candidate->get<Geometry>().position)))
         {

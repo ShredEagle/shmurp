@@ -12,13 +12,11 @@ namespace ad {
 void spawn(aunteater::Engine & aEngine)
 {
     static Randomizer randomX(0, conf::gWindowWorldWidth);
-    static Randomizer randomRotation(-20, 20);
-    static constexpr GLfloat rotationQuant = 2.5f/20.f;
 
     aEngine.addEntity(
             entities::makeSquare({randomX(), conf::gWindowWorldHeight + conf::gViewportOffset},
                                  {0.f, -5.f},
-                                 {rotationQuant*randomRotation(), rotationQuant*randomRotation(), 0.f}));
+                                 {0.4f, 1.1f, 0.f}));
 }
 
 EnemySpawn::EnemySpawn(aunteater::Engine &aEngine) :

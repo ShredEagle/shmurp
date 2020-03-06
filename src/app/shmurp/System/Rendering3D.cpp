@@ -7,8 +7,10 @@
 
 namespace ad {
 
-Rendering3D::Rendering3D(aunteater::Engine &aEngine) :
-    mRenderables(aEngine)
+Rendering3D::Rendering3D(aunteater::Engine &aEngine,
+                         Size<2, GLsizei> aResolution) :
+    mRenderables{aEngine},
+    mImpl{aResolution}
 {
     glClearColor(0.04f, 0.08f, 0.12f, 1.f);
 }
@@ -33,9 +35,10 @@ void Rendering3D::update(double time)
     mImpl.draw(time);
 }
 
-Rendering3D::Impl::Impl() :
-    mProgram(makeLinkedProgram({ {GL_VERTEX_SHADER,   gVertexShader3D},
-                                 {GL_FRAGMENT_SHADER, gFragmentShader} }))
+Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution) :
+    mProgram{makeLinkedProgram({ {GL_VERTEX_SHADER,   gVertexShader3D},
+                                 {GL_FRAGMENT_SHADER, gFragmentShader} })},
+    mOkBloomer{aResolution}
 {
     mShapeToSpecification.emplace(Shape::RocketShip,
                                   ShapeInstancing(
@@ -64,16 +67,22 @@ Rendering3D::Impl::Impl() :
 
 void Rendering3D::Impl::draw(double time)
 {
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glUseProgram(mProgram);
-
-    for (const auto & [shape, instancing] : mShapeToSpecification)
     {
-        glProgramUniform4fv(mProgram, glGetUniformLocation(mProgram, "u_Color"),
-                            1, instancing.mColor.data());
-        instancing.draw();
+        auto offscreenGuard{mOkBloomer.bindFramebuffer()};
+
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(mProgram);
+
+        for (const auto & [shape, instancing] : mShapeToSpecification)
+        {
+            glProgramUniform4fv(mProgram, glGetUniformLocation(mProgram, "u_Color"),
+                                1, instancing.mColor.data());
+            instancing.draw();
+        }
     }
+
+    mOkBloomer.drawResult();
 }
 
 } // namespace add

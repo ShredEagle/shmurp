@@ -2,10 +2,13 @@ project(shmurp)
 
 set(${PROJECT_NAME}_HEADERS
     commons.h
+    Bloom.h
+    BloomShaders.h
     DebugUI.h
     Entities.h
     Game.h
     Instancing.h
+    ScreenQuad.h
     shapes.h
     shapes3D.h
 

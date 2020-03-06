@@ -14,6 +14,9 @@ template <int N, class T>
 using Vec = math::Vec<N, T>;
 
 template <int N, class T>
+using Size = math::Size<N, T>;
+
+template <int N, class T>
 using Matrix = math::Matrix<N, N, T>;
 
 using Radians = GLfloat;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Bloom.h"
 #include "../commons.h"
 #include "../Instancing.h"
 #include "../shapes3D.h"
@@ -23,15 +24,17 @@ class Rendering3D : public aunteater::System
 
     struct Impl
     {
-        Impl();
+        Impl(Size<2, GLsizei> aResolution);
         void draw(double time);
 
         std::map<Shape::Value, ShapeInstancing> mShapeToSpecification;
         Program mProgram;
+
+        Bloom mOkBloomer;
     };
 
 public:
-    Rendering3D(aunteater::Engine &aEngine);
+    Rendering3D(aunteater::Engine &aEngine, Size<2, GLsizei> aResolution);
 
     void update(double time) override;
 

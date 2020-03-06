@@ -40,7 +40,7 @@ Game::Game(Application & aApplication)
     mEntityEngine.addSystem<BulletSpawn>();
 
     //mEntityEngine.addSystem<Rendering>();
-    mEntityEngine.addSystem<Rendering3D>();
+    mEntityEngine.addSystem<Rendering3D>(aApplication.mEngine->getFramebufferSize());
 
 
     /*

@@ -25,6 +25,13 @@ public:
                            glGetUniformLocation(mVBlurProgram, "inputTexture"),
                            1);
 
+        glProgramUniform1i(mScreenProgram,
+                           glGetUniformLocation(mScreenProgram, "sceneTexture"),
+                           1);
+        glProgramUniform1i(mScreenProgram,
+                           glGetUniformLocation(mScreenProgram, "bloomTexture"),
+                           0);
+
         allocateStorage(mTextureScene, GL_RGBA8, aResolution);
         allocateStorage(mTexturePing,  GL_RGBA8, aResolution);
         allocateStorage(mTexturePong,  GL_RGBA8, aResolution);
@@ -53,14 +60,19 @@ public:
 
         glActiveTexture(GL_TEXTURE0);
         bind(mTexturePing);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         glActiveTexture(GL_TEXTURE1);
         bind(mTexturePong);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         for (int pass = 0; pass != 2*aPasses; ++pass)
         {
+            // when pass is pair: ping is rendering to pong
             glUseProgram(pass%2 ? mVBlurProgram : mHBlurProgram);
-            glBindFramebuffer(GL_FRAMEBUFFER, pass%2 ? mPingFB : mPongFB);
+            bind_guard boundFB{pass%2 ? mPingFB : mPongFB};
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
     }
@@ -69,13 +81,15 @@ public:
     {
         glBindVertexArray(mScreenQuad.mVertexArray);
 
+        // in case other code bound something else since bloom()
         glActiveTexture(GL_TEXTURE0);
+        bind(mTexturePing);
+
+        // replaces pong texture
+        glActiveTexture(GL_TEXTURE1);
         bind(mTextureScene);
 
         glUseProgram(mScreenProgram);
-        glProgramUniform1i(mScreenProgram,
-                           glGetUniformLocation(mScreenProgram, "sceneTexture"),
-                           0);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }

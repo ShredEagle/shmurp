@@ -41,11 +41,13 @@ static const char* gFragmentShader = R"#(
 #version 400
 
 in vec4 ex_Color;
-out vec4 out_Color;
+layout (location=0) out vec4 out_Scene;
+layout (location=1) out vec4 out_Bloom;
 
 void main(void)
 {
-    out_Color = ex_Color;
+    out_Scene = ex_Color;
+    out_Bloom = ex_Color;
 }
 )#";
 

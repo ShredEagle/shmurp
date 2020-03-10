@@ -22,16 +22,16 @@ in vec2 ex_TexCoords;
 out vec4 out_Color;
 
 uniform sampler2D sceneTexture;
-//uniform sampler2D bloomTexture;
+uniform sampler2D bloomTexture;
 
 void main(void)
 {
-    out_Color = texture(sceneTexture, ex_TexCoords);
+    //out_Color = texture(sceneTexture, ex_TexCoords);
 
     //out_Color = texture(bloomTexture, ex_TexCoords);
 
-    //out_Color = texture(sceneTexture, ex_TexCoords)
-    //            + texture(bloomTexture, ex_TexCoords);
+    out_Color = texture(sceneTexture, ex_TexCoords)
+                + texture(bloomTexture, ex_TexCoords);
 }
 )#";
 
@@ -48,7 +48,7 @@ out vec4 out_Color;
 uniform sampler2D inputTexture;
 vec2 textureSize = textureSize(inputTexture, 0);
 
-float weights[] = float[](0.4, 0.2, 0.1, 0.08, 0.05, 0.05, 0.05, 0.03, 0.02, 0.01);
+float weights[] = float[](0.4, 0.21, 0.1, 0.08, 0.05, 0.03, 0.02, 0.01);
 
 void main(void)
 {
@@ -73,7 +73,7 @@ uniform sampler2D inputTexture;
 vec2 textureSize = textureSize(inputTexture, 0);
 
 //float weights[4] = float[](0.3, 0.2, 0.1, 0.05);
-float weights[] = float[](0.4, 0.2, 0.1, 0.08, 0.05, 0.05, 0.05, 0.03, 0.02, 0.01);
+float weights[] = float[](0.4, 0.21, 0.1, 0.08, 0.05, 0.03, 0.02, 0.01);
 
 void main(void)
 {

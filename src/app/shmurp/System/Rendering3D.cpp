@@ -71,6 +71,7 @@ void Rendering3D::Impl::draw(double time)
         auto offscreenGuard{mOkBloomer.bindFramebuffer()};
 
         glClear(GL_COLOR_BUFFER_BIT);
+        glClearBufferfv(GL_COLOR, 1, gBlack.data());
 
         glUseProgram(mProgram);
 
@@ -82,6 +83,7 @@ void Rendering3D::Impl::draw(double time)
         }
     }
 
+    mOkBloomer.bloom(2);
     mOkBloomer.drawResult();
 }
 

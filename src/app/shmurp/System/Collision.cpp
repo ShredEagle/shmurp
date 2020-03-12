@@ -16,7 +16,13 @@ void Collision::update(double aDelta)
             if(   (attacker->get<Faction>().isAttacking(defender->get<Faction>()))
                && (attacker->get<Geometry>().isColliding(defender->get<Geometry>())) )
             {
-                mEngine.markToRemove(defender);
+                defender->get<HitPoints>().hp -= 1;
+
+                if (defender->get<HitPoints>().hp == 0)
+                {
+                  mEngine.markToRemove(defender);
+                }
+
                 if (defender->get<Faction>().isAttacking(attacker->get<Faction>()))
                 {
                     mEngine.markToRemove(attacker);

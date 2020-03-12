@@ -186,6 +186,24 @@ std::vector<vertex3D::Data> makeVertices(GLfloat aRadius)
 
 } // namespace circle3D
 
+namespace filledSquare3D {
+
+static const std::array<vertex3D::Data, 4> gVertices = {
+    vertex3D::Data{
+        {1.f, 1.f, 0.f},
+    },
+    vertex3D::Data{
+        {1.f,  0.f, 0.f},
+    },
+    vertex3D::Data{
+        {0.f,  0.f, 0.f},
+    },
+    vertex3D::Data{
+        { 0.f,  1.f, 0.f},
+    }
+};
+}
+
 namespace instance3D {
 
 struct Data

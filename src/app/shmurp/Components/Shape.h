@@ -11,6 +11,7 @@ struct Shape : public aunteater::Component<Shape>
         Circle,
         RocketShip,
         Square,
+        FilledSquare,
     };
 
     Shape(Value aEnumerator) :

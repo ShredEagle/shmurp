@@ -2,6 +2,7 @@
 
 #include <Components/Faction.h>
 #include <Components/Geometry.h>
+#include <Components/HitPoints.h>
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
@@ -9,7 +10,7 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<Faction, Geometry> Colliding;
+typedef aunteater::Archetype<Faction, Geometry, HitPoints> Colliding;
 
 class Collision : public aunteater::System
 {

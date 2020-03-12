@@ -6,6 +6,7 @@
 #include <Components/Geometry.h>
 #include <Components/Shape.h>
 #include <Components/Speed.h>
+#include <Components/HitPoints.h>
 
 #include <aunteater/Entity.h>
 
@@ -17,6 +18,7 @@ inline aunteater::Entity makeEnemyBullet(Vec<2, GLfloat> aPosition, Vec<4, GLflo
     return aunteater::Entity().add<Faction>(Faction::LibLies, Faction::SpaceForce)
                               .add<Geometry>(aPosition, conf::gBulletRadius)
                               .add<Shape>(Shape::Circle)
+                              .add<HitPoints>(1)
                               .add<Speed>(aSpeed.x(), aSpeed.y());
 }
 
@@ -25,6 +27,7 @@ inline aunteater::Entity makeFriendBullet(Vec<2, GLfloat> aPosition, Vec<4, GLfl
     return aunteater::Entity().add<Faction>(Faction::TruthBullet, Faction::Democrats)
                               .add<Geometry>(aPosition, conf::gBulletRadius)
                               .add<Shape>(Shape::Circle)
+                              .add<HitPoints>(1)
                               .add<Speed>(aSpeed.x(), aSpeed.y());
 }
 
@@ -32,10 +35,11 @@ inline aunteater::Entity makeSquare(Vec<2, GLfloat> aPosition,
                                     Vec<2, GLfloat> aTranslationSpeed,
                                     Vec<3, GLfloat> aRotationSpeed)
 {
-    return aunteater::Entity().add<Faction>(Faction::Democrats, Faction::TruthBullet)
+    return aunteater::Entity().add<Faction>(Faction::Democrats, 0)
                               .add<Geometry>(aPosition, conf::squareRadius)
                               .add<Shape>(Shape::Square)
-                              .add<Speed>(aTranslationSpeed, aRotationSpeed);
+                              .add<HitPoints>(10)
+                              .add<Speed>(aTranslationSpeed, aRotationSpeed); 
 }
 
 } // namespace entities

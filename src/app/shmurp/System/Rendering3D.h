@@ -6,6 +6,7 @@
 
 #include <Components/Geometry.h>
 #include <Components/Shape.h>
+#include <Components/HitPoints.h>
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
@@ -14,8 +15,6 @@
 #include <renderer/Shading.h>
 
 namespace ad {
-
-typedef aunteater::Archetype<Geometry, Shape> Renderable;
 
 class Rendering3D : public aunteater::System
 {
@@ -36,7 +35,8 @@ public:
     void update(double time) override;
 
 private:
-    aunteater::FamilyHelp<Renderable> mRenderables;
+    aunteater::Family &mRenderables;
+    aunteater::Family &mHealthBarRenderables;
     Impl mImpl;
 };
 

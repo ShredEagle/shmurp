@@ -6,6 +6,7 @@
 #include "Components/Faction.h"
 #include "Components/Geometry.h"
 #include "Components/Shape.h"
+#include "Components/HitPoints.h"
 
 #include "System/BulletSpawn.h"
 #include "System/Collision.h"
@@ -49,6 +50,7 @@ Game::Game(Application & aApplication)
     mEntityEngine.addEntity(Entity().add<ControlDevice>(0)
                                     .add<Faction>(Faction::SpaceForce, Faction::Democrats)
                                     .add<Geometry>(conf::shipInitialX, conf::shipInitialY, conf::shipRadius)
+                                    .add<HitPoints>(1)
                                     .add<Shape>(Shape::RocketShip)
                                     .add<Speed>(0., 0.)
                                     );

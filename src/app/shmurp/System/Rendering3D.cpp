@@ -7,8 +7,12 @@
 
 namespace ad {
 
+typedef aunteater::Archetype<Geometry, Shape> Renderable;
+typedef aunteater::Archetype<Geometry, HitPoints> HealthBarRenderables;
+
 Rendering3D::Rendering3D(aunteater::Engine &aEngine) :
-    mRenderables(aEngine)
+    mRenderables(aEngine.getFamily<Renderable>()),
+    mHealthBarRenderables(aEngine.getFamily<HealthBarRenderables>())
 {
     glClearColor(0.04f, 0.08f, 0.12f, 1.f);
 }
@@ -22,6 +26,15 @@ void Rendering3D::update(double time)
         sorted[renderable->get<Shape>().enumerator]
             .push_back({renderable->get<Geometry>().position,
                         renderable->get<Geometry>().orientation});
+    }
+
+    for (const auto & renderable : mHealthBarRenderables)
+    {
+        const float hpPercentage = static_cast<float>(renderable->get<HitPoints>().hp) / static_cast<float>(renderable->get<HitPoints>().totalHp);
+        std::cerr << hpPercentage << " " << renderable->get<HitPoints>().hp << " " << renderable->get<HitPoints>().totalHp << "\n";
+        sorted[Shape::FilledSquare]
+            .push_back({renderable->get<Geometry>().position + Vec<2, GLfloat>({0.f, 1.f}),
+                        transform::scaleMatrix(hpPercentage, 0.2f)});
     }
 
     for (auto & [shape, instancing] : mImpl.mShapeToSpecification)
@@ -57,6 +70,14 @@ Rendering3D::Impl::Impl() :
                                       {},
                                       GL_TRIANGLE_FAN,
                                       Vec<4, GLfloat>(0.44f, 0.9f, 1.0f, 1.0f)));
+
+    mShapeToSpecification.emplace(Shape::FilledSquare,
+                                  ShapeInstancing(
+                                      filledSquare3D::gVertices,
+                                      {},
+                                      GL_TRIANGLE_FAN,
+                                      Vec<4, GLfloat>(1.f, 1.f, 1.f, 1.0f)));
+
 
     glProgramUniformMatrix4fv(mProgram, glGetUniformLocation(mProgram, "u_WorldToDevice"),
                               1, true, conf::worldToDevice().data());

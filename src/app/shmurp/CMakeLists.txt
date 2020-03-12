@@ -14,6 +14,7 @@ set(${PROJECT_NAME}_HEADERS
     Components/Geometry.h
     Components/Shape.h
     Components/Speed.h
+    Components/HitPoints.h
 
     System/BulletSpawn.h
     System/Collision.h

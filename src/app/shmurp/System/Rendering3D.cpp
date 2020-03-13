@@ -12,7 +12,8 @@ Rendering3D::Rendering3D(aunteater::Engine &aEngine,
     mRenderables{aEngine},
     mImpl{aResolution}
 {
-    glClearColor(0.04f, 0.08f, 0.12f, 1.f);
+    //glClearColor(0.04f, 0.08f, 0.12f, 1.f);
+    glClearColor(0.f, 0.f, 0.f, 1.f);
 }
 
 void Rendering3D::update(double time)
@@ -89,7 +90,7 @@ void Rendering3D::Impl::draw(double time)
     }
 
     glDisablei(GL_BLEND, 0);
-    mOkBloomer.bloom(2);
+    mOkBloomer.bloom(3);
     mOkBloomer.drawResult();
 }
 

@@ -57,8 +57,8 @@ void main(void)
 
     for(int i=1; i<weights.length(); ++i)
     {
-        out_Color += weights[i] * texture(inputTexture, ex_TexCoords - (i*texOffset));
-        out_Color += weights[i] * texture(inputTexture, ex_TexCoords + (i*texOffset));
+        out_Color += weights[i]/2.0 * texture(inputTexture, ex_TexCoords - (i*texOffset));
+        out_Color += weights[i]/2.0 * texture(inputTexture, ex_TexCoords + (i*texOffset));
     }
 }
 )#";
@@ -78,7 +78,7 @@ float weights[] = float[](0.4, 0.21, 0.1, 0.08, 0.05, 0.03, 0.02, 0.01);
 void main(void)
 {
     out_Color = weights[0] * texture(inputTexture, ex_TexCoords);
-    vec2 texOffset = vec2(0., 1.0/textureSize.x);
+    vec2 texOffset = vec2(0., 1.0/textureSize.y);
 
     for(int i=1; i<weights.length(); ++i)
     {

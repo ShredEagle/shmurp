@@ -35,6 +35,10 @@ void KeyboardControl::Callback::operator()(int key, int scancode, int action, in
         {
             mFiring = Edge::Press;
         }
+        if (key == GLFW_KEY_P)
+        {
+            mEngine.pause(!mEngine.isPaused());
+        }
     }
     else if (action == GLFW_RELEASE)
     {
@@ -95,7 +99,6 @@ void KeyboardControl::update(double time)
             default: break;
         }
     }
-
 }
 
 } // namespace ad

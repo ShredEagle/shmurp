@@ -34,8 +34,13 @@ class KeyboardControl : public aunteater::System
 
     struct Callback
     {
+        explicit Callback(aunteater::Engine & aEngine) :
+            mEngine(aEngine)
+        {}
+
         void operator()(int key, int scancode, int action, int mods);
 
+        aunteater::Engine & mEngine;
         short mDirection{0};
         Edge mFiring{Edge::None};
     };
@@ -47,13 +52,13 @@ public:
     std::shared_ptr<Callback> getCallback();
 
 private:
-    std::shared_ptr<Callback> mCallback{std::make_shared<Callback>()};
+    aunteater::Engine & mEngine;
+    std::shared_ptr<Callback> mCallback{std::make_shared<Callback>(mEngine)};
     aunteater::Family & mPlayerMovable;
     Vec<2, GLfloat> mTargetSpeed{0.f, 0.f};
     Interpolation<Vec<2, GLfloat>, GLfloat> mSpeedInterpolation{mTargetSpeed,
                                                                 mTargetSpeed,
                                                                 conf::gShipAccelerationFactor};
-    aunteater::Engine & mEngine;
 };
 
 inline std::shared_ptr<KeyboardControl::Callback> KeyboardControl::getCallback()

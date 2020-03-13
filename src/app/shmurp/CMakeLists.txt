@@ -55,6 +55,13 @@ add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_HEADERS}
 )
 
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE "-fno-omit-frame-pointer" "-fsanitize=address")
+    target_link_options(${PROJECT_NAME}
+        PRIVATE "-fsanitize=address")
+endif()
+
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(${PROJECT_NAME}

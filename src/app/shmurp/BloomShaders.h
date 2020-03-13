@@ -26,12 +26,12 @@ uniform sampler2D bloomTexture;
 
 void main(void)
 {
-    //out_Color = texture(sceneTexture, ex_TexCoords);
+    out_Color = texture(sceneTexture, ex_TexCoords);
 
     //out_Color = texture(bloomTexture, ex_TexCoords);
 
-    out_Color = texture(sceneTexture, ex_TexCoords)
-                + texture(bloomTexture, ex_TexCoords);
+    //out_Color = texture(sceneTexture, ex_TexCoords)
+    //            + texture(bloomTexture, ex_TexCoords);
 }
 )#";
 

@@ -14,7 +14,7 @@ void spawn(aunteater::Engine & aEngine)
     static Randomizer randomX(0, conf::gWindowWorldWidth);
 
     aEngine.addEntity(
-            entities::makeSquare({randomX(), conf::gWindowWorldHeight + conf::gViewportOffset},
+            entities::makeSquare({static_cast<float>(randomX()), static_cast<float>(conf::gWindowWorldHeight + conf::gViewportOffset)},
                                  {0.f, -5.f},
                                  {0.4f, 1.1f, 0.f}));
 }

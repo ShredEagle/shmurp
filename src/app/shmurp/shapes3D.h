@@ -67,10 +67,10 @@ static const std::array<vertex3D::Data, 8*3> gVertices = {
         { 0.3f,  0.3f, 0.3f},
     },
     vertex3D::Data{
-        { 0.3f,  -0.3, 0.3f},
+        { 0.3f,  -0.3f, 0.3f},
     },
     vertex3D::Data{
-        { 0.3f,  -0.3, 0.3f},
+        { 0.3f,  -0.3f, 0.3f},
     },
     vertex3D::Data{
         {-0.3f, -0.3f, 0.3f},
@@ -93,10 +93,10 @@ static const std::array<vertex3D::Data, 8*3> gVertices = {
         { 0.3f,  0.3f, -0.3f},
     },
     vertex3D::Data{
-        { 0.3f,  -0.3, -0.3f},
+        { 0.3f,  -0.3f, -0.3f},
     },
     vertex3D::Data{
-        { 0.3f,  -0.3, -0.3f},
+        { 0.3f,  -0.3f, -0.3f},
     },
     vertex3D::Data{
         {-0.3f, -0.3f, -0.3f},
@@ -122,10 +122,10 @@ static const std::array<vertex3D::Data, 8*3> gVertices = {
         { 0.3f,  0.3f, +0.3f},
     },
     vertex3D::Data{
-        { 0.3f,  -0.3, -0.3f},
+        { 0.3f,  -0.3f, -0.3f},
     },
     vertex3D::Data{
-        { 0.3f,  -0.3, +0.3f},
+        { 0.3f,  -0.3f, +0.3f},
     },
 };
 

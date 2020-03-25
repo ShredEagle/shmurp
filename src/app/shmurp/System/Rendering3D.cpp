@@ -45,21 +45,21 @@ Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution) :
                                       ship3D::gVertices,
                                       {},
                                       GL_LINE_LOOP,
-                                      Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
+                                      Vec<4, GLfloat>(0.44f, 0.9f, 1.0f, 1.0f)));
 
     mShapeToSpecification.emplace(Shape::Square,
                                   ShapeInstancing(
                                       cube::gVertices,
                                       {},
                                       GL_LINES,
-                                      Vec<4, GLfloat>(0.96, 0.14, 0.97, 1.0)));
+                                      Vec<4, GLfloat>(0.96f, 0.14f, 0.97f, 1.0f)));
 
     mShapeToSpecification.emplace(Shape::Circle,
                                   ShapeInstancing(
                                       circle3D::makeVertices<30>(conf::gBulletRadius),
                                       {},
                                       GL_TRIANGLE_FAN,
-                                      Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
+                                      Vec<4, GLfloat>(0.44f, 0.9f, 1.0f, 1.0f)));
 
     glProgramUniformMatrix4fv(mProgram, glGetUniformLocation(mProgram, "u_WorldToDevice"),
                               1, true, conf::worldToDevice().data());

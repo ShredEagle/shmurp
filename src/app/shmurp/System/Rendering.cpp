@@ -48,14 +48,14 @@ Rendering::Impl::Impl() :
                                       gsl::span<const VertexShape>(triangle::gVertices),
                                       gsl::span<const instance::Data>(),
                                       GL_LINE_LOOP,
-                                      Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
+                                      Vec<4, GLfloat>(0.44f, 0.9f, 1.0f, 1.0f)));
 
     mShapeToSpecification.emplace(Shape::Square,
                                   ShapeInstancing(
                                       gsl::span<const VertexShape>(square::gVertices),
                                       gsl::span<const instance::Data>(),
                                       GL_LINE_LOOP,
-                                      Vec<4, GLfloat>(0.96, 0.14, 0.97, 1.0)));
+                                      Vec<4, GLfloat>(0.96f, 0.14f, 0.97f, 1.0f)));
 
     mShapeToSpecification.emplace(Shape::Circle,
                                   ShapeInstancing(
@@ -63,7 +63,7 @@ Rendering::Impl::Impl() :
                                           circle::makeVertices<20>(conf::gBulletRadius)),
                                       gsl::span<const instance::Data>(),
                                       GL_LINE_LOOP,
-                                      Vec<4, GLfloat>(0.44, 0.9, 1.0, 1.0)));
+                                      Vec<4, GLfloat>(0.44f, 0.9f, 1.0f, 1.0f)));
 
     glProgramUniformMatrix4fv(mProgram, glGetUniformLocation(mProgram, "u_WorldToDevice"),
                               1, true, mWorldToDevice.data());

@@ -1,27 +1,57 @@
 from conans import ConanFile, CMake, tools
 
+from os import path
 
-class ShpongConan(ConanFile):
+
+class ShmurpConan(ConanFile):
     name = "shmurp"
     version = "0.0.0"
     license = "The Unlicense"
     author = "adnn"
     url = "https://github.com/Adnn/shmurp"
     description = "Shoot them urp!"
-    topics = ("opengl", "2D", "Game")
+    topics = ("opengl", "2D", "game")
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
-    generators = "cmake_paths", "cmake"
-    build_policy = "missing"
-
-    requires = (
-        ("glad/0.1.29@bincrafters/stable"),
-        #Aunteater
-        #Graphics
-        #Math
-        #Websockets
-    )
-
     default_options = {
         "shared": False,
     }
+
+    requires = (
+        ("glad/0.1.29@bincrafters/stable"),
+
+        ("2d/local"),
+        ("aunteater/local"),
+        ("math/local"),
+        ("websocket/local"),
+    )
+
+    build_requires = ("cmake_installer/[>=3.16]@conan/stable",)
+
+    generators = "cmake_paths", "cmake"
+    build_policy = "missing"
+
+    scm = {
+        "type": "git",
+        "url": "auto",
+        "revision": "auto",
+        "submodule": "recursive",
+    }
+
+
+    def _configure_cmake(self):
+        cmake = CMake(self)
+        cmake.definitions["CMAKE_PROJECT_Shmurp_INCLUDE"] = \
+            path.join(self.source_folder, "cmake", "conan", "customconan.cmake")
+        cmake.configure()
+        return cmake
+
+
+    def build(self):
+        cmake = self._configure_cmake()
+        cmake.build()
+
+
+    def package(self):
+        cmake = self._configure_cmake()
+        cmake.install()

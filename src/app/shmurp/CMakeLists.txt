@@ -1,4 +1,4 @@
-project(shmurp)
+project(shmurp VERSION "${CMAKE_PROJECT_VERSION}")
 
 set(${PROJECT_NAME}_HEADERS
     commons.h
@@ -68,3 +68,14 @@ target_link_libraries(${PROJECT_NAME}
 
         glad::glad
 )
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+                      VERSION "${${PROJECT_NAME}_VERSION}"
+)
+
+
+##
+## Install
+##
+
+install(TARGETS ${PROJECT_NAME})

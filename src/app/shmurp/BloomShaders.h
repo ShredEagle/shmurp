@@ -26,12 +26,12 @@ uniform sampler2D bloomTexture;
 
 void main(void)
 {
-    out_Color = texture(sceneTexture, ex_TexCoords);
+    //out_Color = texture(sceneTexture, ex_TexCoords);
 
     //out_Color = texture(bloomTexture, ex_TexCoords);
 
-    //out_Color = texture(sceneTexture, ex_TexCoords)
-    //            + texture(bloomTexture, ex_TexCoords);
+    out_Color = texture(sceneTexture, ex_TexCoords)
+                + texture(bloomTexture, ex_TexCoords);
 }
 )#";
 
@@ -48,7 +48,7 @@ out vec4 out_Color;
 uniform sampler2D inputTexture;
 vec2 textureSize = textureSize(inputTexture, 0);
 
-float weights[] = float[](0.4, 0.21, 0.1, 0.08, 0.05, 0.03, 0.02, 0.01);
+float weights[] = float[](0.44, 0.25, 0.12, 0.08, 0.05, 0.03, 0.02, 0.01);
 
 void main(void)
 {
@@ -73,7 +73,7 @@ uniform sampler2D inputTexture;
 vec2 textureSize = textureSize(inputTexture, 0);
 
 //float weights[4] = float[](0.3, 0.2, 0.1, 0.05);
-float weights[] = float[](0.4, 0.21, 0.1, 0.08, 0.05, 0.03, 0.02, 0.01);
+float weights[] = float[](0.44, 0.25, 0.12, 0.08, 0.05, 0.03, 0.02, 0.01);
 
 void main(void)
 {
@@ -82,6 +82,7 @@ void main(void)
 
     for(int i=1; i<weights.length(); ++i)
     {
+        // Dividing by 2 would make a too weak effect...
         out_Color += weights[i] * texture(inputTexture, ex_TexCoords - (i*texOffset));
         out_Color += weights[i] * texture(inputTexture, ex_TexCoords + (i*texOffset));
     }

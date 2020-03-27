@@ -17,7 +17,9 @@ class Game
 public:
     Game(Application & aApplication);
 
-    void update(const Timer & aTimer);
+    /// \return True if an the simulation was updated
+    /// (i.e. a new frame was generated, and buffers should be swapped)
+    bool update(const Timer & aTimer);
 
 private:
     aunteater::Engine mEntityEngine;

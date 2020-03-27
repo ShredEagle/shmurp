@@ -17,10 +17,13 @@ int main(int argc, const char * argv[])
 
         shmurp::Game game(application);
 
-        while(application.nextFrame())
+        while(application.handleEvents())
         {
             timer.mark(glfwGetTime());
-            game.update(timer);
+            if(game.update(timer))
+            {
+                application.swapBuffers();
+            }
         }
     }
     catch(const std::exception & e)

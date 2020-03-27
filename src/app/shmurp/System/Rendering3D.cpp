@@ -37,7 +37,7 @@ void Rendering3D::update(double time)
 
 Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution) :
     mProgram{makeLinkedProgram({ {GL_VERTEX_SHADER,   gVertexShader3D},
-                                 {GL_FRAGMENT_SHADER, gFragmentShader} })},
+                                 {GL_FRAGMENT_SHADER, gFragmentShader3D} })},
     mOkBloomer{aResolution}
 {
     mShapeToSpecification.emplace(Shape::RocketShip,
@@ -73,6 +73,10 @@ void Rendering3D::Impl::draw(double time)
         glClear(GL_COLOR_BUFFER_BIT);
         glClearBufferfv(GL_COLOR, 1, gBlack.data());
 
+        //glEnable(GL_BLEND);
+        //glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+        //glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE);
+
         glUseProgram(mProgram);
 
         for (const auto & [shape, instancing] : mShapeToSpecification)
@@ -83,7 +87,8 @@ void Rendering3D::Impl::draw(double time)
         }
     }
 
-    mOkBloomer.bloom(2);
+    //glDisablei(GL_BLEND, 0);
+    mOkBloomer.bloom(4);
     mOkBloomer.drawResult();
 }
 

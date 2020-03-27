@@ -70,12 +70,14 @@ Game::Game(Application & aApplication)
     //                                );
 }
 
-void Game::update(const Timer & aTimer)
+bool Game::update(const Timer & aTimer)
 {
     aunteater::UpdateTiming timings;
     mEntityEngine.update(aTimer.delta(), timings);
 
     mUI.broadcast(timings);
+
+    return ! mEntityEngine.isPaused();
 }
 
 } // namespace shmurp

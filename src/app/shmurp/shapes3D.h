@@ -13,10 +13,12 @@ namespace vertex3D
 struct Data
 {
     Vec<3, GLfloat> mPosition;
+    Vec<3, GLfloat> mNormal{0.f, 0.f, 1.f};
 };
 
 constexpr AttributeDescriptionList gDescription = {
     { 0, 3, offsetof(Data, mPosition), MappedGL<GLfloat>::enumerator},
+    { 1, 3, offsetof(Data, mNormal), MappedGL<GLfloat>::enumerator},
 };
 
 } // namespace vertex3D
@@ -49,83 +51,109 @@ static const std::array<vertex3D::Data, 4> gVertices = {
 
 namespace cube {
 
+static constexpr float cpi4 = 0.70710678f;
+
 static const std::array<vertex3D::Data, 8*3> gVertices = {
-    //Upface
+    // Frontface
     vertex3D::Data{
         {-0.3f, -0.3f, 0.3f},
+        {-cpi4,  0.0f, cpi4},
     },
     vertex3D::Data{
         {-0.3f,  0.3f, 0.3f},
+        {-cpi4,  0.0f, cpi4},
     },
     vertex3D::Data{
         {-0.3f,  0.3f, 0.3f},
+        { 0.0f,  cpi4, cpi4},
     },
     vertex3D::Data{
         { 0.3f,  0.3f, 0.3f},
+        { 0.0f,  cpi4, cpi4},
     },
     vertex3D::Data{
         { 0.3f,  0.3f, 0.3f},
+        { cpi4,  0.0f, cpi4},
     },
     vertex3D::Data{
         { 0.3f,  -0.3f, 0.3f},
+        { cpi4,  0.0f,  cpi4},
     },
     vertex3D::Data{
-        { 0.3f,  -0.3f, 0.3f},
+        { 0.3f, -0.3f, 0.3f},
+        { 0.0f, -cpi4, cpi4},
     },
     vertex3D::Data{
         {-0.3f, -0.3f, 0.3f},
+        { 0.0f, -cpi4, cpi4},
     },
 
-    //Lowface
+    // Backface
     vertex3D::Data{
         {-0.3f, -0.3f, -0.3f},
+          {-cpi4,  0.0f, -cpi4},
     },
     vertex3D::Data{
         {-0.3f,  0.3f, -0.3f},
+        {-cpi4,  0.0f, -cpi4},
     },
     vertex3D::Data{
         {-0.3f,  0.3f, -0.3f},
+        { 0.0f,  cpi4, -cpi4},
     },
     vertex3D::Data{
         { 0.3f,  0.3f, -0.3f},
+        { 0.0f,  cpi4, -cpi4},
     },
     vertex3D::Data{
         { 0.3f,  0.3f, -0.3f},
+        { cpi4,  0.0f, -cpi4},
     },
     vertex3D::Data{
         { 0.3f,  -0.3f, -0.3f},
+        { cpi4,   0.0f, -cpi4},
     },
     vertex3D::Data{
-        { 0.3f,  -0.3f, -0.3f},
+        { 0.3f, -0.3f, -0.3f},
+        { 0.0f, -cpi4, -cpi4},
     },
     vertex3D::Data{
         {-0.3f, -0.3f, -0.3f},
+        { 0.0f, -cpi4, -cpi4},
     },
 
-    //Connect
+    // Connect
     vertex3D::Data{
         {-0.3f, -0.3f, -0.3f},
+        {-cpi4, -cpi4,  0.0f},
     },
     vertex3D::Data{
         {-0.3f, -0.3f, +0.3f},
+        {-cpi4, -cpi4,  0.0f},
     },
     vertex3D::Data{
         {-0.3f,  0.3f, -0.3f},
+        {-cpi4,  cpi4,  0.0f},
     },
     vertex3D::Data{
         {-0.3f,  0.3f, +0.3f},
+        {-cpi4,  cpi4,  0.0f},
     },
     vertex3D::Data{
         { 0.3f,  0.3f, -0.3f},
+        { cpi4,  cpi4,  0.0f},
     },
     vertex3D::Data{
         { 0.3f,  0.3f, +0.3f},
+        { cpi4,  cpi4,  0.0f},
     },
     vertex3D::Data{
         { 0.3f,  -0.3f, -0.3f},
+        { cpi4,  -cpi4,  0.0f},
     },
     vertex3D::Data{
         { 0.3f,  -0.3f, +0.3f},
+        { cpi4,  -cpi4,  0.0f},
     },
 };
 
@@ -142,9 +170,16 @@ std::vector<vertex3D::Data> makeVertices(GLfloat aRadius)
     result.reserve(N_vertices+2);
     for(int i=0; i<=N_vertices; ++i)
     {
-        result.emplace_back(vertex3D::Data{ {cos(2*pi<float>*i/N_vertices) * aRadius,
-                                             sin(2*pi<float>*i/N_vertices) * aRadius,
-                                             0.f} });
+        result.emplace_back(vertex3D::Data{{
+                                                cos(2*pi<float>*i/N_vertices) * aRadius,
+                                                sin(2*pi<float>*i/N_vertices) * aRadius,
+                                                0.f,
+                                            },
+                                            {
+                                                0.f,
+                                                0.f,
+                                                -1.f,
+                                            }});
     }
     return result;
 }
@@ -160,11 +195,11 @@ struct Data
 };
 
 constexpr AttributeDescriptionList gDescription = {
-    {1, 2, offsetof(Data, mPosition),      MappedGL<GLfloat>::enumerator},
-    {2, 4, offsetof(Data, mOrientation),   MappedGL<GLfloat>::enumerator},
-    {3, 4, offsetof(Data, mOrientation) +  4*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
-    {4, 4, offsetof(Data, mOrientation) +  8*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
-    {5, 4, offsetof(Data, mOrientation) + 12*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
+    {2, 2, offsetof(Data, mPosition),      MappedGL<GLfloat>::enumerator},
+    {3, 4, offsetof(Data, mOrientation),   MappedGL<GLfloat>::enumerator},
+    {4, 4, offsetof(Data, mOrientation) +  4*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
+    {5, 4, offsetof(Data, mOrientation) +  8*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
+    {6, 4, offsetof(Data, mOrientation) + 12*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
 };
 
 } // namespace instance3D

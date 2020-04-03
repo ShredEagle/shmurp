@@ -4,29 +4,28 @@ namespace ad {
 
 Collision::Collision(aunteater::Engine &aEngine) :
     mEngine(aEngine),
-    mColliders(mEngine)
+    mSpaceForces(mEngine),
+    mDemocrats(mEngine),
+    mLibLies(mEngine),
+    mTruthBullets(mEngine)
 {}
 
 void Collision::update(double aDelta)
 {
-    for(auto attacker : mColliders)
+    for(auto truthBullet : mTruthBullets)
     {
-        for(auto defender : mColliders)
+        for(auto democrat : mDemocrats)
         {
-            if(   (attacker->get<Faction>().isAttacking(defender->get<Faction>()))
-               && (attacker->get<Geometry>().isColliding(defender->get<Geometry>())) )
+            if(truthBullet->get<Geometry>().isColliding(democrat->get<Geometry>()))
             {
-                defender->get<HitPoints>().hp -= 1;
+                democrat->get<HitPoints>().hp -= 1;
 
-                if (defender->get<HitPoints>().hp == 0)
+                if (democrat->get<HitPoints>().hp == 0)
                 {
-                  mEngine.markToRemove(defender);
+                  mEngine.markToRemove(democrat);
                 }
 
-                if (defender->get<Faction>().isAttacking(attacker->get<Faction>()))
-                {
-                    mEngine.markToRemove(attacker);
-                }
+                mEngine.markToRemove(truthBullet);
             }
         }
     }

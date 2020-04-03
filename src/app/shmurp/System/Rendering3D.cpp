@@ -30,7 +30,6 @@ void Rendering3D::update(double time)
     for (const auto & renderable : mHealthBarRenderables)
     {
         const float hpPercentage = static_cast<float>(renderable->get<HitPoints>().hp) / static_cast<float>(renderable->get<HitPoints>().totalHp);
-        std::cerr << hpPercentage << " " << renderable->get<HitPoints>().hp << " " << renderable->get<HitPoints>().totalHp << "\n";
         sorted[Shape::FilledSquare]
             .push_back({renderable->get<Geometry>().position + Vec<2, GLfloat>({0.f, 1.f}),
                         transform::scaleMatrix(hpPercentage, 0.2f)});

@@ -56,7 +56,7 @@ Game::Game(Application & aApplication)
             .add<ControlDevice>(0)
             .add<Faction>(Faction::SpaceForce, Faction::Democrats)
             .add<Geometry>(conf::shipInitialX, conf::shipInitialY, conf::shipRadius)
-            .add<HitPoints>(1)
+            .add<HitPoints>(conf::gSpaceForceHitPoints)
             .add<Shape>(Shape::RocketShip)
             .add<Speed>(0., 0.)
             );

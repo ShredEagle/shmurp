@@ -190,16 +190,16 @@ namespace filledSquare3D {
 
 static const std::array<vertex3D::Data, 4> gVertices = {
     vertex3D::Data{
-        {1.f, 1.f, 0.f},
+        {0.5f, 1.f, 0.f},
     },
     vertex3D::Data{
-        {1.f,  0.f, 0.f},
+        {0.5f,  0.f, 0.f},
     },
     vertex3D::Data{
-        {0.f,  0.f, 0.f},
+        {-0.5f,  0.f, 0.f},
     },
     vertex3D::Data{
-        { 0.f,  1.f, 0.f},
+        {-0.5f,  1.f, 0.f},
     }
 };
 }

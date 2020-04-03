@@ -39,6 +39,9 @@ constexpr Rectangle<> gShipBoundingRect = {
     {0.3f, 0.25f},
     {gWindowWorldWidth-0.3f-0.3f, gWindowWorldHeight-0.25f-0.75f}
 };
+// Hit points
+constexpr int gDemocratsHitPoints = 5;
+constexpr int gSpaceForceHitPoints = 1;
 
 // TODO should be able to constexpr
 inline Matrix<4, GLfloat> worldToDevice()

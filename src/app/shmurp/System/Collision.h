@@ -10,7 +10,10 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<Faction, Geometry, HitPoints> Colliding;
+typedef aunteater::Archetype<FactionSpaceForce, Geometry, HitPoints> SpaceForce;
+typedef aunteater::Archetype<FactionDemocrats, Geometry, HitPoints> Democrats;
+typedef aunteater::Archetype<FactionLibLies, Geometry> LibLies;
+typedef aunteater::Archetype<FactionTruthBullet, Geometry> TruthBullet;
 
 class Collision : public aunteater::System
 {
@@ -22,7 +25,10 @@ public:
 
 private:
     aunteater::Engine & mEngine;
-    const aunteater::FamilyHelp<Colliding> mColliders;
+    const aunteater::FamilyHelp<SpaceForce> mSpaceForces;
+    const aunteater::FamilyHelp<Democrats> mDemocrats;
+    const aunteater::FamilyHelp<LibLies> mLibLies;
+    const aunteater::FamilyHelp<TruthBullet> mTruthBullets;
 };
 
 } // namespace ad

@@ -2,23 +2,33 @@
 
 #include <math/Constants.h>
 #include <math/Matrix.h>
+#include <math/Rectangle.h>
 #include <math/Vector.h>
 
 #include <glad/glad.h>
 
 namespace ad {
 
-template <class T> T pi = math::pi<T>;
+using Floating = float;
 
-template <int N, class T>
+template <class T=Floating> T pi = math::pi<T>;
+
+template <int N, class T=Floating>
 using Vec = math::Vec<N, T>;
 
-template <int N, class T>
+template <int N, class T=Floating>
 using Size = math::Size<N, T>;
 
-template <int N, class T>
+template <int N, class T=Floating>
+using Position = math::Position<N, T>;
+
+template <int N, class T=Floating>
 using Matrix = math::Matrix<N, N, T>;
 
-using Radians = GLfloat;
+template <class T=Floating>
+using Rectangle = math::Rectangle<T>;
+
+// TODO replace with an actual angle type from math
+using Radians = Floating;
 
 } // namespace ad

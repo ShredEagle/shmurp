@@ -1,5 +1,6 @@
 #pragma once
 
+#include "commons.h"
 #include "transformations.h"
 
 namespace ad {
@@ -22,7 +23,7 @@ constexpr double getWorldToDeviceScale(int aDimension)
 // World unit
 constexpr float shipInitialX = gWindowWorldWidth/2.f;
 constexpr float shipInitialY = 1.f;
-constexpr float shipRadius = 0.2f;
+constexpr float gShipRadius = 0.2f;
 constexpr float squareRadius = 0.3f;
 constexpr float gBulletRadius = 0.1f;
 
@@ -33,6 +34,11 @@ constexpr float gShipAccelerationFactor = 20.f;
 
 constexpr float gBulletSpeed = 25.f;
 constexpr float gEnemyBulletSpeed = 8.f;
+
+constexpr Rectangle<> gShipBoundingRect = {
+    {0.3f, 0.25f},
+    {gWindowWorldWidth-0.3f-0.3f, gWindowWorldHeight-0.25f-0.75f}
+};
 
 // TODO should be able to constexpr
 inline Matrix<4, GLfloat> worldToDevice()

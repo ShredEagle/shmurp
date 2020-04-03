@@ -12,6 +12,7 @@ set(${PROJECT_NAME}_HEADERS
     shapes.h
     shapes3D.h
 
+    Components/Boundaries.h
     Components/FirePattern.h
     Components/ControlDevice.h
     Components/Geometry.h
@@ -22,6 +23,7 @@ set(${PROJECT_NAME}_HEADERS
     System/Collision.h
     System/Displace.h
     System/EnemySpawn.h
+    System/LimitPosition.h
     System/KeyboardControl.h
     System/Rendering.h
     System/Rendering3D.h
@@ -39,6 +41,7 @@ set(${PROJECT_NAME}_SOURCES
     System/Collision.cpp
     System/Displace.cpp
     System/EnemySpawn.cpp
+    System/LimitPosition.cpp
     System/Rendering.cpp
     System/Rendering3D.cpp
     System/KeyboardControl.cpp

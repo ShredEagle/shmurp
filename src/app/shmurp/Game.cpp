@@ -2,6 +2,7 @@
 
 #include "configuration.h"
 
+#include "Components/Boundaries.h"
 #include "Components/ControlDevice.h"
 #include "Components/Faction.h"
 #include "Components/Geometry.h"
@@ -12,6 +13,7 @@
 #include "System/Displace.h"
 #include "System/EnemySpawn.h"
 #include "System/KeyboardControl.h"
+#include "System/LimitPosition.h"
 #include "System/Rendering.h"
 #include "System/Rendering3D.h"
 
@@ -33,6 +35,8 @@ Game::Game(Application & aApplication)
 
     mEntityEngine.addSystem<Displace>();
 
+    mEntityEngine.addSystem<LimitPosition>();
+
     mEntityEngine.addSystem<Collision>();
 
     mEntityEngine.addSystem<EnemySpawn>();
@@ -46,12 +50,14 @@ Game::Game(Application & aApplication)
     /*
      * Entities
      */
-    mEntityEngine.addEntity(Entity().add<ControlDevice>(0)
-                                    .add<Faction>(Faction::SpaceForce, Faction::Democrats)
-                                    .add<Geometry>(conf::shipInitialX, conf::shipInitialY, conf::shipRadius)
-                                    .add<Shape>(Shape::RocketShip)
-                                    .add<Speed>(0., 0.)
-                                    );
+    mEntityEngine.addEntity(Entity()
+            .add<Boundaries>(ad::conf::gShipBoundingRect)
+            .add<ControlDevice>(0)
+            .add<Faction>(Faction::SpaceForce, Faction::Democrats)
+            .add<Geometry>(conf::shipInitialX, conf::shipInitialY, conf::gShipRadius)
+            .add<Shape>(Shape::RocketShip)
+            .add<Speed>(0., 0.)
+            );
 
     //mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
     //                                .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)

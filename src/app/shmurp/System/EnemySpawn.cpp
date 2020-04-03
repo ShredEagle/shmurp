@@ -33,7 +33,7 @@ void EnemySpawn::update(double time)
 
     for (const auto candidate : mPrunables)
     {
-        static const math::Rectangle<GLfloat> gGameArea{
+        static const Rectangle<GLfloat> gGameArea{
             {-conf::gViewportOffset, -conf::gViewportOffset},
             {conf::gWindowWorldWidth+2*conf::gViewportOffset, conf::gWindowWorldHeight+2*conf::gViewportOffset}};
 

@@ -3,6 +3,7 @@
 #include "../configuration.h"
 
 #include "RenderingShaders.h"
+#include "Shaper.h"
 #include "transformations.h"
 
 namespace ad {
@@ -72,7 +73,19 @@ Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution):
                                       circle3D::makeVertices<30>(conf::gBulletRadius),
                                       {},
                                       GL_TRIANGLE_FAN,
-                                      Vec<4, GLfloat>(0.44f, 0.9f, 1.0f, 1.0f)));
+                                      //Vec<4, GLfloat>(0.44f, 0.9f, 1.0f, 1.0f)));
+                                      Vec<4, GLfloat>(1.0f, 0.42f, 0.07f, 1.0f)));
+
+    // Apparently, cannot instantiate a valid gsl::span from a temporary vector
+    auto pyramidVertices = make_pyramid<3>(conf::gPyramidRadius, conf::gPyramidHeight);
+    mShapeToSpecification.emplace(Shape::Pyramid,
+                                  ShapeInstancing(
+                                      pyramidVertices *=
+                                        transform::rotateMatrix_X(-pi<>/2.f)
+                                        * transform::translateMatrix(0.f, conf::gPyramidHeight),
+                                      {},
+                                      GL_LINES,
+                                      Vec<4, GLfloat>(1.0f, 0.22f, 0.39f, 1.0f)));
 
     glProgramUniformMatrix4fv(mProgram, glGetUniformLocation(mProgram, "u_WorldToDevice"),
                               1, true, conf::worldToDevice().data());

@@ -40,6 +40,9 @@ constexpr Rectangle<> gShipBoundingRect = {
     {gWindowWorldWidth-0.3f-0.3f, gWindowWorldHeight-0.25f-0.75f}
 };
 
+constexpr Floating gPyramidRadius = 1.0f;
+constexpr Floating gPyramidHeight = gPyramidRadius;
+
 // TODO should be able to constexpr
 inline Matrix<4, GLfloat> worldToDevice()
 {

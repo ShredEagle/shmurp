@@ -51,13 +51,20 @@ Game::Game(Application & aApplication)
      * Entities
      */
     mEntityEngine.addEntity(Entity()
-            .add<Boundaries>(ad::conf::gShipBoundingRect)
+            .add<Boundaries>(conf::gShipBoundingRect)
             .add<ControlDevice>(0)
             .add<Faction>(Faction::SpaceForce, Faction::Democrats)
             .add<Geometry>(conf::shipInitialX, conf::shipInitialY, conf::gShipRadius)
             .add<Shape>(Shape::RocketShip)
             .add<Speed>(0., 0.)
-            );
+    );
+
+    mEntityEngine.addEntity(Entity()
+            .add<Faction>(Faction::Democrats, Faction::SpaceForce)
+            .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::gPyramidRadius)
+            .add<Shape>(Shape::Pyramid)
+            .add<Speed>(Vec<2>{0.f, 0.f}, Vec<3>{0.f, 0.4f, 0.f})
+    );
 
     //mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
     //                                .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)

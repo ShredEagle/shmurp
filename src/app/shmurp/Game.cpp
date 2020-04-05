@@ -17,6 +17,8 @@
 #include "System/Rendering.h"
 #include "System/Rendering3D.h"
 
+#include <Utils/Rythm.h>
+
 #include <aunteater/UpdateTiming.h>
 
 using aunteater::Entity;
@@ -59,7 +61,10 @@ Game::Game(Application & aApplication)
             .add<Speed>(0., 0.)
     );
 
+    Rythm fourFour{0.15f, 8};
+    fourFour.note(0).note(1).note(2).note(3);
     mEntityEngine.addEntity(Entity()
+            .add<FirePattern>(std::make_unique<Fire::Line<Rythm>>(fourFour))
             .add<Faction>(Faction::Democrats, Faction::SpaceForce)
             .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::gPyramidRadius)
             .add<Shape>(Shape::Pyramid)

@@ -25,8 +25,7 @@ public:
                           Vec<2, GLfloat> aBasePosition) = 0;
 
         virtual std::unique_ptr<Base_impl> clone() = 0;
-        virtual ~Base_impl()
-        {}
+        virtual ~Base_impl() = default;
     };
 
     template <class T_derived>
@@ -66,6 +65,36 @@ private:
 };
 
 namespace Fire {
+
+template <class T_timer>
+class Line : public FirePattern::Base<Line<T_timer>>
+{
+public:
+    Line(T_timer aTimer, float aAngle=-pi<>/2.f) :
+        mTimer{std::move(aTimer)},
+        mAngle(aAngle)
+    {}
+
+    void fire(double aDelta,
+              aunteater::Engine & aEngine,
+              Vec<2, GLfloat> aBasePosition) override
+    {
+        mTimer.forEachEvent(aDelta, [&, this](timet aRemainingTime)
+        {
+            static constexpr Vec<4, GLfloat> gSpeed(conf::gEnemyBulletSpeed, 0.f, 0.f, 1.f);
+            auto speed = gSpeed * transform::rotateMatrix(mAngle);
+
+            Vec<2, GLfloat> startPosition =
+                aBasePosition
+                + static_cast<GLfloat>(aRemainingTime)*Vec<2>{speed.x(), speed.y()};
+            aEngine.addEntity(entities::makeEnemyBullet(startPosition, speed));
+        });
+    }
+
+private:
+    T_timer mTimer;
+    float mAngle;
+};
 
 class Spiral : public FirePattern::Base<Spiral>
 {

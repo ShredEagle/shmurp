@@ -82,7 +82,7 @@ Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution):
                                   ShapeInstancing(
                                       pyramidVertices *=
                                         transform::rotateMatrix_X(-pi<>/2.f)
-                                        * transform::translateMatrix(0.f, conf::gPyramidHeight),
+                                        * transform::translateMatrix(0.f, conf::gPyramidHeight/2.f),
                                       {},
                                       GL_LINES,
                                       Vec<4, GLfloat>(1.0f, 0.22f, 0.39f, 1.0f)));

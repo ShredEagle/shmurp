@@ -31,6 +31,7 @@ set(${PROJECT_NAME}_HEADERS
 
     utils/interpolation.h
     utils/Periodic.h
+    utils/Rythm.h
 )
 
 set(${PROJECT_NAME}_SOURCES

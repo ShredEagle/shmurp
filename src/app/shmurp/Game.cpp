@@ -58,7 +58,7 @@ Game::Game(Application & aApplication)
             .add<Faction>(Faction::SpaceForce, Faction::Democrats)
             .add<Geometry>(conf::shipInitialX, conf::shipInitialY, conf::gShipRadius)
             .add<Shape>(Shape::RocketShip)
-            .add<Speed>(0., 0.)
+            .add<Speed>(0.f, 0.f)
     );
 
     Rythm fourFour{0.15f, 8};

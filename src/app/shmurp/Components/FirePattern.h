@@ -12,6 +12,7 @@
 
 #include <handy/random.h>
 
+
 namespace ad {
 
 class FirePattern : public aunteater::Component<FirePattern>
@@ -24,7 +25,7 @@ public:
                           aunteater::Engine & aEngine,
                           Vec<2, GLfloat> aBasePosition) = 0;
 
-        virtual std::unique_ptr<Base_impl> clone() = 0;
+        virtual std::unique_ptr<Base_impl> clone() const = 0;
         virtual ~Base_impl() = default;
     };
 
@@ -32,9 +33,9 @@ public:
     class Base : public Base_impl
     {
     public:
-        std::unique_ptr<Base_impl> clone() final
+        std::unique_ptr<Base_impl> clone() const final
         {
-            return std::make_unique<T_derived>(*static_cast<T_derived*>(this));
+            return std::make_unique<T_derived>(*static_cast<const T_derived*>(this));
         }
     };
 
@@ -45,7 +46,7 @@ public:
     {}
 
     template <class T_base>
-    FirePattern(std::unique_ptr<T_base> aImplementation) :
+    explicit FirePattern(std::unique_ptr<T_base> aImplementation) :
         mImplementation(std::move(aImplementation))
     {}
 
@@ -64,13 +65,14 @@ private:
     std::unique_ptr<Base_impl> mImplementation;
 };
 
+
 namespace Fire {
 
 template <class T_timer>
 class Line : public FirePattern::Base<Line<T_timer>>
 {
 public:
-    Line(T_timer aTimer, float aAngle=-pi<>/2.f) :
+    explicit Line(T_timer aTimer, float aAngle=-pi<>/2.f) :
         mTimer{std::move(aTimer)},
         mAngle(aAngle)
     {}
@@ -95,6 +97,7 @@ private:
     T_timer mTimer;
     float mAngle;
 };
+
 
 class Spiral : public FirePattern::Base<Spiral>
 {
@@ -165,6 +168,7 @@ private:
     Periodic mPeriod;
     const int mCount{0};
 };
+
 
 class Burst : public FirePattern::Base<Burst>
 {

@@ -31,7 +31,7 @@ private:
 };
 
 
-Rythm & Rythm::note(int aTime)
+inline Rythm & Rythm::note(int aTime)
 {
     Expects( (aTime >= 0) && (aTime < mDuration) );
     mScore.push_back(aTime);

@@ -72,9 +72,9 @@ template <class T_timer>
 class Line : public FirePattern::Base<Line<T_timer>>
 {
 public:
-    explicit Line(T_timer aTimer, float aAngle=-pi<>/2.f) :
+    explicit Line(T_timer aTimer, float aAngle=pi<>/2.f) :
         mTimer{std::move(aTimer)},
-        mAngle(aAngle)
+        mAngle{aAngle}
     {}
 
     void fire(double aDelta,
@@ -83,7 +83,12 @@ public:
     {
         mTimer.forEachEvent(aDelta, [&, this](timet aRemainingTime)
         {
-            static constexpr Vec<4, GLfloat> gSpeed(conf::gEnemyBulletSpeed, 0.f, 0.f, 1.f);
+#if !defined(__clang__)
+            // see: https://stackoverflow.com/q/61060240/1027706
+            constexpr
+#endif
+            Vec<4, GLfloat> gSpeed{conf::gEnemyBulletSpeed, 0.f, 0.f, 1.f};
+
             auto speed = gSpeed * transform::rotateMatrix(mAngle);
 
             Vec<2, GLfloat> startPosition =

@@ -47,10 +47,10 @@ set(${PROJECT_NAME}_SOURCES
     System/KeyboardControl.cpp
 )
 
-find_package(aunteater CONFIG REQUIRED)
-find_package(graphics CONFIG REQUIRED COMPONENTS engine)
-find_package(math CONFIG REQUIRED)
-find_package(websocket CONFIG REQUIRED)
+find_package(Aunteater CONFIG REQUIRED COMPONENTS aunteater)
+find_package(Graphics CONFIG REQUIRED COMPONENTS engine)
+find_package(Math CONFIG REQUIRED COMPONENTS math)
+find_package(Websocket CONFIG REQUIRED COMPONENTS websocket)
 
 find_package(glad CONFIG REQUIRED)
 

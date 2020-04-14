@@ -20,8 +20,8 @@ class ShmurpConan(ConanFile):
     requires = (
         ("glad/0.1.29@bincrafters/stable"),
 
-        ("2d/local"),
         ("aunteater/local"),
+        ("graphics/local"),
         ("math/local"),
         ("websocket/local"),
     )

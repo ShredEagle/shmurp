@@ -48,7 +48,7 @@ set(${PROJECT_NAME}_SOURCES
 )
 
 find_package(aunteater CONFIG REQUIRED)
-find_package(2d CONFIG REQUIRED COMPONENTS engine)
+find_package(graphics CONFIG REQUIRED COMPONENTS engine)
 find_package(math CONFIG REQUIRED)
 find_package(websocket CONFIG REQUIRED)
 

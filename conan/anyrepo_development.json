@@ -1,8 +1,8 @@
 {
     "downstream": "git@github.com:Adnn/shmurp.git",
     "dependencies": [
-        "git@github.com:Adnn/2d.git",
         "git@github.com:Adnn/aunteater.git",
+        "git@github.com:Adnn/graphics.git",
         ["git@github.com:Adnn/math.git", "master"],
         "git@github.com:Adnn/websocket.git"
     ]

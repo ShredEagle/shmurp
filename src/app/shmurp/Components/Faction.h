@@ -2,32 +2,31 @@
 
 #include <aunteater/Component.h>
 
+#include <iostream>
 namespace ad {
 
-struct Faction : public aunteater::Component<Faction>
+struct FactionSpaceForce : public aunteater::Component<FactionSpaceForce>
 {
-    enum Bit : short
-    {
-        SpaceForce = (1 << 0),
-        Democrats  = (1 << 1),
-        TruthBullet  = (1 << 2),
-        LibLies  = (1 << 3),
-    };
-
-    Faction(Bit aSide, short aTargets = 0) :
-        side(aSide),
-        targets(aTargets)
-    {}
-
-    bool isAttacking(Faction aOther) const
-    {
-        return aOther.side & targets;
-    }
-
-    Bit side{0};
-    short targets{0};
+  FactionSpaceForce()
+  {}
 };
 
+struct FactionDemocrats : public aunteater::Component<FactionDemocrats>
+{
+  FactionDemocrats()
+  {}
+};
 
+struct FactionTruthBullet : public aunteater::Component<FactionTruthBullet>
+{
+  FactionTruthBullet()
+  {}
+};
+
+struct FactionLibLies : public aunteater::Component<FactionLibLies>
+{
+  FactionLibLies()
+  {}
+};
 
 } // namespace ad

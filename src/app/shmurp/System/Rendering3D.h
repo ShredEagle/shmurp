@@ -7,6 +7,7 @@
 
 #include <Components/Geometry.h>
 #include <Components/Shape.h>
+#include <Components/HitPoints.h>
 
 #include <aunteater/Archetype.h>
 #include <aunteater/FamilyHelp.h>
@@ -16,7 +17,8 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<Geometry, Shape> Renderable;
+using Renderable = aunteater::Archetype<Geometry, Shape>;
+using HealthBarRenderable = aunteater::Archetype<Geometry, HitPoints>;
 
 class Rendering3D : public aunteater::System
 {
@@ -40,6 +42,7 @@ public:
 
 private:
     aunteater::FamilyHelp<Renderable> mRenderables;
+    aunteater::FamilyHelp<HealthBarRenderable> mHealthBarRenderables;
     Impl mImpl;
 };
 

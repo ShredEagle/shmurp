@@ -52,8 +52,7 @@ public:
     std::shared_ptr<Callback> getCallback();
 
 private:
-    aunteater::Engine & mEngine;
-    std::shared_ptr<Callback> mCallback{std::make_shared<Callback>(mEngine)};
+    std::shared_ptr<Callback> mCallback;
     aunteater::Family & mPlayerMovable;
     Vec<2, GLfloat> mTargetSpeed{0.f, 0.f};
     Interpolation<Vec<2, GLfloat>, GLfloat> mSpeedInterpolation{mTargetSpeed,

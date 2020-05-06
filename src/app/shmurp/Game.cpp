@@ -30,7 +30,7 @@ Game::Game(Application & aApplication)
      * Systems
      */
     auto kbControl = std::make_shared<KeyboardControl>(mEntityEngine);
-    aApplication.registerKeyCallback(kbControl->getCallback());
+    aApplication.getEngine()->registerKeyCallback(kbControl->getCallback());
     mEntityEngine.addSystem(kbControl);
 
     mEntityEngine.addSystem<Displace>();
@@ -44,7 +44,7 @@ Game::Game(Application & aApplication)
     mEntityEngine.addSystem<BulletSpawn>();
 
     //mEntityEngine.addSystem<Rendering>();
-    mEntityEngine.addSystem<Rendering3D>(aApplication.mEngine->getFramebufferSize());
+    mEntityEngine.addSystem<Rendering3D>(*aApplication.getEngine());
 
 
     /*

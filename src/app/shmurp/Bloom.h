@@ -116,7 +116,7 @@ private:
 
     // Cannot be static: the application must be started before starting to load
     // VOAs and VBOs
-    const VertexSpecification mScreenQuad{make_ScreenQuad()};
+    VertexSpecification mScreenQuad{make_ScreenQuad()};
 };
 
 

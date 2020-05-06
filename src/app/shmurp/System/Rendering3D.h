@@ -12,6 +12,8 @@
 #include <aunteater/FamilyHelp.h>
 #include <aunteater/System.h>
 
+#include <engine/Engine.h>
+
 #include <renderer/Shading.h>
 
 namespace ad {
@@ -34,12 +36,15 @@ class Rendering3D : public aunteater::System
     };
 
 public:
-    Rendering3D(aunteater::Engine &aEngine, Size<2, GLsizei> aResolution);
+    Rendering3D(aunteater::Engine &aEngine, ::ad::Engine & aAppEngine);
 
     void update(double time) override;
 
+    void resizeRenderTarget(Size<2, GLsizei> aNewResolution);
+
 private:
     aunteater::FamilyHelp<Renderable> mRenderables;
+    std::shared_ptr<::ad::Engine::SizeListener> mSizeListener;
     Impl mImpl;
 };
 

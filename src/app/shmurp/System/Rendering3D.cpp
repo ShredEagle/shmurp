@@ -7,12 +7,18 @@
 
 namespace ad {
 
-Rendering3D::Rendering3D(aunteater::Engine &aEngine,
-                         Size<2, GLsizei> aResolution) :
+
+namespace sp = std::placeholders;
+
+
+Rendering3D::Rendering3D(aunteater::Engine &aEngine, ::ad::Engine & aAppEngine) :
     mRenderables{aEngine},
-    mImpl{aResolution}
+    mImpl{aAppEngine.getFramebufferSize()}
 {
     glClearColor(0.04f, 0.08f, 0.12f, 1.f);
+    // Note: binding once construction is complete
+    mSizeListener = aAppEngine.listenFramebufferResize(
+            std::bind(&Rendering3D::resizeRenderTarget, this, sp::_1));
 }
 
 void Rendering3D::update(double time)
@@ -35,7 +41,14 @@ void Rendering3D::update(double time)
     mImpl.draw(time);
 }
 
-Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution) :
+
+void Rendering3D::resizeRenderTarget(Size<2, GLsizei> aNewResolution)
+{
+    mImpl.mOkBloomer = Bloom{aNewResolution};
+}
+
+
+Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution):
     mProgram{makeLinkedProgram({ {GL_VERTEX_SHADER,   gVertexShader3D},
                                  {GL_FRAGMENT_SHADER, gFragmentShader3D} })},
     mOkBloomer{aResolution}

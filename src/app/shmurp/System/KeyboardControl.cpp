@@ -51,8 +51,8 @@ void KeyboardControl::Callback::operator()(int key, int scancode, int action, in
 }
 
 KeyboardControl::KeyboardControl(aunteater::Engine &aEngine) :
-    mPlayerMovable(aEngine.getFamily<PlayerMovable>()),
-    mEngine(aEngine)
+    mCallback{std::make_shared<Callback>(aEngine)},
+    mPlayerMovable{aEngine.getFamily<PlayerMovable>()}
 {}
 
 void KeyboardControl::update(double time)

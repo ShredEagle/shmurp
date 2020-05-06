@@ -47,7 +47,7 @@ class KeyboardControl : public aunteater::System
 
 public:
     KeyboardControl(aunteater::Engine &aEngine);
-    void update(double time) override;
+    void update(const aunteater::Timer aTimer) override;
 
     std::shared_ptr<Callback> getCallback();
 

@@ -7,7 +7,7 @@ Collision::Collision(aunteater::Engine &aEngine) :
     mColliders(mEngine)
 {}
 
-void Collision::update(double aDelta)
+void Collision::update(const aunteater::Timer aTimer)
 {
     for(auto attacker : mColliders)
     {

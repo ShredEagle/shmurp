@@ -8,13 +8,14 @@ Displace::Displace(aunteater::Engine &aEngine) :
     mMovables(aEngine)
 {}
 
-void Displace::update(double aDelta)
+void Displace::update(const aunteater::Timer aTimer)
 {
+    const auto delta = aTimer.delta();
     for (auto & [geometry, speed] : mMovables)
     {
-        geometry.position += static_cast<GLfloat>(aDelta) * speed.translation;
-        geometry.orientation *= transform::rotateMatrix_X(aDelta * speed.rotation.x())
-                                * transform::rotateMatrix_Y(aDelta * speed.rotation.y());
+        geometry.position += static_cast<GLfloat>(delta) * speed.translation;
+        geometry.orientation *= transform::rotateMatrix_X(delta * speed.rotation.x())
+                                * transform::rotateMatrix_Y(delta * speed.rotation.y());
     }
 }
 

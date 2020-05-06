@@ -22,7 +22,7 @@ Rendering3D::Rendering3D(aunteater::Engine &aEngine, ::ad::Engine & aAppEngine) 
             std::bind(&Rendering3D::resizeRenderTarget, this, sp::_1));
 }
 
-void Rendering3D::update(double time)
+void Rendering3D::update(const aunteater::Timer aTimer)
 {
     std::map<Shape::Value, std::vector<instance3D::Data>> sorted;
 
@@ -39,7 +39,7 @@ void Rendering3D::update(double time)
         instancing.updateIBO(sorted[shape]);
     }
 
-    mImpl.draw(time);
+    mImpl.draw();
 }
 
 
@@ -91,7 +91,7 @@ Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution):
                               1, true, conf::worldToDevice().data());
 }
 
-void Rendering3D::Impl::draw(double time)
+void Rendering3D::Impl::draw()
 {
     {
         auto offscreenGuard{mOkBloomer.bindFramebuffer()};

@@ -18,7 +18,7 @@ class EnemySpawn : public aunteater::System
 public:
     EnemySpawn(aunteater::Engine &aEngine);
 
-    void update(double aDelta) override;
+    void update(const aunteater::Timer aTimer) override;
 
 private:
     aunteater::Engine & mEngine;

@@ -11,11 +11,11 @@ BulletSpawn::BulletSpawn(aunteater::Engine &aEngine) :
 {}
 
 
-void BulletSpawn::update(double aDelta)
+void BulletSpawn::update(const aunteater::Timer aTimer)
 {
     for (auto & [firePattern, geometry] : mCanons)
     {
-        firePattern.fire(aDelta, mEngine, geometry.position);
+        firePattern.fire(aTimer.delta(), mEngine, geometry.position);
     }
 }
 

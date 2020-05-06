@@ -88,10 +88,10 @@ Game::Game(Application & aApplication)
     //                                );
 }
 
-bool Game::update(const Timer & aTimer)
+bool Game::update(const aunteater::Timer & aTimer)
 {
     aunteater::UpdateTiming timings;
-    mEntityEngine.update(aTimer.delta(), timings);
+    mEntityEngine.update(aTimer, timings);
 
     mUI.broadcast(timings);
 

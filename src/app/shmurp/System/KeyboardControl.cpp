@@ -55,7 +55,7 @@ KeyboardControl::KeyboardControl(aunteater::Engine &aEngine) :
     mPlayerMovable{aEngine.getFamily<PlayerMovable>()}
 {}
 
-void KeyboardControl::update(double time)
+void KeyboardControl::update(const aunteater::Timer aTimer)
 {
     for (auto & movable : mPlayerMovable)
     {
@@ -84,7 +84,7 @@ void KeyboardControl::update(double time)
             mSpeedInterpolation.redirect(mTargetSpeed);
         }
 
-        movable->get<Speed>().translation = mSpeedInterpolation(time);
+        movable->get<Speed>().translation = mSpeedInterpolation(aTimer.delta());
 
         switch(mCallback->mFiring)
         {

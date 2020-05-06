@@ -24,9 +24,9 @@ EnemySpawn::EnemySpawn(aunteater::Engine &aEngine) :
     mPrunables(aEngine)
 {}
 
-void EnemySpawn::update(double time)
+void EnemySpawn::update(const aunteater::Timer aTimer)
 {
-    for(auto count = mSpawnPeriod.countEvents(time); count; --count)
+    for(auto count = mSpawnPeriod.countEvents(aTimer.delta()); count; --count)
     {
         spawn(mEngine);
     }

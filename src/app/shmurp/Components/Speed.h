@@ -12,7 +12,7 @@ struct Speed : public aunteater::Component<Speed>
         translation{aTranslation}
     {}
 
-    Speed(Vec<2, GLfloat> aTranslation, Vec<3, GLfloat> aRotation) :
+    Speed(Vec<2, GLfloat> aTranslation, Vec<3> aRotation) :
         translation{aTranslation},
         rotation{aRotation}
     {}
@@ -22,7 +22,7 @@ struct Speed : public aunteater::Component<Speed>
     {}
 
     Vec<2, GLfloat> translation;
-    Vec<3, GLfloat> rotation{Vec<3, GLfloat>::Zero()};
+    Vec<3> rotation{Vec<3>::Zero()};
 };
 
 

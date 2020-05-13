@@ -12,7 +12,7 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<ControlDevice, ControlDevice, Geometry, Speed> PlayerMovable;
+typedef aunteater::Archetype<ControlDevice, Geometry, Speed> PlayerMovable;
 
 void KeyboardControl::Callback::operator()(int key, int scancode, int action, int mods)
 {
@@ -93,7 +93,7 @@ void KeyboardControl::update(const aunteater::Timer aTimer)
                 mCallback->mFiring = Edge::None;
                 break;
             case Edge::Release:
-                movable->removeComponent<FirePattern>();
+                movable->remove<FirePattern>();
                 mCallback->mFiring = Edge::None;
                 break;
             default: break;

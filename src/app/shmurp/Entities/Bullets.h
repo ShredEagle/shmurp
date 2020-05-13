@@ -9,8 +9,10 @@
 
 #include <aunteater/Entity.h>
 
+
 namespace ad {
 namespace entities {
+
 
 inline aunteater::Entity makeEnemyBullet(Vec<2, GLfloat> aPosition, Vec<4, GLfloat> aSpeed)
 {
@@ -20,6 +22,7 @@ inline aunteater::Entity makeEnemyBullet(Vec<2, GLfloat> aPosition, Vec<4, GLflo
                               .add<Speed>(aSpeed.x(), aSpeed.y());
 }
 
+
 inline aunteater::Entity makeFriendBullet(Vec<2, GLfloat> aPosition, Vec<4, GLfloat> aSpeed)
 {
     return aunteater::Entity().add<Faction>(Faction::TruthBullet, Faction::Democrats)
@@ -28,15 +31,6 @@ inline aunteater::Entity makeFriendBullet(Vec<2, GLfloat> aPosition, Vec<4, GLfl
                               .add<Speed>(aSpeed.x(), aSpeed.y());
 }
 
-inline aunteater::Entity makeSquare(Vec<2, GLfloat> aPosition,
-                                    Vec<2, GLfloat> aTranslationSpeed,
-                                    Vec<3, GLfloat> aRotationSpeed)
-{
-    return aunteater::Entity().add<Faction>(Faction::Democrats, Faction::TruthBullet)
-                              .add<Geometry>(aPosition, conf::squareRadius)
-                              .add<Shape>(Shape::Square)
-                              .add<Speed>(aTranslationSpeed, aRotationSpeed);
-}
 
 } // namespace entities
 } // namespace ad

@@ -2,7 +2,7 @@
 
 #include "../commons.h"
 #include "../configuration.h"
-#include "../Entities.h"
+#include "../Entities/Bullets.h"
 #include "../transformations.h"
 
 #include "../Utils/Periodic.h"
@@ -89,7 +89,7 @@ public:
 #endif
             Vec<4, GLfloat> gSpeed{conf::gEnemyBulletSpeed, 0.f, 0.f, 1.f};
 
-            auto speed = gSpeed * transform::rotateMatrix(mAngle);
+            auto speed = gSpeed * transform::rotateMatrix_Z(mAngle);
 
             Vec<2, GLfloat> startPosition =
                 aBasePosition
@@ -119,7 +119,7 @@ public:
         mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
         {
             static constexpr Vec<4, GLfloat> gSpeed(0.f, -conf::gEnemyBulletSpeed, 0.f, 1.f);
-            auto speed = gSpeed * transform::rotateMatrix(nextAngle());
+            auto speed = gSpeed * transform::rotateMatrix_Z(nextAngle());
 
             Vec<2, GLfloat> startPosition =
                 aBasePosition
@@ -159,7 +159,7 @@ public:
 
             for (int bulletCount = 0; bulletCount != mCount; ++bulletCount)
             {
-                auto speed = gSpeed * transform::rotateMatrix(bulletCount * 2*pi<GLfloat>/mCount);
+                auto speed = gSpeed * transform::rotateMatrix_Z(bulletCount * 2*pi<GLfloat>/mCount);
                 Vec<2, GLfloat> startPosition =
                     aBasePosition
                     + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
@@ -191,7 +191,7 @@ public:
 
         mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
         {
-            auto speed = gSpeed * transform::rotateMatrix(mAngleQuant*mRandomizer());
+            auto speed = gSpeed * transform::rotateMatrix_Z(mAngleQuant*mRandomizer());
             Vec<2, GLfloat> startPosition =
                 aBasePosition
                 + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};

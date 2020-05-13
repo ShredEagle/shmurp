@@ -1,6 +1,5 @@
 #include "Displace.h"
 
-#include "../transformations.h"
 
 namespace ad {
 
@@ -10,12 +9,13 @@ Displace::Displace(aunteater::Engine &aEngine) :
 
 void Displace::update(const aunteater::Timer aTimer)
 {
-    const auto delta = aTimer.delta();
+    const GLfloat delta = aTimer.delta();
     for (auto & [geometry, speed] : mMovables)
     {
         geometry.position += static_cast<GLfloat>(delta) * speed.translation;
-        geometry.orientation *= transform::rotateMatrix_X(delta * speed.rotation.x())
-                                * transform::rotateMatrix_Y(delta * speed.rotation.y());
+        // Note: limitation in math::matrix, only accepting scalar multiplication with matching type
+        geometry.orientations += (delta * speed.rotation);
+
     }
 }
 

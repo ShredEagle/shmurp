@@ -1,5 +1,6 @@
 #pragma once
 
+#include <math/Angle.h>
 #include <math/Constants.h>
 #include <math/Matrix.h>
 #include <math/Rectangle.h>
@@ -30,5 +31,8 @@ using Rectangle = math::Rectangle<T>;
 
 // TODO replace with an actual angle type from math
 using Radians = Floating;
+
+template <class T=Floating>
+using Radian = math::Radian<T>;
 
 } // namespace ad

@@ -1,7 +1,7 @@
 #include "EnemySpawn.h"
 
 #include "../configuration.h"
-#include "../Entities.h"
+#include "../Entities/Ships.h"
 
 #include <handy/random.h>
 

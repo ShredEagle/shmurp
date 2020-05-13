@@ -30,7 +30,7 @@ void Rendering3D::update(const aunteater::Timer aTimer)
     {
         sorted[renderable->get<Shape>().enumerator]
             .push_back({renderable->get<Geometry>().position,
-                        renderable->get<Geometry>().orientation});
+                        renderable->get<Geometry>().orientationMatrix()});
     }
 
     for (auto & [shape, instancing] : mImpl.mShapeToSpecification)

@@ -8,16 +8,18 @@
 #include "Components/Geometry.h"
 #include "Components/Shape.h"
 
+#include "Entities/Ships.h"
+
 #include "System/BulletSpawn.h"
 #include "System/Collision.h"
+#include "System/Customizer.h"
 #include "System/Displace.h"
 #include "System/EnemySpawn.h"
 #include "System/KeyboardControl.h"
 #include "System/LimitPosition.h"
 #include "System/Rendering.h"
 #include "System/Rendering3D.h"
-
-#include <Utils/Rythm.h>
+#include "System/Tracking.h"
 
 #include <aunteater/UpdateTiming.h>
 
@@ -31,9 +33,13 @@ Game::Game(Application & aApplication)
     /*
      * Systems
      */
+    mEntityEngine.addSystem<Customizer>();
+
     auto kbControl = std::make_shared<KeyboardControl>(mEntityEngine);
     aApplication.getEngine()->registerKeyCallback(kbControl->getCallback());
     mEntityEngine.addSystem(kbControl);
+
+    mEntityEngine.addSystem<Tracking>();
 
     mEntityEngine.addSystem<Displace>();
 
@@ -61,15 +67,10 @@ Game::Game(Application & aApplication)
             .add<Speed>(0.f, 0.f)
     );
 
-    Rythm fourFour{0.15f, 8};
-    fourFour.note(0).note(1).note(2).note(3);
-    mEntityEngine.addEntity(Entity()
-            .add<FirePattern>(std::make_unique<Fire::Line<Rythm>>(fourFour))
-            .add<Faction>(Faction::Democrats, Faction::SpaceForce)
-            .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::gPyramidRadius)
-            .add<Shape>(Shape::Pyramid)
-            .add<Speed>(Vec<2>{0.f, 0.f}, Vec<3>{0.f, 0.4f, 0.f})
-    );
+    mEntityEngine.addEntity(entities::makeTrackingPyramid(
+            Vec<2>{5.f, conf::gWindowWorldHeight-5.f},
+            Vec<2>{0.f, 0.f},
+            Vec<3>{0.f, 0.4f, 0.f}));
 
     //mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
     //                                .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)

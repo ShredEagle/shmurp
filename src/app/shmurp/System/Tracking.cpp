@@ -21,7 +21,7 @@ void Tracking::update(const aunteater::Timer aTimer)
         for(auto & [geometry, ignored] : mTrackers)
         {
             geometry.orientations.z() =
-                transform::angleBetween({0.f, -1.f}, targetPosition-geometry.position).value();
+                transform::angleBetween({0.f, -1.f}, targetPosition-geometry.position);
         }
     }
 }

@@ -25,6 +25,8 @@
 
 using aunteater::Entity;
 
+using namespace ad::math::angle_literals;
+
 namespace ad {
 namespace shmurp {
 
@@ -70,7 +72,7 @@ Game::Game(Application & aApplication)
     mEntityEngine.addEntity(entities::makeTrackingPyramid(
             Vec<2>{5.f, conf::gWindowWorldHeight-5.f},
             Vec<2>{0.f, 0.f},
-            Vec<3>{0.f, 0.4f, 0.f}));
+            Vec<3, Radian<>>{0._radf, 0.4_radf, 0._radf}));
 
     //mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
     //                                .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)

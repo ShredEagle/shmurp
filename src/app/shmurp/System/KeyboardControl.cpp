@@ -89,7 +89,7 @@ void KeyboardControl::update(const aunteater::Timer aTimer)
         switch(mCallback->mFiring)
         {
             case Edge::Press:
-                movable->add<FirePattern>(std::make_unique<Fire::Burst>(0.02f, pi<GLfloat>/180.f*7.5f));
+                movable->add<FirePattern>(std::make_unique<Fire::Burst>(0.02f, pi<Radian<>>/180.f*7.5f));
                 mCallback->mFiring = Edge::None;
                 break;
             case Edge::Release:

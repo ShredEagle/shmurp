@@ -29,9 +29,6 @@ using Matrix = math::Matrix<N, N, T>;
 template <class T=Floating>
 using Rectangle = math::Rectangle<T>;
 
-// TODO replace with an actual angle type from math
-using Radians = Floating;
-
 template <class T=Floating>
 using Radian = math::Radian<T>;
 

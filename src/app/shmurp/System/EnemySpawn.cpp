@@ -7,6 +7,10 @@
 
 #include <math/Rectangle.h>
 
+
+using namespace ad::math::angle_literals;
+
+
 namespace ad {
 
 void spawn(aunteater::Engine & aEngine)
@@ -16,7 +20,7 @@ void spawn(aunteater::Engine & aEngine)
     aEngine.addEntity(
             entities::makeSquare({static_cast<float>(randomX()), static_cast<float>(conf::gWindowWorldHeight + conf::gViewportOffset)},
                                  {0.f, -5.f},
-                                 {0.4f, 1.1f, 0.f}));
+                                 {0.4_radf, 1.1_radf, 0._radf}));
 }
 
 EnemySpawn::EnemySpawn(aunteater::Engine &aEngine) :

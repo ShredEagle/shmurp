@@ -21,7 +21,7 @@ namespace entities {
 
 inline aunteater::Entity makeSquare(Vec<2, GLfloat> aPosition,
                                     Vec<2, GLfloat> aTranslationSpeed,
-                                    Vec<3> aRotationSpeed)
+                                    Vec<3, Radian<>> aRotationSpeed)
 {
     return aunteater::Entity().add<Faction>(Faction::Democrats, Faction::TruthBullet)
                               .add<Geometry>(aPosition, conf::squareRadius)
@@ -32,7 +32,7 @@ inline aunteater::Entity makeSquare(Vec<2, GLfloat> aPosition,
 
 inline aunteater::Entity makeTrackingPyramid(Vec<2, GLfloat> aPosition,
                                              Vec<2, GLfloat> aTranslationSpeed,
-                                             Vec<3> aRotationSpeed)
+                                             Vec<3, Radian<>> aRotationSpeed)
 {
     static constexpr float firePeriod = 0.15f;
     static constexpr int burstSize = 4;
@@ -66,8 +66,7 @@ inline aunteater::Entity makeTrackingPyramid(Vec<2, GLfloat> aPosition,
             .add<Faction>(Faction::Democrats, Faction::SpaceForce)
             .add<Geometry>(aPosition, conf::gPyramidRadius)
             .add<Shape>(Shape::Pyramid)
-            .add<Speed>(Vec<2>{0.f, 0.f}, Vec<3>{0.f, 0.4f, 0.f})
-                              .add<Speed>(aTranslationSpeed, aRotationSpeed);
+            .add<Speed>(aTranslationSpeed, aRotationSpeed);
             ;
 }
 

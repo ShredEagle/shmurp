@@ -72,7 +72,7 @@ template <class T_timer>
 class Line : public FirePattern::Base<Line<T_timer>>
 {
 public:
-    explicit Line(T_timer aTimer, float aAngle=pi<>/2.f) :
+    explicit Line(T_timer aTimer, Radian<> aAngle=pi<Radian<>>/2.f) :
         mTimer{std::move(aTimer)},
         mAngle{aAngle}
     {}
@@ -100,7 +100,7 @@ public:
 
 private:
     T_timer mTimer;
-    float mAngle;
+    Radian<> mAngle;
 };
 
 
@@ -129,15 +129,15 @@ public:
     }
 
 private:
-    float nextAngle()
+    Radian<> nextAngle()
     {
         return mAngle += mAngleIncrement;
     }
 
 private:
     Periodic mPeriod;
-    float mAngle{0};
-    const float mAngleIncrement;
+    Radian<> mAngle{0};
+    const Radian<> mAngleIncrement;
 };
 
 
@@ -159,7 +159,7 @@ public:
 
             for (int bulletCount = 0; bulletCount != mCount; ++bulletCount)
             {
-                auto speed = gSpeed * transform::rotateMatrix_Z(bulletCount * 2*pi<GLfloat>/mCount);
+                auto speed = gSpeed * transform::rotateMatrix_Z(bulletCount * 2*pi<Radian<>>/mCount);
                 Vec<2, GLfloat> startPosition =
                     aBasePosition
                     + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
@@ -178,9 +178,9 @@ private:
 class Burst : public FirePattern::Base<Burst>
 {
 public:
-    Burst(timet aPeriod, Radians aSpreadAngle) :
+    Burst(timet aPeriod, Radian<> aSpreadAngle) :
         mPeriod{aPeriod},
-        mAngleQuant(aSpreadAngle/gDivisions)
+        mAngleQuant{aSpreadAngle/gDivisions}
     {}
 
     void fire(double aDelta,
@@ -203,7 +203,7 @@ private:
     static constexpr int gDivisions{30};
     Randomizer<> mRandomizer{-gDivisions, gDivisions};
     Periodic mPeriod;
-    const Radians mAngleQuant;
+    const Radian<> mAngleQuant;
 
 };
 

@@ -81,7 +81,7 @@ Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution):
     mShapeToSpecification.emplace(Shape::Pyramid,
                                   ShapeInstancing(
                                       pyramidVertices *=
-                                        transform::rotateMatrix_X(-pi<>/2.f)
+                                        transform::rotateMatrix_X(-pi<Radian<>>/2.f)
                                         * transform::translateMatrix(0.f, conf::gPyramidHeight/2.f),
                                       {},
                                       GL_LINES,

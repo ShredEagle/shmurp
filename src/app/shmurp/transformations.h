@@ -23,33 +23,33 @@ inline Matrix<4, GLfloat> translateMatrix(GLfloat x, GLfloat y)
     return result;
 }
 
-inline Matrix<4, GLfloat> rotateMatrix_X(GLfloat aAngle)
+inline Matrix<4, GLfloat> rotateMatrix_X(Radian<> aAngle)
 {
     auto result = Matrix<4, GLfloat>::Identity();
-    result[1][1] =  std::cos(aAngle);
-    result[1][2] = -std::sin(aAngle);
-    result[2][1] =  std::sin(aAngle);
-    result[2][2] =  std::cos(aAngle);
+    result[1][1] =  std::cos(aAngle.value());
+    result[1][2] = -std::sin(aAngle.value());
+    result[2][1] =  std::sin(aAngle.value());
+    result[2][2] =  std::cos(aAngle.value());
     return result;
 }
 
-inline Matrix<4, GLfloat> rotateMatrix_Y(GLfloat aAngle)
+inline Matrix<4, GLfloat> rotateMatrix_Y(Radian<> aAngle)
 {
     auto result = Matrix<4, GLfloat>::Identity();
-    result[0][0] =  std::cos(aAngle);
-    result[2][0] = -std::sin(aAngle);
-    result[0][2] =  std::sin(aAngle);
-    result[2][2] =  std::cos(aAngle);
+    result[0][0] =  std::cos(aAngle.value());
+    result[2][0] = -std::sin(aAngle.value());
+    result[0][2] =  std::sin(aAngle.value());
+    result[2][2] =  std::cos(aAngle.value());
     return result;
 }
 
-inline Matrix<4, GLfloat> rotateMatrix_Z(GLfloat aAngle)
+inline Matrix<4, GLfloat> rotateMatrix_Z(Radian<> aAngle)
 {
     auto result = Matrix<4, GLfloat>::Identity();
-    result[0][0] =  std::cos(aAngle);
-    result[0][1] = -std::sin(aAngle);
-    result[1][0] =  std::sin(aAngle);
-    result[1][1] =  std::cos(aAngle);
+    result[0][0] =  std::cos(aAngle.value());
+    result[0][1] = -std::sin(aAngle.value());
+    result[1][0] =  std::sin(aAngle.value());
+    result[1][1] =  std::cos(aAngle.value());
     return result;
 }
 

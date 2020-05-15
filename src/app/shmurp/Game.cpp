@@ -19,6 +19,7 @@
 #include "System/LimitPosition.h"
 #include "System/Rendering.h"
 #include "System/Rendering3D.h"
+#include "System/SceneGraph.h"
 #include "System/Tracking.h"
 
 #include <aunteater/UpdateTiming.h>
@@ -45,6 +46,8 @@ Game::Game(Application & aApplication)
 
     mEntityEngine.addSystem<Displace>();
 
+    mEntityEngine.addSystem<SceneGraph>();
+
     mEntityEngine.addSystem<LimitPosition>();
 
     mEntityEngine.addSystem<Collision>();
@@ -69,10 +72,11 @@ Game::Game(Application & aApplication)
             .add<Speed>(0.f, 0.f)
     );
 
-    mEntityEngine.addEntity(entities::makeTrackingPyramid(
+    entities::addTrackingPyramid(
+            mEntityEngine,
             Vec<2>{5.f, conf::gWindowWorldHeight-5.f},
             Vec<2>{0.f, 0.f},
-            Vec<3, Radian<>>{0._radf, 0.4_radf, 0._radf}));
+            Vec<3, Radian<>>{0._radf, 0.4_radf, 0._radf});
 
     //mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
     //                                .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)

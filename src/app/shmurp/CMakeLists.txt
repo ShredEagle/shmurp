@@ -16,6 +16,8 @@ set(${PROJECT_NAME}_HEADERS
     Components/CustomCallback.h
     Components/FirePattern.h
     Components/Geometry.h
+    Components/SceneGraphComposite.h
+    Components/SceneGraphParent.h
     Components/Shape.h
     Components/Speed.h
     Components/TrackerPlayer.h
@@ -33,6 +35,7 @@ set(${PROJECT_NAME}_HEADERS
     System/Rendering.h
     System/Rendering3D.h
     System/RenderingShaders.h
+    System/SceneGraph.h
     System/Tracking.h
 
     utils/interpolation.h
@@ -53,6 +56,7 @@ set(${PROJECT_NAME}_SOURCES
     System/Rendering.cpp
     System/Rendering3D.cpp
     System/KeyboardControl.cpp
+    System/SceneGraph.cpp
     System/Tracking.cpp
 )
 

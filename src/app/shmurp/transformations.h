@@ -61,8 +61,21 @@ inline Radian<> angleBetween(Vec<2> a, Vec<2> b)
     //return math::Radian<GLfloat>{std::acos(a.normalize().dot(b.normalize()))};
 
     // see: https://stackoverflow.com/a/21484228/1027706
-    return Radian<>{std::atan2(b.y(), b.x()) - std::atan2(a.y(), a.x())};
+    return Radian<>{std::atan2(a.y(), a.x()) - std::atan2(b.y(), b.x())};
 }
+
+
+//
+// Ad-hoc helpers, while the transformation system relies on position + 3 orientations
+//
+inline Matrix<4, GLfloat> makeOrientationMatrix(Vec<3, Radian<>> & aOrientations)
+{
+    return   transform::rotateMatrix_X(aOrientations.x())
+           * transform::rotateMatrix_Y(aOrientations.y())
+           * transform::rotateMatrix_Z(aOrientations.z());
+}
+
+
 
 
 } // namespace transform

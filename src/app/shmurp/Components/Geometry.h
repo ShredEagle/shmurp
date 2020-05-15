@@ -29,15 +29,6 @@ struct Geometry : public aunteater::Component<Geometry>
         return (position-aOther.position).getNormSquared() <= std::pow(radius+aOther.radius, 2);
     }
 
-
-    Matrix<4, GLfloat> orientationMatrix() const
-    {
-        return transform::rotateMatrix_Z(orientations.z())
-               * transform::rotateMatrix_Y(orientations.y())
-               * transform::rotateMatrix_X(orientations.x());
-    }
-
-
     Vec<2, GLfloat> position;
     GLfloat radius;
     Vec<3, Radian<>> orientations{Vec<3, Radian<>>::Zero()};

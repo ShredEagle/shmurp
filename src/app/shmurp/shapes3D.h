@@ -198,12 +198,12 @@ std::vector<vertex3D::Data> makeVertices(GLfloat aRadius)
                                                 cos(2*pi<float>*i/N_vertices) * aRadius,
                                                 sin(2*pi<float>*i/N_vertices) * aRadius,
                                                 0.f,
-                                            },
-                                            {
-                                                0.f,
-                                                0.f,
-                                                -1.f,
-                                            }});
+                                           },
+                                           {
+                                               0.f,
+                                               0.f,
+                                               -1.f,
+                                           }});
     }
     return result;
 }

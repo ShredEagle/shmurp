@@ -6,6 +6,8 @@
 #include <Components/Faction.h>
 #include <Components/FirePattern.h>
 #include <Components/Geometry.h>
+#include <Components/SceneGraphComposite.h>
+#include <Components/SceneGraphParent.h>
 #include <Components/Shape.h>
 #include <Components/Speed.h>
 #include <Components/TrackerPlayer.h>
@@ -30,9 +32,10 @@ inline aunteater::Entity makeSquare(Vec<2, GLfloat> aPosition,
 }
 
 
-inline aunteater::Entity makeTrackingPyramid(Vec<2, GLfloat> aPosition,
-                                             Vec<2, GLfloat> aTranslationSpeed,
-                                             Vec<3, Radian<>> aRotationSpeed)
+inline void addTrackingPyramid(aunteater::Engine & aEngine,
+                               Vec<2, GLfloat> aPosition,
+                               Vec<2, GLfloat> aTranslationSpeed,
+                               Vec<3, Radian<>> aRotationSpeed)
 {
     static constexpr float firePeriod = 0.15f;
     static constexpr int burstSize = 4;
@@ -60,14 +63,22 @@ inline aunteater::Entity makeTrackingPyramid(Vec<2, GLfloat> aPosition,
             }
         };
 
-    return aunteater::Entity()
+    aunteater::weak_entity ship = aEngine.addEntity(
+        aunteater::Entity()
             .add<CustomCallback>(std::move(customBehaviour))
-            .add<FirePattern>(std::make_unique<Fire::Line<Rythm>>(fourFour))
             .add<Faction>(Faction::Democrats, Faction::SpaceForce)
-            .add<Geometry>(aPosition, conf::gPyramidRadius)
+            .add<Geometry>(Vec<2>{0.f, 0.f}, conf::gPyramidRadius)
+            .add<SceneGraphComposite>(aPosition)
+            .add<SceneGraphParent>(/*root*/)
             .add<Shape>(Shape::Pyramid)
-            .add<Speed>(aTranslationSpeed, aRotationSpeed);
-            ;
+            .add<Speed>(aTranslationSpeed, aRotationSpeed));
+
+    aEngine.addEntity(
+        aunteater::Entity()
+            .add<FirePattern>(std::make_unique<Fire::Line<Rythm>>(fourFour))
+            .add<Geometry>(Vec<2>{0.f, 0.f}, 0.f) // The position is handled by SceneGraph system
+            .add<SceneGraphComposite>(Vec<2>{0.f, -.5f})
+            .add<SceneGraphParent>(ship));
 }
 
 

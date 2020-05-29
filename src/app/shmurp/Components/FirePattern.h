@@ -23,7 +23,8 @@ public:
     public:
         virtual void fire(double aDelta,
                           aunteater::Engine & aEngine,
-                          Vec<2, GLfloat> aBasePosition) = 0;
+                          Vec<2> aBasePosition,
+                          Vec<3, Radian<>> aOrientation) = 0;
 
         virtual std::unique_ptr<Base_impl> clone() const = 0;
         virtual ~Base_impl() = default;
@@ -56,9 +57,10 @@ public:
 
     void fire(double aDelta,
               aunteater::Engine & aEngine,
-              Vec<2, GLfloat> aBasePosition)
+              Vec<2, GLfloat> aBasePosition,
+              Vec<3, Radian<>> aOrientation)
     {
-        mImplementation->fire(aDelta, aEngine, aBasePosition);
+        mImplementation->fire(aDelta, aEngine, aBasePosition, aOrientation);
     }
 
 private:
@@ -72,14 +74,14 @@ template <class T_timer>
 class Line : public FirePattern::Base<Line<T_timer>>
 {
 public:
-    explicit Line(T_timer aTimer, Radian<> aAngle=pi<Radian<>>/2.f) :
-        mTimer{std::move(aTimer)},
-        mAngle{aAngle}
+    explicit Line(T_timer aTimer) :
+        mTimer{std::move(aTimer)}
     {}
 
     void fire(double aDelta,
               aunteater::Engine & aEngine,
-              Vec<2, GLfloat> aBasePosition) override
+              Vec<2, GLfloat> aBasePosition,
+              Vec<3, Radian<>> aOrientation) override
     {
         mTimer.forEachEvent(aDelta, [&, this](timet aRemainingTime)
         {
@@ -89,7 +91,7 @@ public:
 #endif
             Vec<4, GLfloat> gSpeed{conf::gEnemyBulletSpeed, 0.f, 0.f, 1.f};
 
-            auto speed = gSpeed * transform::rotateMatrix_Z(mAngle);
+            auto speed = gSpeed * transform::makeOrientationMatrix(aOrientation);
 
             Vec<2, GLfloat> startPosition =
                 aBasePosition
@@ -100,7 +102,6 @@ public:
 
 private:
     T_timer mTimer;
-    Radian<> mAngle;
 };
 
 
@@ -114,7 +115,8 @@ public:
 
     void fire(double aDelta,
               aunteater::Engine & aEngine,
-              Vec<2, GLfloat> aBasePosition) override
+              Vec<2, GLfloat> aBasePosition,
+              Vec<3, Radian<>> /*unused*/) override
     {
         mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
         {
@@ -151,7 +153,8 @@ public:
 
     void fire(double aDelta,
               aunteater::Engine & aEngine,
-              Vec<2, GLfloat> aBasePosition) override
+              Vec<2, GLfloat> aBasePosition,
+              Vec<3, Radian<>> /*unused*/) override
     {
         mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
         {
@@ -185,13 +188,16 @@ public:
 
     void fire(double aDelta,
               aunteater::Engine & aEngine,
-              Vec<2, GLfloat> aBasePosition) override
+              Vec<2, GLfloat> aBasePosition,
+              Vec<3, Radian<>> aOrientation) override
     {
         static constexpr Vec<4, GLfloat> gSpeed(0.f, conf::gBulletSpeed, 0.f, 1.f);
 
         mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
         {
-            auto speed = gSpeed * transform::rotateMatrix_Z(mAngleQuant*mRandomizer());
+            auto speed = gSpeed
+                         * transform::rotateMatrix_Z(mAngleQuant*mRandomizer())
+                         * transform::makeOrientationMatrix(aOrientation);
             Vec<2, GLfloat> startPosition =
                 aBasePosition
                 + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};

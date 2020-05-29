@@ -15,7 +15,7 @@ void BulletSpawn::update(const aunteater::Timer aTimer)
 {
     for (auto & [firePattern, geometry] : mCanons)
     {
-        firePattern.fire(aTimer.delta(), mEngine, geometry.position);
+        firePattern.fire(aTimer.delta(), mEngine, geometry.position, geometry.orientations);
     }
 }
 

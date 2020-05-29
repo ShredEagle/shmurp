@@ -29,7 +29,7 @@ struct Geometry : public aunteater::Component<Geometry>
         return (position-aOther.position).getNormSquared() <= std::pow(radius+aOther.radius, 2);
     }
 
-    Vec<2, GLfloat> position;
+    Vec<2> position;
     GLfloat radius;
     Vec<3, Radian<>> orientations{Vec<3, Radian<>>::Zero()};
 };

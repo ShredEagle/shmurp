@@ -15,12 +15,13 @@ class SceneGraphComposite : public aunteater::Component<SceneGraphComposite>
     friend class SceneGraph;
 
 public:
-    SceneGraphComposite(Vec<2> aPosition) :
-        position{aPosition.x(), aPosition.y(), 0.f, 1.f}
+    SceneGraphComposite(Vec<2> aPosition, Vec<3, Radian<>> aOrientations=Vec<3, Radian<>>::Zero()) :
+        position{aPosition},
+        orientations{aOrientations}
     {}
 
-    Vec<4> position;
-    Vec<3, Radian<>> orientations{Vec<3, Radian<>>::Zero()};
+    Vec<2> position;
+    Vec<3, Radian<>> orientations;
 
 private:
     std::vector<aunteater::weak_entity> mChildren;

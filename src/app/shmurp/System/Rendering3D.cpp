@@ -81,14 +81,14 @@ Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution):
     mShapeToSpecification.emplace(Shape::Pyramid,
                                   ShapeInstancing(
                                       pyramidVertices *=
-                                        transform::rotateMatrix_X(-pi<Radian<>>/2.f)
-                                        * transform::translateMatrix(0.f, conf::gPyramidHeight/2.f),
+                                        transform::rotateMatrix_Y(pi<Radian<>>/2.f)
+                                        * transform::translateMatrix(-conf::gPyramidHeight/2.f, 0.f),
                                       {},
                                       GL_LINES,
                                       Vec<4, GLfloat>(1.0f, 0.22f, 0.39f, 1.0f)));
 
     glProgramUniformMatrix4fv(mProgram, glGetUniformLocation(mProgram, "u_WorldToDevice"),
-                              1, true, conf::worldToDevice().data());
+                              1, /*transpose*/true, conf::worldToDevice().data());
 }
 
 void Rendering3D::Impl::draw()

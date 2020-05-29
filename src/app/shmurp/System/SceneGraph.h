@@ -35,7 +35,9 @@ public:
     void removedEntity(aunteater::LiveEntity &aEntity) override;
 
 private:
-    void traverse(aunteater::LiveEntity & aNode, const Matrix<4> & aTransform);
+    void traverse(aunteater::LiveEntity & aNode,
+                  const Matrix<4> & aTransform,
+                  const Vec<3, Radian<>> aParentOrientation);
 
 private:
     aunteater::Engine & mEngine;

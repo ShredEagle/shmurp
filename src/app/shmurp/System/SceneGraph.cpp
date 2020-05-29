@@ -21,21 +21,26 @@ SceneGraph::~SceneGraph()
 }
 
 
-void SceneGraph::traverse(aunteater::LiveEntity & aNode, const Matrix<4> & aTransform)
+void SceneGraph::traverse(aunteater::LiveEntity & aNode,
+                          const Matrix<4> & aParentTransform,
+                          const Vec<3, Radian<>> aParentOrientation)
 {
     SceneGraphComposite & node = aNode.get<SceneGraphComposite>();
     Geometry & geometry = aNode.get<Geometry>();
 
-    Vec<4> transPos = node.position * aTransform;
+    Vec<4> transPos{node.position.x(), node.position.y(), 0.f, 1.f};
+    transPos *= aParentTransform;
     geometry.position = Vec<2>{transPos.x(), transPos.y()};
+    geometry.orientations = node.orientations + aParentOrientation;
 
-    for (aunteater::weak_entity child : aNode.get<SceneGraphComposite>().mChildren)
+    for (aunteater::weak_entity child : node.mChildren)
     {
-        // IMPORTANT: should be node.orientations instead, but the separation between local/world
-        // transformation has to be deeply refactored
-        traverse(*child, transform::makeOrientationMatrix(geometry.orientations)
-                         * transform::translateMatrix(node.position.x(), node.position.y())
-                         * aTransform);
+        // IMPORTANT: the separation between local/world transformation has to be deeply refactored
+        traverse(*child,
+                 transform::makeOrientationMatrix(node.orientations)
+                    * transform::translateMatrix(node.position.x(), node.position.y())
+                    * aParentTransform,
+                 geometry.orientations);
     }
 }
 
@@ -44,7 +49,7 @@ void SceneGraph::update(const aunteater::Timer aTimer)
 {
     for (auto & root : mRootNodes)
     {
-        traverse(*root, Matrix<4>::Identity());
+        traverse(*root, Matrix<4>::Identity(), Vec<3, Radian<>>::Zero());
     }
 }
 

@@ -17,7 +17,7 @@ Rendering::Rendering(aunteater::Engine &aEngine) :
     glClearColor(0.04f, 0.08f, 0.12f, 1.f);
 }
 
-void Rendering::update(double time)
+void Rendering::update(const aunteater::Timer aTimer)
 {
     std::map<Shape::Value, std::vector<instance::Data>> sorted;
 

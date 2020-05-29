@@ -33,9 +33,11 @@ out vec4 ex_Normal;
 
 void main(void)
 {
-    gl_Position = (in_Position * (in_InstanceOrientation) + vec4(in_InstancePosition, 0, 0))
+    // IMPORTANT: in_InstanceOrientation matrix is not transposed, so we pre-multiply the vector
+    // u_WorldToDevice is transposed, so we post-multiply the vector
+    gl_Position = (in_InstanceOrientation * in_Position + vec4(in_InstancePosition, 0, 0))
         * u_WorldToDevice;
-    ex_Normal = vec4(in_Normal, 0.0) * in_InstanceOrientation;
+    ex_Normal = in_InstanceOrientation * vec4(in_Normal, 0.0);
     ex_Color = u_Color;
 }
 )#";

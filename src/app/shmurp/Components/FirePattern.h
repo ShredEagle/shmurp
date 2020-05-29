@@ -2,7 +2,7 @@
 
 #include "../commons.h"
 #include "../configuration.h"
-#include "../Entities.h"
+#include "../Entities/Bullets.h"
 #include "../transformations.h"
 
 #include "../Utils/Periodic.h"
@@ -11,6 +11,7 @@
 #include <aunteater/Engine.h>
 
 #include <handy/random.h>
+
 
 namespace ad {
 
@@ -22,20 +23,20 @@ public:
     public:
         virtual void fire(double aDelta,
                           aunteater::Engine & aEngine,
-                          Vec<2, GLfloat> aBasePosition) = 0;
+                          Vec<2> aBasePosition,
+                          Vec<3, Radian<>> aOrientation) = 0;
 
-        virtual std::unique_ptr<Base_impl> clone() = 0;
-        virtual ~Base_impl()
-        {}
+        virtual std::unique_ptr<Base_impl> clone() const = 0;
+        virtual ~Base_impl() = default;
     };
 
     template <class T_derived>
     class Base : public Base_impl
     {
     public:
-        std::unique_ptr<Base_impl> clone() final
+        std::unique_ptr<Base_impl> clone() const final
         {
-            return std::make_unique<T_derived>(*static_cast<T_derived*>(this));
+            return std::make_unique<T_derived>(*static_cast<const T_derived*>(this));
         }
     };
 
@@ -46,7 +47,7 @@ public:
     {}
 
     template <class T_base>
-    FirePattern(std::unique_ptr<T_base> aImplementation) :
+    explicit FirePattern(std::unique_ptr<T_base> aImplementation) :
         mImplementation(std::move(aImplementation))
     {}
 
@@ -56,16 +57,53 @@ public:
 
     void fire(double aDelta,
               aunteater::Engine & aEngine,
-              Vec<2, GLfloat> aBasePosition)
+              Vec<2, GLfloat> aBasePosition,
+              Vec<3, Radian<>> aOrientation)
     {
-        mImplementation->fire(aDelta, aEngine, aBasePosition);
+        mImplementation->fire(aDelta, aEngine, aBasePosition, aOrientation);
     }
 
 private:
     std::unique_ptr<Base_impl> mImplementation;
 };
 
+
 namespace Fire {
+
+template <class T_timer>
+class Line : public FirePattern::Base<Line<T_timer>>
+{
+public:
+    explicit Line(T_timer aTimer) :
+        mTimer{std::move(aTimer)}
+    {}
+
+    void fire(double aDelta,
+              aunteater::Engine & aEngine,
+              Vec<2, GLfloat> aBasePosition,
+              Vec<3, Radian<>> aOrientation) override
+    {
+        mTimer.forEachEvent(aDelta, [&, this](timet aRemainingTime)
+        {
+#if !defined(__clang__)
+            // see: https://stackoverflow.com/q/61060240/1027706
+            constexpr
+#endif
+            Vec<4, GLfloat> gSpeed{conf::gEnemyBulletSpeed, 0.f, 0.f, 1.f};
+
+            auto speed = gSpeed * transform::makeOrientationMatrix(aOrientation);
+
+            Vec<2, GLfloat> startPosition =
+                aBasePosition
+                + static_cast<GLfloat>(aRemainingTime)*Vec<2>{speed.x(), speed.y()};
+            aEngine.addEntity(entities::makeEnemyBullet(startPosition, speed));
+        });
+    }
+
+private:
+    T_timer mTimer;
+};
+
 
 class Spiral : public FirePattern::Base<Spiral>
 {
@@ -77,12 +115,13 @@ public:
 
     void fire(double aDelta,
               aunteater::Engine & aEngine,
-              Vec<2, GLfloat> aBasePosition) override
+              Vec<2, GLfloat> aBasePosition,
+              Vec<3, Radian<>> /*unused*/) override
     {
         mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
         {
             static constexpr Vec<4, GLfloat> gSpeed(0.f, -conf::gEnemyBulletSpeed, 0.f, 1.f);
-            auto speed = gSpeed * transform::rotateMatrix(nextAngle());
+            auto speed = gSpeed * transform::rotateMatrix_Z(nextAngle());
 
             Vec<2, GLfloat> startPosition =
                 aBasePosition
@@ -92,15 +131,15 @@ public:
     }
 
 private:
-    float nextAngle()
+    Radian<> nextAngle()
     {
         return mAngle += mAngleIncrement;
     }
 
 private:
     Periodic mPeriod;
-    float mAngle{0};
-    const float mAngleIncrement;
+    Radian<> mAngle{0};
+    const Radian<> mAngleIncrement;
 };
 
 
@@ -114,7 +153,8 @@ public:
 
     void fire(double aDelta,
               aunteater::Engine & aEngine,
-              Vec<2, GLfloat> aBasePosition) override
+              Vec<2, GLfloat> aBasePosition,
+              Vec<3, Radian<>> /*unused*/) override
     {
         mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
         {
@@ -122,7 +162,7 @@ public:
 
             for (int bulletCount = 0; bulletCount != mCount; ++bulletCount)
             {
-                auto speed = gSpeed * transform::rotateMatrix(bulletCount * 2*pi<GLfloat>/mCount);
+                auto speed = gSpeed * transform::rotateMatrix_Z(bulletCount * 2*pi<Radian<>>/mCount);
                 Vec<2, GLfloat> startPosition =
                     aBasePosition
                     + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
@@ -137,23 +177,27 @@ private:
     const int mCount{0};
 };
 
+
 class Burst : public FirePattern::Base<Burst>
 {
 public:
-    Burst(timet aPeriod, Radians aSpreadAngle) :
+    Burst(timet aPeriod, Radian<> aSpreadAngle) :
         mPeriod{aPeriod},
-        mAngleQuant(aSpreadAngle/gDivisions)
+        mAngleQuant{aSpreadAngle/gDivisions}
     {}
 
     void fire(double aDelta,
               aunteater::Engine & aEngine,
-              Vec<2, GLfloat> aBasePosition) override
+              Vec<2, GLfloat> aBasePosition,
+              Vec<3, Radian<>> aOrientation) override
     {
         static constexpr Vec<4, GLfloat> gSpeed(0.f, conf::gBulletSpeed, 0.f, 1.f);
 
         mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
         {
-            auto speed = gSpeed * transform::rotateMatrix(mAngleQuant*mRandomizer());
+            auto speed = gSpeed
+                         * transform::rotateMatrix_Z(mAngleQuant*mRandomizer())
+                         * transform::makeOrientationMatrix(aOrientation);
             Vec<2, GLfloat> startPosition =
                 aBasePosition
                 + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
@@ -165,7 +209,7 @@ private:
     static constexpr int gDivisions{30};
     Randomizer<> mRandomizer{-gDivisions, gDivisions};
     Periodic mPeriod;
-    const Radians mAngleQuant;
+    const Radian<> mAngleQuant;
 
 };
 

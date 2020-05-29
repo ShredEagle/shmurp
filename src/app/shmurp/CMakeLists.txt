@@ -5,7 +5,6 @@ set(${PROJECT_NAME}_HEADERS
     Bloom.h
     BloomShaders.h
     DebugUI.h
-    Entities.h
     Game.h
     Instancing.h
     ScreenQuad.h
@@ -13,14 +12,22 @@ set(${PROJECT_NAME}_HEADERS
     shapes3D.h
 
     Components/Boundaries.h
-    Components/FirePattern.h
     Components/ControlDevice.h
+    Components/CustomCallback.h
+    Components/FirePattern.h
     Components/Geometry.h
+    Components/SceneGraphComposite.h
+    Components/SceneGraphParent.h
     Components/Shape.h
     Components/Speed.h
+    Components/TrackerPlayer.h
+
+    Entities/Bullets.h
+    Entities/Ships.h
 
     System/BulletSpawn.h
     System/Collision.h
+    System/Customizer.h
     System/Displace.h
     System/EnemySpawn.h
     System/LimitPosition.h
@@ -28,9 +35,12 @@ set(${PROJECT_NAME}_HEADERS
     System/Rendering.h
     System/Rendering3D.h
     System/RenderingShaders.h
+    System/SceneGraph.h
+    System/Tracking.h
 
     utils/interpolation.h
     utils/Periodic.h
+    utils/Rythm.h
 )
 
 set(${PROJECT_NAME}_SOURCES
@@ -39,12 +49,15 @@ set(${PROJECT_NAME}_SOURCES
 
     System/BulletSpawn.cpp
     System/Collision.cpp
+    System/Customizer.cpp
     System/Displace.cpp
     System/EnemySpawn.cpp
     System/LimitPosition.cpp
     System/Rendering.cpp
     System/Rendering3D.cpp
     System/KeyboardControl.cpp
+    System/SceneGraph.cpp
+    System/Tracking.cpp
 )
 
 find_package(Aunteater CONFIG REQUIRED COMPONENTS aunteater)

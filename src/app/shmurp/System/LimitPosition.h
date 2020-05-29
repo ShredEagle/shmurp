@@ -18,7 +18,7 @@ class LimitPosition : public aunteater::System
 public:
     LimitPosition(aunteater::Engine &aEngine);
 
-    void update(double aDelta) override;
+    void update(const aunteater::Timer aTimer) override;
 
 private:
     const aunteater::FamilyHelp<PositionBound> mPositionBounds;

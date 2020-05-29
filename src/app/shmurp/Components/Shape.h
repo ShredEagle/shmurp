@@ -9,6 +9,7 @@ struct Shape : public aunteater::Component<Shape>
     enum Value
     {
         Circle,
+        Pyramid,
         RocketShip,
         Square,
     };

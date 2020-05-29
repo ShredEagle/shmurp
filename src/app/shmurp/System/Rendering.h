@@ -30,7 +30,7 @@ class Rendering : public aunteater::System
 public:
     Rendering(aunteater::Engine &aEngine);
 
-    void update(double time) override;
+    void update(const aunteater::Timer aTimer) override;
 
 private:
     const aunteater::Family & mRenderables;

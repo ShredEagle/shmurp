@@ -5,6 +5,9 @@
 
 #include <renderer/VertexSpecification.h>
 
+#include <gsl/gsl>
+
+
 namespace ad {
 
 namespace vertex3D
@@ -20,6 +23,27 @@ constexpr AttributeDescriptionList gDescription = {
     { 0, 3, offsetof(Data, mPosition), MappedGL<GLfloat>::enumerator},
     { 1, 3, offsetof(Data, mNormal), MappedGL<GLfloat>::enumerator},
 };
+
+inline Data operator*(const Data & aLhs, const Matrix<4> & aRhs)
+{
+    Vec<4> position{aLhs.mPosition.x(), aLhs.mPosition.y(), aLhs.mPosition.z(), 1.0f};
+    Vec<4> normal{aLhs.mNormal.x(), aLhs.mNormal.y(), aLhs.mNormal.z(), 0.0f};
+
+    position *= aRhs;
+    normal *= aRhs;
+
+    return {
+        {position.x(), position.y(), position.z()},
+        {normal.x(), normal.y(), normal.z()},
+    };
+}
+
+inline const gsl::span<Data> & operator*=(const gsl::span<Data> & aLhs, const Matrix<4> & aRhs)
+{
+    std::transform(aLhs.begin(), aLhs.end(), aLhs.begin(),
+                   [&aRhs](const Data & data){ return data * aRhs; });
+    return aLhs;
+}
 
 } // namespace vertex3D
 
@@ -174,12 +198,12 @@ std::vector<vertex3D::Data> makeVertices(GLfloat aRadius)
                                                 cos(2*pi<float>*i/N_vertices) * aRadius,
                                                 sin(2*pi<float>*i/N_vertices) * aRadius,
                                                 0.f,
-                                            },
-                                            {
-                                                0.f,
-                                                0.f,
-                                                -1.f,
-                                            }});
+                                           },
+                                           {
+                                               0.f,
+                                               0.f,
+                                               -1.f,
+                                           }});
     }
     return result;
 }

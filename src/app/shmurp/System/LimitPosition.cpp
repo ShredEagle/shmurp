@@ -8,7 +8,7 @@ LimitPosition::LimitPosition(aunteater::Engine &aEngine) :
 {}
 
 
-void LimitPosition::update(double aDelta)
+void LimitPosition::update(const aunteater::Timer aTimer)
 {
     for (auto & [boundaries, geometry] : mPositionBounds)
     {

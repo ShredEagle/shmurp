@@ -1,8 +1,9 @@
 #include "configuration.h"
 #include "Game.h"
 
+#include <aunteater/Timer.h>
+
 #include <engine/Application.h>
-#include <engine/Timer.h>
 
 
 using namespace ad;
@@ -13,7 +14,7 @@ int main(int argc, const char * argv[])
     {
         Application application("Shmurp", conf::gWindowWidth, conf::gWindowHeight,
                                 Application::Window_Keep_Ratio);
-        Timer timer{glfwGetTime(), 0.};
+        aunteater::Timer timer{glfwGetTime()};
 
         shmurp::Game game(application);
 

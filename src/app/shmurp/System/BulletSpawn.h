@@ -16,7 +16,7 @@ class BulletSpawn : public aunteater::System
 public:
     BulletSpawn(aunteater::Engine &aEngine);
 
-    void update(double aDelta) override;
+    void update(const aunteater::Timer aTimer) override;
 
 private:
     aunteater::Engine & mEngine;

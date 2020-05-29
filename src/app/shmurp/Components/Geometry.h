@@ -2,9 +2,13 @@
 
 #include "../commons.h"
 
+#include "../transformations.h"
+
 #include <aunteater/Component.h>
 
+
 namespace ad {
+
 
 struct Geometry : public aunteater::Component<Geometry>
 {
@@ -13,19 +17,22 @@ struct Geometry : public aunteater::Component<Geometry>
         radius(aRadius)
     {}
 
+
     Geometry(GLfloat x, GLfloat y, GLfloat aRadius = 0.) :
         position(x, y),
         radius(aRadius)
     {}
+
 
     bool isColliding(const Geometry & aOther)
     {
         return (position-aOther.position).getNormSquared() <= std::pow(radius+aOther.radius, 2);
     }
 
-    Vec<2, GLfloat> position;
+    Vec<2> position;
     GLfloat radius;
-    Matrix<4, GLfloat> orientation{Matrix<4, GLfloat>::Identity()};
+    Vec<3, Radian<>> orientations{Vec<3, Radian<>>::Zero()};
 };
+
 
 } // namespace ad

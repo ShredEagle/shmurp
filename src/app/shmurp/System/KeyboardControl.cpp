@@ -12,7 +12,7 @@
 
 namespace ad {
 
-typedef aunteater::Archetype<ControlDevice, ControlDevice, Geometry, Speed> PlayerMovable;
+typedef aunteater::Archetype<ControlDevice, Geometry, Speed> PlayerMovable;
 
 void KeyboardControl::Callback::operator()(int key, int scancode, int action, int mods)
 {
@@ -55,7 +55,7 @@ KeyboardControl::KeyboardControl(aunteater::Engine &aEngine) :
     mPlayerMovable{aEngine.getFamily<PlayerMovable>()}
 {}
 
-void KeyboardControl::update(double time)
+void KeyboardControl::update(const aunteater::Timer aTimer)
 {
     for (auto & movable : mPlayerMovable)
     {
@@ -84,16 +84,16 @@ void KeyboardControl::update(double time)
             mSpeedInterpolation.redirect(mTargetSpeed);
         }
 
-        movable->get<Speed>().translation = mSpeedInterpolation(time);
+        movable->get<Speed>().translation = mSpeedInterpolation(aTimer.delta());
 
         switch(mCallback->mFiring)
         {
             case Edge::Press:
-                movable->add<FirePattern>(std::make_unique<Fire::Burst>(0.02f, pi<GLfloat>/180.f*7.5f));
+                movable->add<FirePattern>(std::make_unique<Fire::Burst>(0.02f, pi<Radian<>>/180.f*7.5f));
                 mCallback->mFiring = Edge::None;
                 break;
             case Edge::Release:
-                movable->removeComponent<FirePattern>();
+                movable->remove<FirePattern>();
                 mCallback->mFiring = Edge::None;
                 break;
             default: break;

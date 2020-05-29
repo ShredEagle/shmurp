@@ -27,7 +27,7 @@ class Rendering3D : public aunteater::System
     struct Impl
     {
         Impl(Size<2, GLsizei> aResolution);
-        void draw(double time);
+        void draw();
 
         std::map<Shape::Value, ShapeInstancing> mShapeToSpecification;
         Program mProgram;
@@ -38,7 +38,7 @@ class Rendering3D : public aunteater::System
 public:
     Rendering3D(aunteater::Engine &aEngine, ::ad::Engine & aAppEngine);
 
-    void update(double time) override;
+    void update(const aunteater::Timer aTimer) override;
 
     void resizeRenderTarget(Size<2, GLsizei> aNewResolution);
 

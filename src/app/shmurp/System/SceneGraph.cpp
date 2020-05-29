@@ -82,32 +82,27 @@ void SceneGraph::removedEntity(aunteater::LiveEntity &aEntity)
     const aunteater::weak_entity parent = aEntity.get<SceneGraphParent>().parent;
     if (parent == nullptr)
     {
-        std::remove(mRootNodes.begin(), mRootNodes.end(), entityRefFrom(aEntity));
+        mRootNodes.erase(std::remove(mRootNodes.begin(), mRootNodes.end(), entityRefFrom(aEntity)));
     }
     else
     {
-        auto found = std::find(mNodesFamily.begin(), mNodesFamily.end(), parent);
-        if (found != mNodesFamily.end())
+        auto foundParent = std::find(mNodesFamily.begin(), mNodesFamily.end(), parent);
+        if (foundParent != mNodesFamily.end())
         {
-            auto & children = (*found)->get<SceneGraphComposite>().mChildren;
+            auto & children = (*foundParent)->get<SceneGraphComposite>().mChildren;
             std::remove(children.begin(), children.end(), entityRefFrom(aEntity));
         }
-        else
-        {
-            throw std::logic_error("scene graph node parent is not a scene graph node");
-        }
+        // Else, the parent might have been removed first
+        // (causing the current node to be recursively removed)
     }
 
-    // Recursively mark all children for removal
-    auto markRemove = [this](aunteater::LiveEntity & entity, auto & recursion) -> void
-        {
-            for (aunteater::weak_entity child : entity.get<SceneGraphComposite>().mChildren)
-            {
-                mEngine.markToRemove(child);
-                recursion(*child, recursion);
-            }
-        };
-    markRemove(aEntity, markRemove);
+    // Mark all children for removal
+    // Note: this does not need to recusively traverse all the children:
+    // removing a child will have removedEntity() called for said child, thus implicitly recurring
+    for (aunteater::weak_entity child : aEntity.get<SceneGraphComposite>().mChildren)
+    {
+        mEngine.markToRemove(child);
+    }
 }
 
 

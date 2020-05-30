@@ -18,7 +18,7 @@ inline aunteater::Entity makeEnemyBullet(Vec<2, GLfloat> aPosition, Vec<4, GLflo
 {
     return aunteater::Entity().add<Faction>(Faction::LibLies, Faction::SpaceForce)
                               .add<Geometry>(aPosition, conf::gBulletRadius)
-                              .add<Shape>(Shape::Circle)
+                              .add<Shape>(Shape::Bullet)
                               .add<Speed>(aSpeed.x(), aSpeed.y());
 }
 
@@ -27,7 +27,7 @@ inline aunteater::Entity makeFriendBullet(Vec<2, GLfloat> aPosition, Vec<4, GLfl
 {
     return aunteater::Entity().add<Faction>(Faction::TruthBullet, Faction::Democrats)
                               .add<Geometry>(aPosition, conf::gBulletRadius)
-                              .add<Shape>(Shape::Circle)
+                              .add<Shape>(Shape::Bullet)
                               .add<Speed>(aSpeed.x(), aSpeed.y());
 }
 

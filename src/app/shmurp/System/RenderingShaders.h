@@ -25,7 +25,7 @@ static const char* gVertexShader3D = R"#(
 layout(location=0) in vec4 in_Position;
 layout(location=1) in vec3 in_Normal;
 layout(location=2) in vec2 in_InstancePosition;
-layout(location=3) in mat4 in_InstanceOrientation;
+layout(location=3) in mat4 in_InstanceOrientationScale;
 uniform vec4 u_Color;
 uniform mat4 u_WorldToDevice;
 out vec4 ex_Color;
@@ -33,11 +33,12 @@ out vec4 ex_Normal;
 
 void main(void)
 {
-    // IMPORTANT: in_InstanceOrientation matrix is not transposed, so we pre-multiply the vector
+    // IMPORTANT: in_InstanceOrientationScale matrix is not transposed, so we pre-multiply the vector
     // u_WorldToDevice is transposed, so we post-multiply the vector
-    gl_Position = (in_InstanceOrientation * in_Position + vec4(in_InstancePosition, 0, 0))
+    gl_Position = (in_InstanceOrientationScale * in_Position + vec4(in_InstancePosition, 0, 0))
         * u_WorldToDevice;
-    ex_Normal = in_InstanceOrientation * vec4(in_Normal, 0.0);
+    // The result must be normalized again, there is scaling in the matrix
+    ex_Normal = normalize(in_InstanceOrientationScale * vec4(in_Normal, 0.0));
     ex_Color = u_Color;
 }
 )#";

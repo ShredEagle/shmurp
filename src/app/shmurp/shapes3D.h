@@ -58,13 +58,13 @@ namespace ship3D {
 
 static const std::array<vertex3D::Data, 4> gVertices = {
     vertex3D::Data{
-        {-0.3f, -0.25f, 0.0f},
+        {-1.5f, -1.25f, 0.0f},
     },
     vertex3D::Data{
-        { 0.0f,  0.75f, 0.0f},
+        { 0.0f,  3.75f, 0.0f},
     },
     vertex3D::Data{
-        { 0.3f, -0.25f, 0.0f},
+        { 1.5f, -1.25f, 0.0f},
     },
     vertex3D::Data{
         { 0.0f,  0.0f,  0.0f},
@@ -80,103 +80,103 @@ static constexpr float cpi4 = 0.70710678f;
 static const std::array<vertex3D::Data, 8*3> gVertices = {
     // Frontface
     vertex3D::Data{
-        {-0.3f, -0.3f, 0.3f},
+        {-1.0f, -1.0f, 1.0f},
         {-cpi4,  0.0f, cpi4},
     },
     vertex3D::Data{
-        {-0.3f,  0.3f, 0.3f},
+        {-1.0f,  1.0f, 1.0f},
         {-cpi4,  0.0f, cpi4},
     },
     vertex3D::Data{
-        {-0.3f,  0.3f, 0.3f},
+        {-1.0f,  1.0f, 1.0f},
         { 0.0f,  cpi4, cpi4},
     },
     vertex3D::Data{
-        { 0.3f,  0.3f, 0.3f},
+        { 1.0f,  1.0f, 1.0f},
         { 0.0f,  cpi4, cpi4},
     },
     vertex3D::Data{
-        { 0.3f,  0.3f, 0.3f},
+        { 1.0f,  1.0f, 1.0f},
         { cpi4,  0.0f, cpi4},
     },
     vertex3D::Data{
-        { 0.3f,  -0.3f, 0.3f},
+        { 1.0f,  -1.0f, 1.0f},
         { cpi4,  0.0f,  cpi4},
     },
     vertex3D::Data{
-        { 0.3f, -0.3f, 0.3f},
+        { 1.0f, -1.0f, 1.0f},
         { 0.0f, -cpi4, cpi4},
     },
     vertex3D::Data{
-        {-0.3f, -0.3f, 0.3f},
+        {-1.0f, -1.0f, 1.0f},
         { 0.0f, -cpi4, cpi4},
     },
 
     // Backface
     vertex3D::Data{
-        {-0.3f, -0.3f, -0.3f},
+        {-1.0f, -1.0f, -1.0f},
           {-cpi4,  0.0f, -cpi4},
     },
     vertex3D::Data{
-        {-0.3f,  0.3f, -0.3f},
+        {-1.0f,  1.0f, -1.0f},
         {-cpi4,  0.0f, -cpi4},
     },
     vertex3D::Data{
-        {-0.3f,  0.3f, -0.3f},
+        {-1.0f,  1.0f, -1.0f},
         { 0.0f,  cpi4, -cpi4},
     },
     vertex3D::Data{
-        { 0.3f,  0.3f, -0.3f},
+        { 1.0f,  1.0f, -1.0f},
         { 0.0f,  cpi4, -cpi4},
     },
     vertex3D::Data{
-        { 0.3f,  0.3f, -0.3f},
+        { 1.0f,  1.0f, -1.0f},
         { cpi4,  0.0f, -cpi4},
     },
     vertex3D::Data{
-        { 0.3f,  -0.3f, -0.3f},
+        { 1.0f,  -1.0f, -1.0f},
         { cpi4,   0.0f, -cpi4},
     },
     vertex3D::Data{
-        { 0.3f, -0.3f, -0.3f},
+        { 1.0f, -1.0f, -1.0f},
         { 0.0f, -cpi4, -cpi4},
     },
     vertex3D::Data{
-        {-0.3f, -0.3f, -0.3f},
+        {-1.0f, -1.0f, -1.0f},
         { 0.0f, -cpi4, -cpi4},
     },
 
     // Connect
     vertex3D::Data{
-        {-0.3f, -0.3f, -0.3f},
+        {-1.0f, -1.0f, -1.0f},
         {-cpi4, -cpi4,  0.0f},
     },
     vertex3D::Data{
-        {-0.3f, -0.3f, +0.3f},
+        {-1.0f, -1.0f, +1.0f},
         {-cpi4, -cpi4,  0.0f},
     },
     vertex3D::Data{
-        {-0.3f,  0.3f, -0.3f},
+        {-1.0f,  1.0f, -1.0f},
         {-cpi4,  cpi4,  0.0f},
     },
     vertex3D::Data{
-        {-0.3f,  0.3f, +0.3f},
+        {-1.0f,  1.0f, +1.0f},
         {-cpi4,  cpi4,  0.0f},
     },
     vertex3D::Data{
-        { 0.3f,  0.3f, -0.3f},
+        { 1.0f,  1.0f, -1.0f},
         { cpi4,  cpi4,  0.0f},
     },
     vertex3D::Data{
-        { 0.3f,  0.3f, +0.3f},
+        { 1.0f,  1.0f, +1.0f},
         { cpi4,  cpi4,  0.0f},
     },
     vertex3D::Data{
-        { 0.3f,  -0.3f, -0.3f},
+        { 1.0f,  -1.0f, -1.0f},
         { cpi4,  -cpi4,  0.0f},
     },
     vertex3D::Data{
-        { 0.3f,  -0.3f, +0.3f},
+        { 1.0f,  -1.0f, +1.0f},
         { cpi4,  -cpi4,  0.0f},
     },
 };
@@ -215,15 +215,15 @@ namespace instance3D {
 struct Data
 {
     Vec<2, GLfloat> mPosition;
-    Matrix<4, GLfloat> mOrientation{Matrix<4, GLfloat>::Identity()};
+    Matrix<4, GLfloat> mOrientationScale{Matrix<4, GLfloat>::Identity()};
 };
 
 constexpr AttributeDescriptionList gDescription = {
     {2, 2, offsetof(Data, mPosition),      MappedGL<GLfloat>::enumerator},
-    {3, 4, offsetof(Data, mOrientation),   MappedGL<GLfloat>::enumerator},
-    {4, 4, offsetof(Data, mOrientation) +  4*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
-    {5, 4, offsetof(Data, mOrientation) +  8*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
-    {6, 4, offsetof(Data, mOrientation) + 12*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
+    {3, 4, offsetof(Data, mOrientationScale),   MappedGL<GLfloat>::enumerator},
+    {4, 4, offsetof(Data, mOrientationScale) +  4*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
+    {5, 4, offsetof(Data, mOrientationScale) +  8*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
+    {6, 4, offsetof(Data, mOrientationScale) + 12*sizeof(GLfloat),   MappedGL<GLfloat>::enumerator},
 };
 
 } // namespace instance3D

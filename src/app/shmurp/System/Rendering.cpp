@@ -57,7 +57,7 @@ Rendering::Impl::Impl() :
                                       GL_LINE_LOOP,
                                       Vec<4, GLfloat>(0.96f, 0.14f, 0.97f, 1.0f)));
 
-    mShapeToSpecification.emplace(Shape::Circle,
+    mShapeToSpecification.emplace(Shape::Bullet,
                                   ShapeInstancing(
                                       gsl::span<const VertexShape>(
                                           circle::makeVertices<20>(conf::gBulletRadius)),

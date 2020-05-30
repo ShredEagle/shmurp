@@ -46,8 +46,10 @@ constexpr Floating gPyramidHeight = gPyramidRadius;
 // TODO should be able to constexpr
 inline Matrix<4, GLfloat> worldToDevice()
 {
+    // TODO the Z factor can be used to control the frustrum near/far
     return transform::scaleMatrix(conf::getWorldToDeviceScale(conf::gWindowWidth),
-                                  conf::getWorldToDeviceScale(conf::gWindowHeight))
+                                  conf::getWorldToDeviceScale(conf::gWindowHeight),
+                                  1)
            * transform::translateMatrix(-1., -1.);
 }
 

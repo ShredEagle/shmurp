@@ -30,7 +30,8 @@ void Rendering3D::update(const aunteater::Timer aTimer)
     {
         sorted[renderable->get<Shape>().enumerator]
             .push_back({renderable->get<Geometry>().position,
-                        transform::makeOrientationMatrix(renderable->get<Geometry>().orientations)});
+                        transform::makeOrientationMatrix(renderable->get<Geometry>().orientations)
+                             * transform::scaleMatrix(renderable->get<Geometry>().radius)});
     }
 
     for (auto & [shape, instancing] : mImpl.mShapeToSpecification)
@@ -68,9 +69,9 @@ Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution):
                                       GL_LINES,
                                       Vec<4, GLfloat>(0.96f, 0.14f, 0.97f, 1.0f)));
 
-    mShapeToSpecification.emplace(Shape::Circle,
+    mShapeToSpecification.emplace(Shape::Bullet,
                                   ShapeInstancing(
-                                      circle3D::makeVertices<30>(conf::gBulletRadius),
+                                      circle3D::makeVertices<30>(1.0f),
                                       {},
                                       GL_TRIANGLE_FAN,
                                       //Vec<4, GLfloat>(0.44f, 0.9f, 1.0f, 1.0f)));

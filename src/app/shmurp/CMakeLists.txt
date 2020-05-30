@@ -32,6 +32,7 @@ set(${PROJECT_NAME}_HEADERS
     System/EnemySpawn.h
     System/LimitPosition.h
     System/KeyboardControl.h
+    System/PruneEntities.h
     System/Rendering.h
     System/Rendering3D.h
     System/RenderingShaders.h
@@ -53,6 +54,7 @@ set(${PROJECT_NAME}_SOURCES
     System/Displace.cpp
     System/EnemySpawn.cpp
     System/LimitPosition.cpp
+    System/PruneEntities.cpp
     System/Rendering.cpp
     System/Rendering3D.cpp
     System/KeyboardControl.cpp

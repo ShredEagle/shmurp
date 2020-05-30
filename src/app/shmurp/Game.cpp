@@ -2,9 +2,6 @@
 
 #include "configuration.h"
 
-#include "Components/Boundaries.h"
-#include "Components/ControlDevice.h"
-#include "Components/Faction.h"
 #include "Components/Geometry.h"
 #include "Components/Shape.h"
 
@@ -17,6 +14,7 @@
 #include "System/EnemySpawn.h"
 #include "System/KeyboardControl.h"
 #include "System/LimitPosition.h"
+#include "System/PruneEntities.h"
 #include "System/Rendering.h"
 #include "System/Rendering3D.h"
 #include "System/SceneGraph.h"
@@ -31,69 +29,79 @@ using namespace ad::math::angle_literals;
 namespace ad {
 namespace shmurp {
 
-Game::Game(Application & aApplication)
+
+void setBaseSystems(aunteater::Engine & aEntityEngine, Application & aApplication)
 {
     /*
      * Systems
      */
-    mEntityEngine.addSystem<Customizer>();
+    aEntityEngine.addSystem<Customizer>();
 
-    auto kbControl = std::make_shared<KeyboardControl>(mEntityEngine);
+    auto kbControl = std::make_shared<KeyboardControl>(aEntityEngine);
     aApplication.getEngine()->registerKeyCallback(kbControl->getCallback());
-    mEntityEngine.addSystem(kbControl);
+    aEntityEngine.addSystem(kbControl);
 
-    mEntityEngine.addSystem<Tracking>();
+    aEntityEngine.addSystem<Tracking>();
 
-    mEntityEngine.addSystem<Displace>();
+    aEntityEngine.addSystem<Displace>();
 
-    mEntityEngine.addSystem<LimitPosition>();
+    aEntityEngine.addSystem<LimitPosition>();
 
-    mEntityEngine.addSystem<SceneGraph>();
+    aEntityEngine.addSystem<SceneGraph>();
 
-    mEntityEngine.addSystem<Collision>();
+    aEntityEngine.addSystem<Collision>();
 
-    mEntityEngine.addSystem<EnemySpawn>();
+    aEntityEngine.addSystem<BulletSpawn>();
 
-    mEntityEngine.addSystem<BulletSpawn>();
+    aEntityEngine.addSystem<PruneEntities>();
 
-    //mEntityEngine.addSystem<Rendering>();
-    mEntityEngine.addSystem<Rendering3D>(*aApplication.getEngine());
+    //aEntityEngine.addSystem<Rendering>();
+    aEntityEngine.addSystem<Rendering3D>(*aApplication.getEngine());
+}
 
+
+void cubeLevel(aunteater::Engine & aEntityEngine, Application & aApplication)
+{
+    /*
+     * Systems
+     */
+    aEntityEngine.addSystem<EnemySpawn>();
 
     /*
      * Entities
      */
-    mEntityEngine.addEntity(Entity()
-            .add<Boundaries>(conf::gShipBoundingRect)
-            .add<ControlDevice>(0)
-            .add<Faction>(Faction::SpaceForce, Faction::Democrats)
-            .add<Geometry>(conf::shipInitialX, conf::shipInitialY, conf::gShipRadius)
-            .add<Shape>(Shape::RocketShip)
-            .add<Speed>(0.f, 0.f)
-    );
+    aEntityEngine.addEntity(entities::makeHero(Vec<2>{conf::shipInitialX, conf::shipInitialY}));
 
     entities::addTrackingPyramid(
-            mEntityEngine,
+            aEntityEngine,
             Vec<2>{5.f, conf::gWindowWorldHeight-5.f},
             Vec<2>{0.f, 0.f},
             Vec<3, Radian<>>{0.4_radf, 0._radf, 0._radf});
 
-    //mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
+    //aEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
     //                                .add<Geometry>(5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
     //                                .add<Shape>(Shape::RocketShip)
     //                                .add<Speed>(0., 0.)
     //                                );
-    //mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
+    //aEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Spiral>(0.05f, pi<float>))
     //                                .add<Geometry>(conf::gWindowWorldWidth-5.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
     //                                .add<Shape>(Shape::RocketShip)
     //                                .add<Speed>(0., 0.)
     //                                );
-    //mEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Circle>(0.5f, 25))
+    //aEntityEngine.addEntity(Entity().add<FirePattern>(std::make_unique<Fire::Circle>(0.5f, 25))
     //                                .add<Geometry>(conf::gWindowWorldWidth/2.f, conf::gWindowWorldHeight-5.f, conf::squareRadius)
     //                                .add<Shape>(Shape::RocketShip)
     //                                .add<Speed>(0., 0.)
     //                                );
 }
+
+
+Game::Game(Application & aApplication)
+{
+    setBaseSystems(mEntityEngine, aApplication);
+    cubeLevel(mEntityEngine, aApplication);
+}
+
 
 bool Game::update(const aunteater::Timer & aTimer)
 {

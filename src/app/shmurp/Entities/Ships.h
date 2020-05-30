@@ -2,6 +2,8 @@
 
 #include "configuration.h"
 
+#include "Components/Boundaries.h"
+#include "Components/ControlDevice.h"
 #include <Components/CustomCallback.h>
 #include <Components/Faction.h>
 #include <Components/FirePattern.h>
@@ -19,6 +21,18 @@
 
 namespace ad {
 namespace entities {
+
+
+inline aunteater::Entity makeHero(Vec<2> aPosition)
+{
+    return aunteater::Entity()
+            .add<Boundaries>(conf::gShipBoundingRect)
+            .add<ControlDevice>(0)
+            .add<Faction>(Faction::SpaceForce, Faction::Democrats)
+            .add<Geometry>(aPosition, conf::gShipRadius)
+            .add<Shape>(Shape::RocketShip)
+            .add<Speed>(0.f, 0.f);
+}
 
 
 inline aunteater::Entity makeSquare(Vec<2, GLfloat> aPosition,

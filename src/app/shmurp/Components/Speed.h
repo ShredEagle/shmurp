@@ -21,7 +21,7 @@ struct Speed : public aunteater::Component<Speed>
         translation(x, y)
     {}
 
-    Vec<2, GLfloat> translation;
+    Vec<2> translation;
     Vec<3, Radian<>> rotation{Vec<3, Radian<>>::Zero()};
 };
 

@@ -71,11 +71,18 @@ Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution):
 
     mShapeToSpecification.emplace(Shape::Bullet,
                                   ShapeInstancing(
-                                      circle3D::makeVertices<30>(1.0f),
+                                      circle3D::makeVertices<30, circle3D::Disc>(1.0f),
                                       {},
                                       GL_TRIANGLE_FAN,
                                       //Vec<4, GLfloat>(0.44f, 0.9f, 1.0f, 1.0f)));
                                       Vec<4, GLfloat>(1.0f, 0.42f, 0.07f, 1.0f)));
+
+    mShapeToSpecification.emplace(Shape::Circle,
+                                  ShapeInstancing(
+                                      circle3D::makeVertices<40, circle3D::Circle>(1.0f),
+                                      {},
+                                      GL_LINES,
+                                      Vec<4, GLfloat>(1.0f, 0.22f, 0.39f, 1.0f)));
 
     // Apparently, cannot instantiate a valid gsl::span from a temporary vector
     auto pyramidVertices = make_pyramid<3>(conf::gPyramidRadius, conf::gPyramidHeight);

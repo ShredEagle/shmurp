@@ -12,7 +12,7 @@ namespace ad {
 
 struct Geometry : public aunteater::Component<Geometry>
 {
-    Geometry(Vec<2, GLfloat> aPosition, GLfloat aRadius = 0.) :
+    explicit Geometry(Vec<2, GLfloat> aPosition = Vec<2>::Zero(), GLfloat aRadius = 0.) :
         position(aPosition),
         radius(aRadius)
     {}

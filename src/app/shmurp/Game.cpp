@@ -1,5 +1,6 @@
 #include "Game.h"
 
+#include "Boss1.h"
 #include "configuration.h"
 
 #include "Components/Geometry.h"
@@ -99,7 +100,8 @@ void cubeLevel(aunteater::Engine & aEntityEngine, Application & aApplication)
 Game::Game(Application & aApplication)
 {
     setBaseSystems(mEntityEngine, aApplication);
-    cubeLevel(mEntityEngine, aApplication);
+    //cubeLevel(mEntityEngine, aApplication);
+    boss1(mEntityEngine, aApplication);
 }
 
 

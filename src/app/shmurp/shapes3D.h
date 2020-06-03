@@ -185,13 +185,23 @@ static const std::array<vertex3D::Data, 8*3> gVertices = {
 
 namespace circle3D {
 
-template <GLsizei N_vertices>
+enum Type
+{
+    Circle,
+    Disc,
+};
+
+template <GLsizei N_vertices, Type N_type = Circle>
 std::vector<vertex3D::Data> makeVertices(GLfloat aRadius)
 {
-    std::vector<vertex3D::Data> result{vertex3D::Data{
-        {0.f, 0.f, 0.f},
-    }};
-    result.reserve(N_vertices+2);
+    std::vector<vertex3D::Data> result;
+    if (N_type == Disc)
+    {
+        result.push_back(vertex3D::Data{
+            {0.f, 0.f, 0.f},
+        });
+    }
+    //result.reserve(N_vertices+2);
     for(int i=0; i<=N_vertices; ++i)
     {
         result.emplace_back(vertex3D::Data{{
@@ -202,7 +212,7 @@ std::vector<vertex3D::Data> makeVertices(GLfloat aRadius)
                                            {
                                                0.f,
                                                0.f,
-                                               -1.f,
+                                               N_type == Disc ? -1.f : 1.0f,
                                            }});
     }
     return result;

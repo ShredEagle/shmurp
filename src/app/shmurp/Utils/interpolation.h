@@ -66,13 +66,13 @@ template <class T_value, class T_interpolant>
 T_value lerp(T_value aStart, T_value aEnd, Clamped<T_interpolant> aInterpolant)
 {
     return (Clamped<T_interpolant>::max_v - aInterpolant) * aStart
-           + aInterpolant.getValue() * aEnd;
+           + aInterpolant * aEnd;
 }
 
 namespace animate {
 
-template <class T_value>
-Clamped<T_value> linear(T_value aAdvancement)
+template <class T_interpolant>
+Clamped<T_interpolant> linear(Clamped<T_interpolant> aAdvancement)
 {
     return aAdvancement;
 }
@@ -80,14 +80,14 @@ Clamped<T_value> linear(T_value aAdvancement)
 } // namespace animate
 
 template <class T_interpolant>
-using animation_fun = Clamped<T_interpolant>(*)(T_interpolant);
+using animation_fun = Clamped<T_interpolant>(*)(Clamped<T_interpolant>);
 
-template <class T_interpolant, animation_fun<T_interpolant> F_curve=&animate::linear>
+template <class T_interpolant, animation_fun<T_interpolant> F_curve = &animate::linear>
 class Animation
 {
 public:
-    explicit Animation(T_interpolant aFactor=1) :
-        mFactor(std::move(aFactor))
+    explicit Animation(T_interpolant aDuration) :
+        mFactor(std::move(1/aDuration))
     {}
 
     Clamped<T_interpolant> increment(T_interpolant aIncrement)
@@ -105,15 +105,17 @@ private:
     T_interpolant mAccumulator{0};
 };
 
-template <class T_value, class T_interpolant, animation_fun<T_interpolant> F_curve=&animate::linear>
+// TODO make the lower level class without redirect(), for the usual case when we can do without
+// saving the current value
+template <class T_value, class T_interpolant, animation_fun<T_interpolant> F_curve = &animate::linear>
 class Interpolation
 {
 public:
-    Interpolation(T_value aStart, T_value aEnd, T_interpolant aFactor=1) :
+    Interpolation(T_value aStart, T_value aEnd, T_interpolant aDuration = 1) :
         mStart(std::move(aStart)),
         mEnd(std::move(aEnd)),
         mCurrent(mStart),
-        mAnimation(aFactor)
+        mAnimation(aDuration)
     {}
 
     T_value operator()(T_interpolant aIncrement)

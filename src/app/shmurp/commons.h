@@ -12,7 +12,7 @@ namespace ad {
 
 using Floating = float;
 
-template <class T=Floating> T pi = math::pi<T>;
+template <class T=Floating> constexpr T pi = math::pi<T>;
 
 template <int N, class T=Floating>
 using Vec = math::Vec<N, T>;

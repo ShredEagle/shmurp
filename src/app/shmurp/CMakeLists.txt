@@ -4,6 +4,7 @@ set(${PROJECT_NAME}_HEADERS
     commons.h
     Bloom.h
     BloomShaders.h
+    Boss1.h
     DebugUI.h
     Game.h
     Instancing.h
@@ -21,6 +22,7 @@ set(${PROJECT_NAME}_HEADERS
     Components/Shape.h
     Components/Speed.h
     Components/TrackerPlayer.h
+    Components/Tweening.h
 
     Entities/Bullets.h
     Entities/Ships.h
@@ -30,6 +32,8 @@ set(${PROJECT_NAME}_HEADERS
     System/Customizer.h
     System/Displace.h
     System/EnemySpawn.h
+    System/Interpolate.h
+    System/Interpolate-impl.h
     System/LimitPosition.h
     System/KeyboardControl.h
     System/PruneEntities.h

@@ -76,13 +76,21 @@ void SceneGraph::addedEntity(aunteater::LiveEntity &aEntity)
 }
 
 
+// A similar function exist in stdlib, starting with C++20
+template <class T>
+void eraseElement(std::vector<T> & aVector, const T & aValue)
+{
+    aVector.erase(std::remove(aVector.begin(), aVector.end(), aValue), aVector.end());
+}
+
+
 void SceneGraph::removedEntity(aunteater::LiveEntity &aEntity)
 {
     // Remove the node from its parent
     const aunteater::weak_entity parent = aEntity.get<SceneGraphParent>().parent;
     if (parent == nullptr)
     {
-        mRootNodes.erase(std::remove(mRootNodes.begin(), mRootNodes.end(), entityRefFrom(aEntity)));
+        eraseElement(mRootNodes, entityRefFrom(aEntity));
     }
     else
     {
@@ -90,7 +98,7 @@ void SceneGraph::removedEntity(aunteater::LiveEntity &aEntity)
         if (foundParent != mNodesFamily.end())
         {
             auto & children = (*foundParent)->get<SceneGraphComposite>().mChildren;
-            std::remove(children.begin(), children.end(), entityRefFrom(aEntity));
+            eraseElement(children, entityRefFrom(aEntity));
         }
         // Else, the parent might have been removed first
         // (causing the current node to be recursively removed)

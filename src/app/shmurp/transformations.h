@@ -76,7 +76,7 @@ inline Radian<> angleBetween(Vec<2> a, Vec<2> b)
 //
 // Ad-hoc helpers, while the transformation system relies on position + 3 orientations
 //
-inline Matrix<4, GLfloat> makeOrientationMatrix(Vec<3, Radian<>> & aOrientations)
+inline Matrix<4, GLfloat> makeOrientationMatrix(const Vec<3, Radian<>> aOrientations)
 {
     return   transform::rotateMatrix_X(aOrientations.x())
            * transform::rotateMatrix_Y(aOrientations.y())

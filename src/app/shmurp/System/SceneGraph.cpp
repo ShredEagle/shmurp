@@ -31,13 +31,23 @@ void SceneGraph::traverse(aunteater::LiveEntity & aNode,
     Vec<4> transPos{node.position.x(), node.position.y(), 0.f, 1.f};
     transPos *= aParentTransform;
     geometry.position = Vec<2>{transPos.x(), transPos.y()};
-    geometry.orientations = node.orientations + aParentOrientation;
+
+    geometry.orientations = node.orientations;
+    auto forwardedOrientationMatrix = transform::makeOrientationMatrix(node.orientations);
+    if (node.relation == SceneGraphComposite::InheritOrientation)
+    {
+        geometry.orientations += aParentOrientation;
+    }
+    else if (node.relation == SceneGraphComposite::ResetOrientation)
+    {
+        forwardedOrientationMatrix *= transform::makeOrientationMatrix(-aParentOrientation);
+    }
 
     for (aunteater::weak_entity child : node.mChildren)
     {
         // IMPORTANT: the separation between local/world transformation has to be deeply refactored
         traverse(*child,
-                 transform::makeOrientationMatrix(node.orientations)
+                 forwardedOrientationMatrix
                     * transform::translateMatrix(node.position.x(), node.position.y())
                     * aParentTransform,
                  geometry.orientations);

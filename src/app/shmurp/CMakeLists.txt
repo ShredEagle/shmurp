@@ -46,6 +46,7 @@ set(${PROJECT_NAME}_HEADERS
     utils/interpolation.h
     utils/Periodic.h
     utils/Rythm.h
+    utils/TimedSequence.h
 )
 
 set(${PROJECT_NAME}_SOURCES

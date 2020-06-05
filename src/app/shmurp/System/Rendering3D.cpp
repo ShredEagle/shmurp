@@ -75,7 +75,8 @@ Rendering3D::Impl::Impl(Size<2, GLsizei> aResolution):
                                       {},
                                       GL_TRIANGLE_FAN,
                                       //Vec<4, GLfloat>(0.44f, 0.9f, 1.0f, 1.0f)));
-                                      Vec<4, GLfloat>(1.0f, 0.42f, 0.07f, 1.0f)));
+                                      //Vec<4, GLfloat>(1.0f, 0.42f, 0.07f, 1.0f)));
+                                      Vec<4, GLfloat>(0.98f, 0.23f, 0.74f, 1.0f)));
 
     mShapeToSpecification.emplace(Shape::Circle,
                                   ShapeInstancing(

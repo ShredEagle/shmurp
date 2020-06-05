@@ -68,14 +68,23 @@ private:
 };
 
 
+struct BulletConfig
+{
+    Faction faction{Faction::LibLies};
+    Floating radius{conf::gBulletRadius};
+    Floating velocity{conf::gEnemyBulletSpeed};
+};
+
+
 namespace Fire {
 
 template <class T_timer>
 class Line : public FirePattern::Base<Line<T_timer>>
 {
 public:
-    explicit Line(T_timer aTimer) :
-        mTimer{std::move(aTimer)}
+    explicit Line(T_timer aTimer, BulletConfig aBulletConfig={}) :
+        mTimer{std::move(aTimer)},
+        mBulletConfig{std::move(aBulletConfig)}
     {}
 
     void fire(double aDelta,
@@ -83,34 +92,36 @@ public:
               Vec<2, GLfloat> aBasePosition,
               Vec<3, Radian<>> aOrientation) override
     {
-        mTimer.forEachEvent(aDelta, [&, this](timet aRemainingTime)
+        mTimer.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
 #if !defined(__clang__)
             // see: https://stackoverflow.com/q/61060240/1027706
             constexpr
 #endif
-            Vec<4, GLfloat> gSpeed{conf::gEnemyBulletSpeed, 0.f, 0.f, 1.f};
+            Vec<4, GLfloat> gSpeed{mBulletConfig.velocity, 0.f, 0.f, 1.f};
 
             auto speed = gSpeed * transform::makeOrientationMatrix(aOrientation);
 
             Vec<2, GLfloat> startPosition =
                 aBasePosition
                 + static_cast<GLfloat>(aRemainingTime)*Vec<2>{speed.x(), speed.y()};
-            aEngine.addEntity(entities::makeEnemyBullet(startPosition, speed));
+            aEngine.addEntity(entities::makeEnemyBullet(startPosition, speed, mBulletConfig.radius));
         });
     }
 
 private:
     T_timer mTimer;
+    BulletConfig mBulletConfig;
 };
 
 
 class Spiral : public FirePattern::Base<Spiral>
 {
 public:
-    Spiral(timet aPeriod, double aAngularSpeed) :
+    Spiral(duration_t aPeriod, double aAngularSpeed, BulletConfig aBulletConfig) :
         mPeriod{aPeriod},
-        mAngleIncrement(aAngularSpeed*aPeriod)
+        mAngleIncrement(aAngularSpeed*aPeriod),
+        mBulletConfig{std::move(aBulletConfig)}
     {}
 
     void fire(double aDelta,
@@ -118,7 +129,7 @@ public:
               Vec<2, GLfloat> aBasePosition,
               Vec<3, Radian<>> /*unused*/) override
     {
-        mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
+        mPeriod.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
             static constexpr Vec<4, GLfloat> gSpeed(0.f, -conf::gEnemyBulletSpeed, 0.f, 1.f);
             auto speed = gSpeed * transform::rotateMatrix_Z(nextAngle());
@@ -126,7 +137,7 @@ public:
             Vec<2, GLfloat> startPosition =
                 aBasePosition
                 + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
-            aEngine.addEntity(entities::makeEnemyBullet(startPosition, speed));
+            aEngine.addEntity(entities::makeEnemyBullet(startPosition, speed, mBulletConfig.radius));
         });
     }
 
@@ -140,15 +151,17 @@ private:
     Periodic mPeriod;
     Radian<> mAngle{0};
     const Radian<> mAngleIncrement;
+    BulletConfig mBulletConfig;
 };
 
 
 class Circle : public FirePattern::Base<Circle>
 {
 public:
-    Circle(timet aPeriod, int aCount) :
+    Circle(duration_t aPeriod, int aCount, BulletConfig aBulletConfig) :
         mPeriod{aPeriod},
-        mCount{aCount}
+        mCount{aCount},
+        mBulletConfig{std::move(aBulletConfig)}
     {}
 
     void fire(double aDelta,
@@ -156,7 +169,7 @@ public:
               Vec<2, GLfloat> aBasePosition,
               Vec<3, Radian<>> /*unused*/) override
     {
-        mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
+        mPeriod.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
             static constexpr Vec<4, GLfloat> gSpeed(0.f, -conf::gEnemyBulletSpeed, 0.f, 1.f);
 
@@ -166,7 +179,7 @@ public:
                 Vec<2, GLfloat> startPosition =
                     aBasePosition
                     + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
-                aEngine.addEntity(entities::makeEnemyBullet(startPosition, speed));
+                aEngine.addEntity(entities::makeEnemyBullet(startPosition, speed, mBulletConfig.radius));
             }
 
         });
@@ -175,13 +188,14 @@ public:
 private:
     Periodic mPeriod;
     const int mCount{0};
+    BulletConfig mBulletConfig;
 };
 
 
 class Burst : public FirePattern::Base<Burst>
 {
 public:
-    Burst(timet aPeriod, Radian<> aSpreadAngle) :
+    Burst(duration_t aPeriod, Radian<> aSpreadAngle) :
         mPeriod{aPeriod},
         mAngleQuant{aSpreadAngle/gDivisions}
     {}
@@ -193,7 +207,7 @@ public:
     {
         static constexpr Vec<4, GLfloat> gSpeed(0.f, conf::gBulletSpeed, 0.f, 1.f);
 
-        mPeriod.forEachEvent(aDelta, [&, this](timet aRemainingTime)
+        mPeriod.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
             auto speed = gSpeed
                          * transform::rotateMatrix_Z(mAngleQuant*mRandomizer())
@@ -212,6 +226,7 @@ private:
     const Radian<> mAngleQuant;
 
 };
+
 
 } // namespace Fire
 

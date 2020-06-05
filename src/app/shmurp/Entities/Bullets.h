@@ -14,10 +14,12 @@ namespace ad {
 namespace entities {
 
 
-inline aunteater::Entity makeEnemyBullet(Vec<2, GLfloat> aPosition, Vec<4, GLfloat> aSpeed)
+inline aunteater::Entity makeEnemyBullet(Vec<2, GLfloat> aPosition,
+                                         Vec<4, GLfloat> aSpeed,
+                                         Floating aRadius)
 {
     return aunteater::Entity().add<Faction>(Faction::LibLies, Faction::SpaceForce)
-                              .add<Geometry>(aPosition, conf::gBulletRadius)
+                              .add<Geometry>(aPosition, aRadius)
                               .add<Shape>(Shape::Bullet)
                               .add<Speed>(aSpeed.x(), aSpeed.y());
 }

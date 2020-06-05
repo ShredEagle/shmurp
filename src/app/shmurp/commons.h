@@ -12,6 +12,11 @@ namespace ad {
 
 using Floating = float;
 
+// Most places do not care about a complete Timer with several measurements,
+// such as wall time, delta, etc;
+using duration_t = double;
+using timepoint_t = duration_t;
+
 template <class T=Floating> constexpr T pi = math::pi<T>;
 
 template <int N, class T=Floating>

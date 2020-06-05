@@ -13,7 +13,7 @@ namespace ad {
 class Rythm
 {
 public:
-    explicit Rythm(timet aPeriod, int aDuration) :
+    explicit Rythm(duration_t aPeriod, int aDuration) :
         mMetronom(aPeriod),
         mDuration(aDuration)
     {}
@@ -21,7 +21,7 @@ public:
     Rythm & note(int aTime);
 
     template <class T_functor, class... VT_args>
-    void forEachEvent(timet aDelta, const T_functor & aFunctor, VT_args &&... aArgs);
+    void forEachEvent(duration_t aDelta, const T_functor & aFunctor, VT_args &&... aArgs);
 
 private:
     Periodic mMetronom;
@@ -40,9 +40,9 @@ inline Rythm & Rythm::note(int aTime)
 
 
 template <class T_functor, class... VT_args>
-void Rythm::forEachEvent(timet aDelta, const T_functor & aFunctor, VT_args &&... aArgs)
+void Rythm::forEachEvent(duration_t aDelta, const T_functor & aFunctor, VT_args &&... aArgs)
 {
-    mMetronom.forEachEvent(aDelta, [&aFunctor, this](timet aRemainingTime, VT_args &&... aArgs)
+    mMetronom.forEachEvent(aDelta, [&aFunctor, this](duration_t aRemainingTime, VT_args &&... aArgs)
     {
         if (std::find(mScore.begin(), mScore.end(), mCurrentNote) != mScore.end())
         {

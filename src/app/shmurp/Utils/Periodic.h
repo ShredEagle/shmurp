@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../commons.h"
+
 #include <utility>
 
 #include <cstddef>
@@ -7,7 +9,6 @@
 
 namespace ad {
 
-typedef double timet;
 
 /// TODO make it std::duration based
 // \brief A periodic tick, notably allowing to trigger events at regulare interval
@@ -15,22 +16,22 @@ typedef double timet;
 class Periodic
 {
 public:
-    explicit Periodic(timet aPeriod) :
+    explicit Periodic(duration_t aPeriod) :
         mPeriod(aPeriod)
     {}
 
-    constexpr std::size_t countEvents(timet aDelta);
+    constexpr std::size_t countEvents(duration_t aDelta);
 
     template <class T_functor, class... VT_args>
-    void forEachEvent(timet aDelta, const T_functor & aFunctor, VT_args &&... aArgs);
+    void forEachEvent(duration_t aDelta, const T_functor & aFunctor, VT_args &&... aArgs);
 
 private:
-    const float mPeriod;
-    float mRemainingTime{0.};
+    const duration_t mPeriod;
+    duration_t mRemainingTime{0.};
 };
 
 
-constexpr std::size_t Periodic::countEvents(timet aDelta)
+constexpr std::size_t Periodic::countEvents(duration_t aDelta)
 {
     std::size_t result = 0;
     mRemainingTime += aDelta;
@@ -46,7 +47,7 @@ constexpr std::size_t Periodic::countEvents(timet aDelta)
 
 
 template <class T_functor, class... VT_args>
-void Periodic::forEachEvent(timet aDelta, const T_functor & aFunctor, VT_args &&... aArgs)
+void Periodic::forEachEvent(duration_t aDelta, const T_functor & aFunctor, VT_args &&... aArgs)
 {
     mRemainingTime += aDelta;
 

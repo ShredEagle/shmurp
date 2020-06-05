@@ -123,12 +123,19 @@ public:
         return mCurrent = lerp(mStart, mEnd, mAnimation.increment(aIncrement));
     }
 
+    Interpolation & redirect(T_value aEnd, T_interpolant aDuration)
+    {
+        mAnimation = Animation(std::move(aDuration));
+        mStart = mCurrent;
+        mEnd = std::move(aEnd);
+        return *this;
+    }
+
     Interpolation & redirect(T_value aEnd)
     {
         mAnimation.reset();
         mStart = mCurrent;
         mEnd = std::move(aEnd);
-
         return *this;
     }
 

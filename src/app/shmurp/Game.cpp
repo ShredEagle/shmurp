@@ -71,7 +71,7 @@ void cubeLevel(aunteater::Engine & aEntityEngine, Application & aApplication)
     /*
      * Entities
      */
-    aEntityEngine.addEntity(entities::makeHero(Vec<2>{conf::shipInitialX, conf::shipInitialY}));
+    entities::addHero(aEntityEngine, Vec<2>{conf::shipInitialX, conf::shipInitialY});
 
     entities::addTrackingPyramid(
             aEntityEngine,

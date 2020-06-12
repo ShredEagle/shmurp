@@ -18,6 +18,7 @@ constexpr float gBoss1BallRadius = 3.5f;
 constexpr float gBoss1SatelliteRadius = 0.7f * gBoss1BallRadius;
 constexpr float gBoss1TurretRadius = conf::gPyramidRadius;
 constexpr float gBoss1Padding = 0.2f;
+constexpr Floating gBoss1ReferenceBulletVelocity = conf::gBulletSpeed/8.0;
 
 constexpr duration_t gBoss1RotationAccelerationDuration = 4.0; //Integral of f(x)=x from 0..4 is 2
 constexpr Radian<> gBoss1RotationTopSpeed = pi<Radian<>>;  // so 2*pi rotation during acceleration and deceleration, i.e. 1 revolution
@@ -25,7 +26,15 @@ constexpr duration_t gBoss1PhaseDuration = 6.0;
 
 constexpr duration_t gBoss1TurretPeriod = 0.1;
 constexpr Floating gBoss1TurretBulletRadius = 3*conf::gBulletRadius;
-constexpr Floating gBoss1TurretBulletVelocity = conf::gBulletSpeed/5.0;
+constexpr Floating gBoss1TurretBulletVelocity = gBoss1ReferenceBulletVelocity;
+
+constexpr duration_t gBoss1CoreCanonPeriod = 1.0;
+constexpr Floating gBoss1CoreCanonBaseYPosition = gBoss1BallRadius/1.5f;
+constexpr Floating gBoss1CoreCanonOffset = gBoss1BallRadius/5.f;
+
+constexpr Floating gBoss1ArcCanonBulletCount = 15;
+constexpr Floating gBoss1ArcCanonBulletRadius = 1.5*gBoss1TurretBulletRadius;
+constexpr Floating gBoss1ArcCanonBulletVelocity = gBoss1ReferenceBulletVelocity * 1.5f;
 
 namespace detail {
 
@@ -65,11 +74,31 @@ namespace detail {
     }
 
 
-    aunteater::Entity makeCanon(aunteater::weak_entity aParent,
-                                 Vec<2> aLocalPosition=Vec<2>::Zero())
+    aunteater::Entity makeGenericCanon(aunteater::weak_entity aParent,
+                                       TimedSequence<aunteater::LiveEntity &> aSequence,
+                                       Vec<2> aLocalPosition=Vec<2>::Zero())
     {
         using namespace math::angle_literals;
 
+        aunteater::Entity canon;
+        canon
+            .add<CustomCallback>(
+                [sequence = std::move(aSequence)]
+                (aunteater::LiveEntity & aEntity, const aunteater::Timer & aTimer) mutable
+                {
+                    sequence.elapse(aTimer.delta(), aEntity);
+                })
+            .add<Geometry>(Vec<2>{0.f, 0.f})
+            .add<SceneGraphComposite>(aLocalPosition)
+            .add<SceneGraphParent>(aParent)
+            ;
+        return canon;
+    }
+
+
+    aunteater::Entity makeTurretCanon(aunteater::weak_entity aParent,
+                                      Vec<2> aLocalPosition=Vec<2>::Zero())
+    {
         BulletConfig bulletConfig;
         bulletConfig.radius = gBoss1TurretBulletRadius;
         bulletConfig.velocity = gBoss1TurretBulletVelocity;
@@ -94,21 +123,96 @@ namespace detail {
             },
         }};
 
-        aunteater::Entity canon;
-        canon
-            .add<CustomCallback>(
-                [sequence = std::move(canonSequence)]
-                (aunteater::LiveEntity & aEntity, const aunteater::Timer & aTimer) mutable
-                {
-                    sequence.elapse(aTimer.delta(), aEntity);
-                })
-            .add<Geometry>(Vec<2>{0.f, 0.f})
-            .add<SceneGraphComposite>(aLocalPosition)
-            .add<SceneGraphParent>(aParent)
-            ;
-        return canon;
+        return makeGenericCanon(aParent, std::move(canonSequence), std::move(aLocalPosition));
     }
 
+
+    aunteater::Entity makeArcCanon(aunteater::weak_entity aParent,
+                                   Vec<2> aLocalPosition=Vec<2>::Zero())
+    {
+        BulletConfig bulletConfig;
+        bulletConfig.radius = gBoss1ArcCanonBulletRadius;
+        bulletConfig.velocity = gBoss1ArcCanonBulletVelocity;
+
+        TimedSequence<aunteater::LiveEntity &> canonSequence{
+        { // The map
+            { // A pair element of the map
+                gBoss1PhaseDuration,
+                [bulletConfig](timepoint_t /*ignored*/, aunteater::LiveEntity &aEntity)
+                {
+                    aEntity.add<FirePattern>(std::make_unique<Fire::Arc>(
+                                std::numeric_limits<duration_t>::infinity(),
+                                3.f/8.f * 2*pi<Radian<>>,
+                                gBoss1ArcCanonBulletCount,
+                                std::move(bulletConfig)));
+                }
+            },
+            //{
+            //    gBoss1PhaseDuration,
+            //    [](timepoint_t /*ignored*/, aunteater::LiveEntity &aEntity)
+            //    {
+            //        aEntity.remove<FirePattern>();
+            //    }
+            //},
+        }};
+
+        return makeGenericCanon(aParent, std::move(canonSequence), std::move(aLocalPosition));
+    }
+
+
+    aunteater::Entity makeCoreCanon(aunteater::weak_entity aParent,
+                                    duration_t aPhase,
+                                    Vec<2> aLocalPosition=Vec<2>::Zero())
+    {
+        BulletConfig bulletConfig;
+        bulletConfig.radius = gBoss1TurretBulletRadius;
+        bulletConfig.velocity = gBoss1TurretBulletVelocity;
+
+        TimedSequence<aunteater::LiveEntity &> canonSequence{
+        { // The map
+            { // A pair element of the map
+                aPhase,
+                [bulletConfig](timepoint_t /*ignored*/, aunteater::LiveEntity &aEntity)
+                {
+                    aEntity.add<FirePattern>(std::make_unique<Fire::Burst<3>>(
+                                gBoss1CoreCanonPeriod,
+                                pi<Radian<>> / 2.f,
+                                std::move(bulletConfig)));
+                }
+            },
+            {
+                gBoss1PhaseDuration,
+                [](timepoint_t /*ignored*/, aunteater::LiveEntity &aEntity)
+                {
+                    aEntity.remove<FirePattern>();
+                }
+            },
+        }};
+
+        return makeGenericCanon(aParent, std::move(canonSequence), std::move(aLocalPosition));
+    }
+
+
+
+    void addCircleOfCoreCanons(aunteater::Engine & aEntityEngine,
+                               aunteater::weak_entity aParent,
+                               int aCanonCount,
+                               Floating aCircleRadius,
+                               Vec<2> aCirclePosition = Vec<2>::Zero())
+    {
+        for(int canonId = 0; canonId != aCanonCount; ++canonId)
+        {
+            Radian<> polarDirection = pi<Radian<>>/2.f + (canonId*(2*pi<Radian<>>)/aCanonCount);
+            Vec<2> offsetFromCenter{cos(polarDirection), sin(polarDirection)};
+            offsetFromCenter *= aCircleRadius;
+
+            aunteater::Entity canon =
+                makeCoreCanon(aParent,
+                              canonId * gBoss1CoreCanonPeriod/aCanonCount,
+                              aCirclePosition + offsetFromCenter);
+            aEntityEngine.addEntity(canon);
+        }
+    }
 
 
     aunteater::Entity makeBoss1(aunteater::Engine & aEntityEngine)
@@ -128,6 +232,48 @@ namespace detail {
             .add<Shape>(Shape::Circle)
             .add<Speed>(Vec<2>::Zero(), Vec<3, Radian<>>::Zero());
         aunteater::weak_entity liveBoss = aEntityEngine.addEntity(boss);
+
+        {
+            //
+            // Core Canons
+            //
+
+            // Note: Firing those as a wall (no random, all in the same direction)
+            // makes another cool pattern
+
+            //
+            // Left triplet
+            //
+            addCircleOfCoreCanons(aEntityEngine,
+                                  liveBoss,
+                                  3,
+                                  gBoss1CoreCanonOffset,
+                                  {0.f, -gBoss1CoreCanonBaseYPosition});
+
+            //
+            // Right triplet
+            //
+            addCircleOfCoreCanons(aEntityEngine,
+                                  liveBoss,
+                                  3,
+                                  gBoss1CoreCanonOffset,
+                                  {0.f, +gBoss1CoreCanonBaseYPosition});
+            //
+            // Top triplet
+            //
+            addCircleOfCoreCanons(aEntityEngine,
+                                  liveBoss,
+                                  3,
+                                  gBoss1CoreCanonOffset,
+                                  {-gBoss1CoreCanonBaseYPosition, 0.f});
+        }
+
+        {
+            //
+            // Arc Canon
+            //
+            aEntityEngine.addEntity(makeArcCanon(liveBoss, {-gBoss1BallRadius, 0.f}));
+        }
 
         {
             //
@@ -188,7 +334,7 @@ namespace detail {
 
                     {
                         aunteater::weak_entity liveLeftCanon =
-                            aEntityEngine.addEntity(detail::makeCanon(
+                            aEntityEngine.addEntity(detail::makeTurretCanon(
                                         liveLeftTurret,
                                         {gBoss1TurretRadius/2.f, 0.f}));
                     }
@@ -209,19 +355,10 @@ namespace detail {
 
                     {
                         aunteater::weak_entity liveRightCanon =
-                            aEntityEngine.addEntity(detail::makeCanon(
+                            aEntityEngine.addEntity(detail::makeTurretCanon(
                                         liveRightTurret,
                                         {gBoss1TurretRadius/2.f, 0.f}));
                     }
-
-                    //aunteater::Entity bullet;
-                    //bullet
-                    //    .add<Geometry>(Vec<2>{0.f, 0.f}, conf::gBulletRadius)
-                    //    .add<SceneGraphComposite>(Vec<2>{2.f, 0.f})
-                    //    .add<SceneGraphParent>(liveRightTurret)
-                    //    .add<Shape>(Shape::Pyramid)
-                    //;
-                    //aEntityEngine.addEntity(std::move(bullet));
                 }
             }
         }
@@ -242,7 +379,8 @@ void boss1(aunteater::Engine & aEntityEngine, Application & aApplication)
     /*
      * Entities
      */
-    aEntityEngine.addEntity(entities::makeHero(Vec<2>{conf::shipInitialX, conf::shipInitialY}));
+    entities::addHero(aEntityEngine,
+                      Vec<2>{conf::shipInitialX, conf::shipInitialY});
     aEntityEngine.addEntity(detail::makeBoss1(aEntityEngine));
 }
 

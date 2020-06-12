@@ -58,13 +58,13 @@ namespace ship3D {
 
 static const std::array<vertex3D::Data, 4> gVertices = {
     vertex3D::Data{
-        {-1.5f, -1.25f, 0.0f},
+        {-1.25f, -1.5f, 0.0f},
     },
     vertex3D::Data{
-        { 0.0f,  3.75f, 0.0f},
+        { 3.75f,  0.0f, 0.0f},
     },
     vertex3D::Data{
-        { 1.5f, -1.25f, 0.0f},
+        {-1.25f,  1.5f, 0.0f},
     },
     vertex3D::Data{
         { 0.0f,  0.0f,  0.0f},

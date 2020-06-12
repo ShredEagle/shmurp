@@ -21,8 +21,8 @@ public:
         ResetOrientation,
     };
 
-    SceneGraphComposite(Vec<2> aPosition,
-                        Vec<3, Radian<>> aOrientations=Vec<3, Radian<>>::Zero(),
+    SceneGraphComposite(Vec<2> aPosition = Vec<2>::Zero(),
+                        Vec<3, Radian<>> aOrientations = Vec<3, Radian<>>::Zero(),
                         RelationControl aRelation = InheritOrientation) :
         position{aPosition},
         orientations{aOrientations},

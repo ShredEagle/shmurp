@@ -8,7 +8,7 @@ namespace ad {
 
 struct Speed : public aunteater::Component<Speed>
 {
-    Speed(Vec<2, GLfloat> aTranslation) :
+    explicit Speed(Vec<2, GLfloat> aTranslation = Vec<2>::Zero()) :
         translation{aTranslation}
     {}
 

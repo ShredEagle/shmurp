@@ -23,15 +23,37 @@ namespace ad {
 namespace entities {
 
 
-inline aunteater::Entity makeHero(Vec<2> aPosition)
+inline aunteater::weak_entity addHero(aunteater::Engine & aEngine, Vec<2> aPosition)
 {
-    return aunteater::Entity()
+    using namespace math::angle_literals;
+
+    aunteater::weak_entity liveShip = aEngine.addEntity(aunteater::Entity()
             .add<Boundaries>(conf::gShipBoundingRect)
             .add<ControlDevice>(0)
             .add<Faction>(Faction::SpaceForce, Faction::Democrats)
-            .add<Geometry>(aPosition, conf::gShipRadius)
+            .add<Geometry>(conf::gShipRadius)
+            .add<SceneGraphComposite>(aPosition,
+                                      Vec<3, Radian<>>{0._radf, 0._radf, pi<Radian<>>/2.f})
+            .add<SceneGraphParent>(/*root*/)
             .add<Shape>(Shape::RocketShip)
-            .add<Speed>(0.f, 0.f);
+            .add<Speed>()
+            );
+
+    aEngine.addEntity(aunteater::Entity()
+            .add<Geometry>(conf::gShipRadius)
+            .add<SceneGraphComposite>()
+            .add<SceneGraphParent>(liveShip)
+            .add<Shape>(Shape::Circle)
+            );
+    // TODO offset the canon to the ship tip. This is complicated by the fact
+    // that currently code in KeyboardControl is adding the firing component to the "movable" ship
+    //aEngine.addEntity(aunteater::Entity()
+    //        .add<Geometry>()
+    //        .add<SceneGraphComposite>(Vec<2>{3.75f, 0.f})
+    //        .add<SceneGraphParent>(liveShip)
+    //        );
+
+    return liveShip;
 }
 
 

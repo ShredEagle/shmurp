@@ -21,6 +21,7 @@ public:
 
 private:
     const aunteater::FamilyHelp<Custom> mCustoms;
+    aunteater::Engine & mEngine;
 };
 
 

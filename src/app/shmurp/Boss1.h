@@ -84,7 +84,7 @@ namespace detail {
         canon
             .add<CustomCallback>(
                 [sequence = std::move(aSequence)]
-                (aunteater::LiveEntity & aEntity, const aunteater::Timer & aTimer) mutable
+                (aunteater::LiveEntity & aEntity, const aunteater::Timer & aTimer, aunteater::Engine &) mutable
                 {
                     sequence.elapse(aTimer.delta(), aEntity);
                 })
@@ -289,7 +289,7 @@ namespace detail {
                             Vec<3, Radian<>>{0._radf, 0._radf, 0._radf})
                 .add<CustomCallback>(
                     [rotating = true, alternator = Periodic{gBoss1PhaseDuration}]
-                    (aunteater::LiveEntity & aEntity, const aunteater::Timer & aTimer) mutable
+                    (aunteater::LiveEntity & aEntity, const aunteater::Timer & aTimer, aunteater::Engine &) mutable
                     {
                         if(alternator.countEvents(aTimer.delta()))
                         {

@@ -83,7 +83,7 @@ inline void addTrackingPyramid(aunteater::Engine & aEngine,
     }
 
     auto customBehaviour = [firing = false, alternator = Periodic{burstSize*firePeriod}]
-        (aunteater::LiveEntity & aSelf, const aunteater::Timer aTimer) mutable
+        (aunteater::LiveEntity & aSelf, const aunteater::Timer aTimer, aunteater::Engine &) mutable
         {
             if (alternator.countEvents(aTimer.delta()))
             {

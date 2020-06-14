@@ -12,9 +12,11 @@ set(${PROJECT_NAME}_HEADERS
     shapes.h
     shapes3D.h
 
+    Components/BossEvent.h
     Components/Boundaries.h
     Components/ControlDevice.h
     Components/CustomCallback.h
+    Components/EventObserver.h
     Components/FirePattern.h
     Components/Geometry.h
     Components/SceneGraphComposite.h
@@ -32,6 +34,8 @@ set(${PROJECT_NAME}_HEADERS
     System/Customizer.h
     System/Displace.h
     System/EnemySpawn.h
+    System/EventQueue.h
+    System/EventQueue-impl.h
     System/Interpolate.h
     System/Interpolate-impl.h
     System/LimitPosition.h

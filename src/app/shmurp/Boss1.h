@@ -2,8 +2,10 @@
 
 #include "Entities/Ships.h"
 
+#include "Components/BossEvent.h"
 #include "Components/Tweening.h"
 
+#include "System/EventQueue.h"
 #include "System/Interpolate.h"
 
 #include "Utils/Periodic.h"
@@ -32,20 +34,26 @@ constexpr duration_t gBoss1CoreCanonPeriod = 1.0;
 constexpr Floating gBoss1CoreCanonBaseYPosition = gBoss1BallRadius/1.5f;
 constexpr Floating gBoss1CoreCanonOffset = gBoss1BallRadius/5.f;
 
-constexpr Floating gBoss1ArcCanonBulletCount = 15;
+constexpr Floating gBoss1ArcCanonBulletCount = 15.f;
 constexpr Floating gBoss1ArcCanonBulletRadius = 1.5*gBoss1TurretBulletRadius;
 constexpr Floating gBoss1ArcCanonBulletVelocity = gBoss1ReferenceBulletVelocity * 1.5f;
+
+constexpr Floating gBoss1TurretLaserPeriod = 0.6f;
+constexpr Floating gBoss1TurretLaserVelocity = gBoss1ReferenceBulletVelocity * 0.5f;
 
 namespace detail {
 
 
     aunteater::Entity makeSatellite(aunteater::weak_entity aParent, Vec<2> aLocalPosition)
     {
+        using namespace math::angle_literals;
+
         aunteater::Entity satellite;
         satellite
             .add<Geometry>(Vec<2>::Zero(), gBoss1SatelliteRadius)
             .add<SceneGraphComposite>(aLocalPosition,
-                                      Vec<3, Radian<>>::Zero())
+                                      Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f},
+                                      SceneGraphComposite::ResetOrientation)
             .add<SceneGraphParent>(aParent)
             .add<Shape>(Shape::Circle)
             ;
@@ -71,6 +79,91 @@ namespace detail {
             .add<TrackerPlayer>()
             ;
         return turret;
+    }
+
+
+    class BossEventFunctor
+    {
+    public:
+        using phase_fun = std::function<void(aunteater::LiveEntity &)>;
+
+        BossEventFunctor(aunteater::LiveEntity & aSource) :
+            mSource{entityIdFrom(aSource)}
+        {}
+
+        template <BossEvent::Phase N_phase>
+        BossEventFunctor & on(phase_fun aFunction)
+        {
+            mPhaseFunctions.emplace(N_phase, std::move(aFunction));
+            return *this;
+        }
+
+        void operator()(aunteater::entity_id aSource,
+                        const BossEvent & aEvent,
+                        aunteater::LiveEntity & aObserver)
+        {
+            // TODO implement some "event source filtering"
+            //if (aSource != mSource)
+            //{
+            //    return;
+            //}
+
+            auto found = mPhaseFunctions.find(aEvent.phase);
+            if (found != mPhaseFunctions.end())
+            {
+                std::invoke(found->second, aObserver);
+            }
+        }
+
+    private:
+        aunteater::entity_id mSource;
+        std::map<BossEvent::Phase, phase_fun> mPhaseFunctions;
+    };
+
+    aunteater::Entity makeLaserCanon(aunteater::entity_id aBossId,
+                                     aunteater::weak_entity aParent,
+                                     Vec<2> aLocalPosition=Vec<2>::Zero())
+    {
+        using namespace math::angle_literals;
+
+        BulletConfig bulletConfig;
+        bulletConfig.radius = gBoss1TurretBulletRadius;
+        bulletConfig.velocity = gBoss1TurretLaserVelocity;
+
+        aunteater::Entity canon;
+        canon
+            .add<EventObserver<BossEvent>>(
+                [bulletConfig, aBossId](aunteater::entity_id aSource,
+                                        const BossEvent & aEvent,
+                                        aunteater::LiveEntity & aObserver)
+                {
+                    //if (aSource != aBossId)
+                    //{
+                    //    return;
+                    //}
+                    switch(aEvent.phase)
+                    {
+                        default:
+                            break;
+                        case BossEvent::LaserOn:
+                        {
+                            aObserver.add<FirePattern>(std::make_unique<Fire::Line<Periodic>>(
+                                        Periodic{gBoss1TurretLaserPeriod},
+                                        std::move(bulletConfig)));
+                            break;
+                        }
+                        case BossEvent::LaserOff:
+                        {
+                            aObserver.remove<FirePattern>();
+                            break;
+                        }
+                    }
+                })
+            .add<Geometry>(Vec<2>{0.f, 0.f})
+            .add<SceneGraphComposite>(aLocalPosition)
+            .add<SceneGraphParent>(aParent)
+            ;
+        return canon;
     }
 
 
@@ -231,8 +324,47 @@ namespace detail {
             .add<SceneGraphParent>(/*root*/)
             .add<Shape>(Shape::Circle)
             .add<Speed>(Vec<2>::Zero(), Vec<3, Radian<>>::Zero());
-        aunteater::weak_entity liveBoss = aEntityEngine.addEntity(boss);
 
+
+        //
+        // The main boss automata
+        //
+        TimedSequence<aunteater::LiveEntity &, aunteater::Engine &> bossSequence{
+        { // The map
+            { // A pair element of the map
+                gBoss1PhaseDuration,
+                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                {
+                    aEngine.addEntity(aunteater::Entity().add<BossEvent>(BossEvent::Rotate));
+                    aEngine.addEntity(aunteater::Entity().add<BossEvent>(BossEvent::LaserOn));
+                }
+            },
+            {
+                2*gBoss1PhaseDuration,
+                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                {
+                    aEngine.addEntity(aunteater::Entity().add<BossEvent>(BossEvent::Stabilize));
+                }
+            },
+            {
+                2*gBoss1PhaseDuration + gBoss1RotationAccelerationDuration,
+                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                {
+                    aEngine.addEntity(aunteater::Entity().add<BossEvent>(BossEvent::LaserOff));
+                }
+            },
+        }};
+
+        boss
+            .add<CustomCallback>(
+                [sequence = std::move(bossSequence)]
+                (aunteater::LiveEntity & aEntity, const aunteater::Timer & aTimer, aunteater::Engine & aEngine) mutable
+                {
+                    sequence.elapse(aTimer.delta(), aEntity, aEngine);
+                })
+            ;
+
+        aunteater::weak_entity liveBoss = aEntityEngine.addEntity(boss);
         {
             //
             // Core Canons
@@ -279,6 +411,20 @@ namespace detail {
             //
             // Central Rotation Axis
             //
+            auto handler = BossEventFunctor{*liveBoss};
+            handler
+                .on<BossEvent::Rotate>([](auto & aEntity)
+                        {
+                            aEntity.template get<Tweening<Speed, Radian<>>>()
+                                    .interpolation.redirect(gBoss1RotationTopSpeed);
+                        })
+                .on<BossEvent::Stabilize>([](auto & aEntity)
+                        {
+                            aEntity.template get<Tweening<Speed, Radian<>>>()
+                                .interpolation.redirect(0._radf);
+                        })
+                ;
+
             aunteater::Entity rotationAxis;
             rotationAxis
                 .add<Geometry>()
@@ -287,25 +433,7 @@ namespace detail {
                 .add<SceneGraphParent>(liveBoss)
                 .add<Speed>(Vec<2>::Zero(),
                             Vec<3, Radian<>>{0._radf, 0._radf, 0._radf})
-                .add<CustomCallback>(
-                    [rotating = true, alternator = Periodic{gBoss1PhaseDuration}]
-                    (aunteater::LiveEntity & aEntity, const aunteater::Timer & aTimer, aunteater::Engine &) mutable
-                    {
-                        if(alternator.countEvents(aTimer.delta()))
-                        {
-                            rotating = !rotating;
-                            if (rotating)
-                            {
-                                aEntity.get<Tweening<Speed, Radian<>>>()
-                                    .interpolation.redirect(gBoss1RotationTopSpeed);
-                            }
-                            else
-                            {
-                                aEntity.get<Tweening<Speed, Radian<>>>()
-                                    .interpolation.redirect(0._radf);
-                            }
-                        }
-                    })
+                .add<EventObserver<BossEvent>>(handler)
                 ;
 
             setupTweening<Speed>(rotationAxis,
@@ -338,6 +466,18 @@ namespace detail {
                                         liveLeftTurret,
                                         {gBoss1TurretRadius/2.f, 0.f}));
                     }
+
+                }
+
+                {
+                    //
+                    // Left Laser
+                    //
+                    aunteater::weak_entity liveLeftLaser =
+                        aEntityEngine.addEntity(detail::makeLaserCanon(
+                                    entityIdFrom(*liveBoss),
+                                    liveLeftSatellite,
+                                    {gBoss1SatelliteRadius, 0.f}));
                 }
 
                 //
@@ -360,6 +500,17 @@ namespace detail {
                                         {gBoss1TurretRadius/2.f, 0.f}));
                     }
                 }
+
+                {
+                    //
+                    // Right Laser
+                    //
+                    aunteater::weak_entity liveRightLaser =
+                        aEntityEngine.addEntity(detail::makeLaserCanon(
+                                    entityIdFrom(*liveBoss),
+                                    liveRightSatellite,
+                                    {gBoss1SatelliteRadius, 0.f}));
+                }
             }
         }
         return boss;
@@ -375,13 +526,14 @@ void boss1(aunteater::Engine & aEntityEngine, Application & aApplication)
      * Systems
      */
     aEntityEngine.addSystem<Interpolate<Speed, Radian<>>>();
+    aEntityEngine.addSystem<EventQueue<BossEvent>>();
 
     /*
      * Entities
      */
     entities::addHero(aEntityEngine,
                       Vec<2>{conf::shipInitialX, conf::shipInitialY});
-    aEntityEngine.addEntity(detail::makeBoss1(aEntityEngine));
+    detail::makeBoss1(aEntityEngine);
 }
 
 

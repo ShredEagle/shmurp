@@ -14,6 +14,10 @@ namespace ad {
 // Note: this is a dynamic solution, yet the nature of aunteater make it impossible to attach
 // several component of the same type to an entity.
 // This prevents to simultaneously tween different values of the same type under the same component
+// TODO Maybe add another template parameter, a pointer to a member function of T_component
+//   accessing the value to interpolate (replacing the accessor parameter of constructor).
+//   This would solve the problem above, but requires implementing a member function for each
+//   tweened value.
 template <class T_component, class T_value>
 struct Tweening : public aunteater::Component<Tweening<T_component, T_value>>
 {
@@ -43,6 +47,22 @@ T_entity & setupTweening(T_entity & aEntity,
 
     return aEntity;
 }
+
+
+/// \brief Based on LiveInterpolation, so does not need the initial value at construction.
+template <class T_component, class T_value>
+struct LiveTweening : public aunteater::Component<LiveTweening<T_component, T_value>>
+{
+    using Accessor = std::function<T_value &(T_component &)>;
+
+    LiveTweening(Accessor aAccessor, T_value aEnd, Floating aDuration) :
+        accessor{std::move(aAccessor)},
+        interpolation{aEnd, aDuration}
+    {}
+
+    Accessor accessor;
+    LiveInterpolation<T_value, Floating> interpolation;
+};
 
 
 //template <class T_component, class T_value, T_value &(* F_accessor)(T_component)>

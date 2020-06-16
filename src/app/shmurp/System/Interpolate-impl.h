@@ -12,7 +12,8 @@ void Interpolate<T_component, T_value>::update(const aunteater::Timer aTimer)
 {
     for(auto & [component, tweening] : mAnimateds)
     {
-        std::invoke(tweening.accessor, component) = tweening.interpolation(aTimer.delta());
+        std::invoke(tweening.accessor, component) =
+            tweening.interpolation(std::invoke(tweening.accessor, component), aTimer.delta());
     }
 }
 

@@ -10,7 +10,7 @@ namespace ad {
 
 
 template <class T_component, class T_value>
-using Animated = aunteater::Archetype<T_component, Tweening<T_component, T_value>>;
+using Animated = aunteater::Archetype<T_component, LiveTweening<T_component, T_value>>;
 
 
 template <class T_component, class T_value>

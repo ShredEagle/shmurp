@@ -411,15 +411,19 @@ namespace detail {
             // Central Rotation Axis
             //
             auto handler = BossEventFunctor{*liveBoss}
-                .on<BossEvent::Rotate>([](auto & aEntity)
+                .on<BossEvent::Rotate>([](aunteater::LiveEntity & aEntity)
                         {
-                            aEntity.template get<Tweening<Speed, Radian<>>>()
-                                    .interpolation.redirect(gBoss1RotationTopSpeed);
+                            aEntity.add<LiveTweening<Speed, Radian<>>>(
+                                    [](Speed & speed) -> Radian<> & {return speed.rotation.z();},
+                                    gBoss1RotationTopSpeed,
+                                    gBoss1RotationAccelerationDuration);
                         })
-                .on<BossEvent::Stabilize>([](auto & aEntity)
+                .on<BossEvent::Stabilize>([](aunteater::LiveEntity & aEntity)
                         {
-                            aEntity.template get<Tweening<Speed, Radian<>>>()
-                                .interpolation.redirect(0._radf);
+                            aEntity.add<LiveTweening<Speed, Radian<>>>(
+                                    [](Speed & speed) -> Radian<> & {return speed.rotation.z();},
+                                    0._radf,
+                                    gBoss1RotationAccelerationDuration);
                         })
                 ;
 
@@ -433,11 +437,6 @@ namespace detail {
                             Vec<3, Radian<>>{0._radf, 0._radf, 0._radf})
                 .add<EventObserver<BossEvent>>(handler)
                 ;
-
-            setupTweening<Speed>(rotationAxis,
-                                 [](Speed & speed) -> Radian<> & {return speed.rotation.z();},
-                                 0._radf,
-                                 gBoss1RotationAccelerationDuration);
 
             aunteater::weak_entity liveRotationAxis = aEntityEngine.addEntity(rotationAxis);
 

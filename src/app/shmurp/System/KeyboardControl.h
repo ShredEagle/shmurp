@@ -55,9 +55,10 @@ private:
     std::shared_ptr<Callback> mCallback;
     aunteater::Family & mPlayerMovable;
     Vec<2, GLfloat> mTargetSpeed{0.f, 0.f};
-    Interpolation<Vec<2, GLfloat>, GLfloat> mSpeedInterpolation{mTargetSpeed,
-                                                                mTargetSpeed,
-                                                                conf::gShipDirectionChangeDuration};
+    RedirectableInterpolation<Vec<2, GLfloat>, GLfloat> mSpeedInterpolation{
+        mTargetSpeed,
+        mTargetSpeed,
+        conf::gShipDirectionChangeDuration};
 };
 
 inline std::shared_ptr<KeyboardControl::Callback> KeyboardControl::getCallback()

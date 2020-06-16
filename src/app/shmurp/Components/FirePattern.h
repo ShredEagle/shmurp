@@ -256,14 +256,21 @@ private:
 };
 
 
-template <int N_divisions = 30>
-class Burst : public FirePattern::Base<Burst<N_divisions>>
+template <int N_divisions, class T_timer=Periodic>
+class Spray : public FirePattern::Base<Spray<N_divisions, T_timer>>
 {
 public:
-    Burst(duration_t aPeriod, Radian<> aSpreadAngle, BulletConfig aBulletConfig) :
-        mPeriod{aPeriod},
+    Spray(Radian<> aSpreadAngle, BulletConfig aBulletConfig, T_timer aTimer) :
+        mTimer{std::move(aTimer)},
         mAngleQuant{aSpreadAngle/N_divisions},
         mBulletConfig{std::move(aBulletConfig)}
+    {}
+
+    template <class... VT_timerCtorArgs>
+    Spray(Radian<> aSpreadAngle, BulletConfig aBulletConfig, VT_timerCtorArgs &&... aTimerCtorArgs) :
+        Spray{aSpreadAngle,
+              std::move(aBulletConfig),
+              T_timer{std::forward<VT_timerCtorArgs>(aTimerCtorArgs)...}}
     {}
 
     void fire(double aDelta,
@@ -273,7 +280,7 @@ public:
     {
         static const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
 
-        mPeriod.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
+        mTimer.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
             auto speed = gSpeed
                          * transform::rotateMatrix_Z(mAngleQuant*mRandomizer())
@@ -290,7 +297,7 @@ public:
 
 private:
     Randomizer<> mRandomizer{-N_divisions, N_divisions, ++gSeed};
-    Periodic mPeriod;
+    T_timer mTimer;
     const Radian<> mAngleQuant;
     BulletConfig mBulletConfig;
 
@@ -298,8 +305,8 @@ private:
 
 };
 
-template <int N_divisions>
-std::atomic<int> Burst<N_divisions>::gSeed = 0;
+template <int N_divisions, class T_timer>
+std::atomic<int> Spray<N_divisions, T_timer>::gSeed = 0;
 
 
 } // namespace Fire

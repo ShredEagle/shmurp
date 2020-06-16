@@ -47,10 +47,11 @@ set(${PROJECT_NAME}_HEADERS
     System/SceneGraph.h
     System/Tracking.h
 
-    utils/interpolation.h
-    utils/Periodic.h
-    utils/Rythm.h
-    utils/TimedSequence.h
+    Utils/Delay.h
+    Utils/interpolation.h
+    Utils/Periodic.h
+    Utils/Rythm.h
+    Utils/TimedSequence.h
 )
 
 set(${PROJECT_NAME}_SOURCES

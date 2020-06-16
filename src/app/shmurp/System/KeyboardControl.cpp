@@ -99,7 +99,7 @@ void KeyboardControl::update(const aunteater::Timer aTimer)
         {
             case Edge::Press:
                 static const BulletConfig bulletConfig = configureBullet();
-                movable->add<FirePattern>(std::make_unique<Fire::Burst<>>(0.02f, pi<Radian<>>/180.f*7.5f, bulletConfig));
+                movable->add<FirePattern>(std::make_unique<Fire::Spray<30>>(pi<Radian<>>/180.f*7.5f, bulletConfig, 0.02f));
                 mCallback->mFiring = Edge::None;
                 break;
             case Edge::Release:

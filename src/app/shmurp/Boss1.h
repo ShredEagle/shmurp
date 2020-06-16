@@ -8,6 +8,7 @@
 #include "System/EventQueue.h"
 #include "System/Interpolate.h"
 
+#include "Utils/Delay.h"
 #include "Utils/Periodic.h"
 #include "Utils/TimedSequence.h"
 
@@ -91,6 +92,10 @@ namespace detail {
             mSource{entityIdFrom(aSource)}
         {}
 
+        BossEventFunctor(aunteater::entity_id aSourceId) :
+            mSource{aSourceId}
+        {}
+
         template <BossEvent::Phase N_phase>
         BossEventFunctor & on(phase_fun aFunction)
         {
@@ -98,15 +103,14 @@ namespace detail {
             return *this;
         }
 
-        void operator()(aunteater::entity_id aSource,
+        void operator()(aunteater::entity_id /*aEventEntityId*/,
                         const BossEvent & aEvent,
                         aunteater::LiveEntity & aObserver)
         {
-            // TODO implement some "event source filtering"
-            //if (aSource != mSource)
-            //{
-            //    return;
-            //}
+            if (aEvent.source != mSource)
+            {
+                return;
+            }
 
             auto found = mPhaseFunctions.find(aEvent.phase);
             if (found != mPhaseFunctions.end())
@@ -130,35 +134,22 @@ namespace detail {
         bulletConfig.radius = gBoss1TurretBulletRadius;
         bulletConfig.velocity = gBoss1TurretLaserVelocity;
 
+        auto handler = BossEventFunctor{aBossId}
+            .on<BossEvent::LaserOn>([bulletConfig](aunteater::LiveEntity & aEntity)
+                    {
+                        aEntity.add<FirePattern>(std::make_unique<Fire::Line<Periodic>>(
+                                    Periodic{gBoss1TurretLaserPeriod},
+                                    std::move(bulletConfig)));
+                    })
+            .on<BossEvent::LaserOff>([](aunteater::LiveEntity & aEntity)
+                    {
+                        aEntity.remove<FirePattern>();
+                    })
+            ;
+
         aunteater::Entity canon;
         canon
-            .add<EventObserver<BossEvent>>(
-                [bulletConfig, aBossId](aunteater::entity_id aSource,
-                                        const BossEvent & aEvent,
-                                        aunteater::LiveEntity & aObserver)
-                {
-                    //if (aSource != aBossId)
-                    //{
-                    //    return;
-                    //}
-                    switch(aEvent.phase)
-                    {
-                        default:
-                            break;
-                        case BossEvent::LaserOn:
-                        {
-                            aObserver.add<FirePattern>(std::make_unique<Fire::Line<Periodic>>(
-                                        Periodic{gBoss1TurretLaserPeriod},
-                                        std::move(bulletConfig)));
-                            break;
-                        }
-                        case BossEvent::LaserOff:
-                        {
-                            aObserver.remove<FirePattern>();
-                            break;
-                        }
-                    }
-                })
+            .add<EventObserver<BossEvent>>(std::move(handler))
             .add<Geometry>(Vec<2>{0.f, 0.f})
             .add<SceneGraphComposite>(aLocalPosition)
             .add<SceneGraphParent>(aParent)
@@ -168,19 +159,14 @@ namespace detail {
 
 
     aunteater::Entity makeGenericCanon(aunteater::weak_entity aParent,
-                                       TimedSequence<aunteater::LiveEntity &> aSequence,
+                                       BossEventFunctor aBossEventHandler,
                                        Vec<2> aLocalPosition=Vec<2>::Zero())
     {
         using namespace math::angle_literals;
 
         aunteater::Entity canon;
         canon
-            .add<CustomCallback>(
-                [sequence = std::move(aSequence)]
-                (aunteater::LiveEntity & aEntity, const aunteater::Timer & aTimer, aunteater::Engine &) mutable
-                {
-                    sequence.elapse(aTimer.delta(), aEntity);
-                })
+            .add<EventObserver<BossEvent>>(std::move(aBossEventHandler))
             .add<Geometry>(Vec<2>{0.f, 0.f})
             .add<SceneGraphComposite>(aLocalPosition)
             .add<SceneGraphParent>(aParent)
@@ -189,105 +175,90 @@ namespace detail {
     }
 
 
-    aunteater::Entity makeTurretCanon(aunteater::weak_entity aParent,
+    aunteater::Entity makeTurretCanon(aunteater::entity_id aBossId,
+                                      aunteater::weak_entity aParent,
                                       Vec<2> aLocalPosition=Vec<2>::Zero())
     {
         BulletConfig bulletConfig;
         bulletConfig.radius = gBoss1TurretBulletRadius;
         bulletConfig.velocity = gBoss1TurretBulletVelocity;
 
-        TimedSequence<aunteater::LiveEntity &> canonSequence{
-        { // The map
-            { // A pair element of the map
-                2*gBoss1PhaseDuration,
-                [bulletConfig](timepoint_t /*ignored*/, aunteater::LiveEntity &aEntity)
-                {
-                    aEntity.add<FirePattern>(std::make_unique<Fire::Line<Periodic>>(
-                                Periodic{gBoss1TurretPeriod},
-                                std::move(bulletConfig)));
-                }
-            },
-            {
-                2*gBoss1PhaseDuration + gBoss1RotationAccelerationDuration,
-                [](timepoint_t /*ignored*/, aunteater::LiveEntity &aEntity)
-                {
-                    aEntity.remove<FirePattern>();
-                }
-            },
-        }};
+        auto handler = BossEventFunctor{aBossId}
+            .on<BossEvent::Turret_1>([bulletConfig](aunteater::LiveEntity & aEntity)
+                    {
+                        aEntity.add<FirePattern>(std::make_unique<Fire::Line<Periodic>>(
+                                    Periodic{gBoss1TurretPeriod},
+                                    std::move(bulletConfig)));
+                    })
+            .on<BossEvent::TurretOff>([](aunteater::LiveEntity & aEntity)
+                    {
+                        aEntity.remove<FirePattern>();
+                    })
+            ;
 
-        return makeGenericCanon(aParent, std::move(canonSequence), std::move(aLocalPosition));
+        return makeGenericCanon(aParent, std::move(handler), std::move(aLocalPosition));
     }
 
 
-    aunteater::Entity makeArcCanon(aunteater::weak_entity aParent,
+    aunteater::Entity makeArcCanon(aunteater::entity_id aBossId,
+                                   aunteater::weak_entity aParent,
                                    Vec<2> aLocalPosition=Vec<2>::Zero())
     {
         BulletConfig bulletConfig;
         bulletConfig.radius = gBoss1ArcCanonBulletRadius;
         bulletConfig.velocity = gBoss1ArcCanonBulletVelocity;
 
-        TimedSequence<aunteater::LiveEntity &> canonSequence{
-        { // The map
-            { // A pair element of the map
-                gBoss1PhaseDuration,
-                [bulletConfig](timepoint_t /*ignored*/, aunteater::LiveEntity &aEntity)
-                {
-                    aEntity.add<FirePattern>(std::make_unique<Fire::Arc>(
-                                std::numeric_limits<duration_t>::infinity(),
-                                3.f/8.f * 2*pi<Radian<>>,
-                                gBoss1ArcCanonBulletCount,
-                                std::move(bulletConfig)));
-                }
-            },
-            //{
-            //    gBoss1PhaseDuration,
-            //    [](timepoint_t /*ignored*/, aunteater::LiveEntity &aEntity)
-            //    {
-            //        aEntity.remove<FirePattern>();
-            //    }
-            //},
-        }};
+        auto handler = BossEventFunctor{aBossId}
+            .on<BossEvent::Arc>([bulletConfig](aunteater::LiveEntity & aEntity)
+                    {
+                        aEntity.add<FirePattern>(std::make_unique<Fire::Arc>(
+                                    std::numeric_limits<duration_t>::infinity(),
+                                    3.f/8.f * 2*pi<Radian<>>,
+                                    gBoss1ArcCanonBulletCount,
+                                    std::move(bulletConfig)));
+                    })
+            // TODO would be better to actually remove the FirePattern
+            // for the moment, its period is infinite, so it shoot only when added (or re-added)
+            //.on<BossEvent::ArcOff>([](aunteater::LiveEntity & aEntity)
+            //        {
+            //            aEntity.remove<FirePattern>();
+            //        })
+            ;
 
-        return makeGenericCanon(aParent, std::move(canonSequence), std::move(aLocalPosition));
+        return makeGenericCanon(aParent, std::move(handler), std::move(aLocalPosition));
     }
 
 
-    aunteater::Entity makeCoreCanon(aunteater::weak_entity aParent,
-                                    duration_t aPhase,
+    aunteater::Entity makeCoreCanon(aunteater::entity_id aBossId,
+                                    aunteater::weak_entity aParent,
+                                    duration_t aDelay,
                                     Vec<2> aLocalPosition=Vec<2>::Zero())
     {
         BulletConfig bulletConfig;
         bulletConfig.radius = gBoss1TurretBulletRadius;
         bulletConfig.velocity = gBoss1TurretBulletVelocity;
 
-        TimedSequence<aunteater::LiveEntity &> canonSequence{
-        { // The map
-            { // A pair element of the map
-                aPhase,
-                [bulletConfig](timepoint_t /*ignored*/, aunteater::LiveEntity &aEntity)
-                {
-                    aEntity.add<FirePattern>(std::make_unique<Fire::Burst<3>>(
-                                gBoss1CoreCanonPeriod,
-                                pi<Radian<>> / 2.f,
-                                std::move(bulletConfig)));
-                }
-            },
-            {
-                gBoss1PhaseDuration,
-                [](timepoint_t /*ignored*/, aunteater::LiveEntity &aEntity)
-                {
-                    aEntity.remove<FirePattern>();
-                }
-            },
-        }};
-
-        return makeGenericCanon(aParent, std::move(canonSequence), std::move(aLocalPosition));
+        auto handler = BossEventFunctor{aBossId}
+            .on<BossEvent::CoreCanon_1>([bulletConfig, aDelay](aunteater::LiveEntity & aEntity)
+                    {
+                        aEntity.add<FirePattern>(std::make_unique<Fire::Spray<3, Delay<Periodic>>>(
+                                    pi<Radian<>> / 2.f,
+                                    std::move(bulletConfig),
+                                    aDelay,
+                                    gBoss1CoreCanonPeriod));
+                    })
+            .on<BossEvent::CoreCanonOff>([](aunteater::LiveEntity & aEntity)
+                    {
+                        aEntity.remove<FirePattern>();
+                    })
+            ;
+        return makeGenericCanon(aParent, std::move(handler), std::move(aLocalPosition));
     }
 
 
 
-    void addCircleOfCoreCanons(aunteater::Engine & aEntityEngine,
+    void addCircleOfCoreCanons(aunteater::entity_id aBossId,
+                               aunteater::Engine & aEntityEngine,
                                aunteater::weak_entity aParent,
                                int aCanonCount,
                                Floating aCircleRadius,
@@ -300,11 +271,22 @@ namespace detail {
             offsetFromCenter *= aCircleRadius;
 
             aunteater::Entity canon =
-                makeCoreCanon(aParent,
+                makeCoreCanon(aBossId,
+                              aParent,
                               canonId * gBoss1CoreCanonPeriod/aCanonCount,
                               aCirclePosition + offsetFromCenter);
             aEntityEngine.addEntity(canon);
         }
+    }
+
+
+    template <class T_event, class... VT_ctorArgs>
+    void postEvent(aunteater::Engine & aEngine,
+                   aunteater::LiveEntity & aSource,
+                   VT_ctorArgs &&... vaCtorArgs)
+    {
+        aEngine.addEntity(aunteater::Entity().add<T_event>(entityIdFrom(aSource),
+                                                           std::forward<VT_ctorArgs>(vaCtorArgs)...));
     }
 
 
@@ -332,25 +314,37 @@ namespace detail {
         TimedSequence<aunteater::LiveEntity &, aunteater::Engine &> bossSequence{
         { // The map
             { // A pair element of the map
+                0,
+                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                {
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::CoreCanon_1);
+                }
+            },
+            { // A pair element of the map
                 gBoss1PhaseDuration,
                 [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
                 {
-                    aEngine.addEntity(aunteater::Entity().add<BossEvent>(BossEvent::Rotate));
-                    aEngine.addEntity(aunteater::Entity().add<BossEvent>(BossEvent::LaserOn));
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::CoreCanonOff);
+
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::Arc);
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::Rotate);
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::LaserOn);
                 }
             },
             {
                 2*gBoss1PhaseDuration,
                 [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
                 {
-                    aEngine.addEntity(aunteater::Entity().add<BossEvent>(BossEvent::Stabilize));
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::Stabilize);
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::Turret_1);
                 }
             },
             {
                 2*gBoss1PhaseDuration + gBoss1RotationAccelerationDuration,
                 [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
                 {
-                    aEngine.addEntity(aunteater::Entity().add<BossEvent>(BossEvent::LaserOff));
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::LaserOff);
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::TurretOff);
                 }
             },
         }};
@@ -376,7 +370,8 @@ namespace detail {
             //
             // Left triplet
             //
-            addCircleOfCoreCanons(aEntityEngine,
+            addCircleOfCoreCanons(entityIdFrom(*liveBoss),
+                                  aEntityEngine,
                                   liveBoss,
                                   3,
                                   gBoss1CoreCanonOffset,
@@ -385,7 +380,8 @@ namespace detail {
             //
             // Right triplet
             //
-            addCircleOfCoreCanons(aEntityEngine,
+            addCircleOfCoreCanons(entityIdFrom(*liveBoss),
+                                  aEntityEngine,
                                   liveBoss,
                                   3,
                                   gBoss1CoreCanonOffset,
@@ -393,7 +389,8 @@ namespace detail {
             //
             // Top triplet
             //
-            addCircleOfCoreCanons(aEntityEngine,
+            addCircleOfCoreCanons(entityIdFrom(*liveBoss),
+                                  aEntityEngine,
                                   liveBoss,
                                   3,
                                   gBoss1CoreCanonOffset,
@@ -404,15 +401,16 @@ namespace detail {
             //
             // Arc Canon
             //
-            aEntityEngine.addEntity(makeArcCanon(liveBoss, {-gBoss1BallRadius, 0.f}));
+            aEntityEngine.addEntity(makeArcCanon(entityIdFrom(*liveBoss),
+                                                 liveBoss,
+                                                 {-gBoss1BallRadius, 0.f}));
         }
 
         {
             //
             // Central Rotation Axis
             //
-            auto handler = BossEventFunctor{*liveBoss};
-            handler
+            auto handler = BossEventFunctor{*liveBoss}
                 .on<BossEvent::Rotate>([](auto & aEntity)
                         {
                             aEntity.template get<Tweening<Speed, Radian<>>>()
@@ -463,6 +461,7 @@ namespace detail {
                     {
                         aunteater::weak_entity liveLeftCanon =
                             aEntityEngine.addEntity(detail::makeTurretCanon(
+                                        entityIdFrom(*liveBoss),
                                         liveLeftTurret,
                                         {gBoss1TurretRadius/2.f, 0.f}));
                     }
@@ -496,6 +495,7 @@ namespace detail {
                     {
                         aunteater::weak_entity liveRightCanon =
                             aEntityEngine.addEntity(detail::makeTurretCanon(
+                                        entityIdFrom(*liveBoss),
                                         liveRightTurret,
                                         {gBoss1TurretRadius/2.f, 0.f}));
                     }

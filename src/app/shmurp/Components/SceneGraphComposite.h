@@ -38,5 +38,4 @@ private:
 };
 
 
-
 } // namespace ad

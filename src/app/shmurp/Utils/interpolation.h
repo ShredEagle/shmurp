@@ -110,7 +110,7 @@ public:
         mFactor(std::move(1/aDuration))
     {}
 
-    Clamped<T_interpolant> current()
+    Clamped<T_interpolant> current() const
     {
         return (*F_curve)(mFactor * mAccumulator);
     }
@@ -123,6 +123,11 @@ public:
     void reset()
     {
         mAccumulator = 0;
+    }
+
+    bool isComplete() const
+    {
+        return (mFactor * mAccumulator) >= Clamped<T_interpolant>::max_v;
     }
 
 private:
@@ -149,6 +154,11 @@ public:
         return lerp(mStart, mEnd, mAnimation.increment(aIncrement));
     }
 
+    bool isComplete() const
+    {
+        return mAnimation.isComplete();
+    }
+
 protected:
     T_value mStart;
     T_value mEnd;
@@ -173,6 +183,11 @@ public:
         return lerp(std::make_pair(aPreviousResult, mAnimation.current()),
                     mEnd,
                     mAnimation.increment(aIncrement));
+    }
+
+    bool isComplete() const
+    {
+        return mAnimation.isComplete();
     }
 
 private:

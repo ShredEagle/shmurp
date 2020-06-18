@@ -16,7 +16,6 @@
 namespace ad {
 
 
-constexpr Vec<2> gBossPosition{conf::gWindowWorldWidth/2.0f, conf::gWindowWorldHeight-5.0f};
 constexpr float gBoss1BallRadius = 3.5f;
 constexpr float gBoss1SatelliteRadius = 0.7f * gBoss1BallRadius;
 constexpr float gBoss1TurretRadius = conf::gPyramidRadius;
@@ -41,6 +40,22 @@ constexpr Floating gBoss1ArcCanonBulletVelocity = gBoss1ReferenceBulletVelocity 
 
 constexpr Floating gBoss1TurretLaserPeriod = 0.6f;
 constexpr Floating gBoss1TurretLaserVelocity = gBoss1ReferenceBulletVelocity * 0.5f;
+
+namespace Boss1 {
+
+    constexpr Vec<2> gStartPosition = {conf::gWindowWorldWidth/2.0f, conf::gWindowWorldHeight-5.0f};
+
+    constexpr std::array<Vec<2>, 4> gPositions = {
+        gStartPosition + Vec<2>{-4.f, -3.f},
+        gStartPosition,
+        gStartPosition + Vec<2>{+4.f, -3.f},
+        gStartPosition,
+    };
+
+    constexpr duration_t gDisplacementDuration = 7.f;
+
+} // namespace Boss1
+
 
 namespace detail {
 
@@ -290,6 +305,23 @@ namespace detail {
     }
 
 
+    template <class T_entity>
+    void recursePositionTween(T_entity & aEntity, std::size_t aPositionId=0)
+    {
+        aEntity
+            .template add<LiveTweening<SceneGraphComposite, Vec<2>>>(
+                [](SceneGraphComposite & sgc) -> Vec<2> & {return sgc.position;},
+                Boss1::gPositions[aPositionId],
+                Boss1::gDisplacementDuration,
+                [aPositionId](AUNTEATER_CB_ARGS)
+                    {
+                        recursePositionTween(aEntity,
+                                             (aPositionId+1) % Boss1::gPositions.size());
+                    })
+        ;
+    }
+
+
     aunteater::Entity makeBoss1(aunteater::Engine & aEntityEngine)
     {
         using namespace math::angle_literals;
@@ -301,12 +333,17 @@ namespace detail {
         boss
             //.add<Faction>(Faction::Democrats, Faction::SpaceForce)
             .add<Geometry>(Vec<2>{0.f, 0.f}, gBoss1BallRadius)
-            .add<SceneGraphComposite>(gBossPosition,
+            .add<SceneGraphComposite>(Boss1::gStartPosition,
                                       Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f})
             .add<SceneGraphParent>(/*root*/)
             .add<Shape>(Shape::Circle)
             .add<Speed>(Vec<2>::Zero(), Vec<3, Radian<>>::Zero());
 
+
+        //
+        // The boss perpatual displacement
+        //
+        recursePositionTween(boss);
 
         //
         // The main boss automata
@@ -525,6 +562,7 @@ void boss1(aunteater::Engine & aEntityEngine, Application & aApplication)
      * Systems
      */
     aEntityEngine.addSystem<Interpolate<Speed, Radian<>>>();
+    aEntityEngine.addSystem<Interpolate<SceneGraphComposite, Vec<2>>>();
     aEntityEngine.addSystem<EventQueue<BossEvent>>();
 
     /*

@@ -3,6 +3,8 @@
 #include "../commons.h"
 #include "../Utils/interpolation.h"
 
+#include "CustomCallback.h" // for CustomCallback::function_type
+
 #include <aunteater/Component.h>
 
 #include <functional>
@@ -55,13 +57,18 @@ struct LiveTweening : public aunteater::Component<LiveTweening<T_component, T_va
 {
     using Accessor = std::function<T_value &(T_component &)>;
 
-    LiveTweening(Accessor aAccessor, T_value aEnd, Floating aDuration) :
+    LiveTweening(Accessor aAccessor,
+                 T_value aEnd,
+                 Floating aDuration,
+                 CustomCallback::function_type aOnCompletion = & CustomCallback::NullCallback) :
         accessor{std::move(aAccessor)},
-        interpolation{aEnd, aDuration}
+        interpolation{aEnd, aDuration},
+        onCompletion{std::move(aOnCompletion)}
     {}
 
     Accessor accessor;
     LiveInterpolation<T_value, Floating> interpolation;
+    CustomCallback::function_type onCompletion;
 };
 
 

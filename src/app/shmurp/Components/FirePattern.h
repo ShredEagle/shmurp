@@ -162,7 +162,7 @@ public:
     Arc(duration_t aPeriod, Radian<> aCoverage, int aCount, BulletConfig aBulletConfig) :
         mPeriod{aPeriod},
         mStartingAngle{aCount > 1 ? -aCoverage/2. : Radian<>{0}},
-        mAngleIncrement{aCoverage / std::max(1, aCount-1)},
+        mAngleIncrement{aCoverage / std::max(1, aCount-1)}, // There are count-1 intervals
         mCount{aCount},
         mBulletConfig{std::move(aBulletConfig)}
     {}
@@ -172,22 +172,25 @@ public:
               Vec<2, GLfloat> aBasePosition,
               Vec<3, Radian<>> aOrientations) override
     {
+        static const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
+
         mPeriod.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
-            static const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
+            // Copy orientation, and offset Z by the starting angle
+            auto orientations = aOrientations;
+            orientations.z() += mStartingAngle;
 
             for (int bulletCount = 0; bulletCount < mCount; ++bulletCount)
             {
-                // There are count-1 intervals
-                aOrientations.z() += mStartingAngle + (bulletCount * mAngleIncrement);
-                auto speed = gSpeed * transform::makeOrientationMatrix(aOrientations);
+                auto speed = gSpeed * transform::makeOrientationMatrix(orientations);
 
                 Vec<2> startPosition =
                     aBasePosition + aRemainingTime * Vec<2>{speed.x(), speed.y()};
                 aEngine.addEntity(entities::makeBullet(startPosition,
-                                                       aOrientations.z(),
+                                                       orientations.z(),
                                                        speed,
                                                        mBulletConfig));
+                orientations.z() += mAngleIncrement;
             }
 
         });
@@ -216,21 +219,24 @@ public:
               Vec<2, GLfloat> aBasePosition,
               Vec<3, Radian<>> aOrientations) override
     {
+        static const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
+
         mPeriod.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
-            static const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
+            // Copy orientation
+            auto orientations = aOrientations;
 
             for (int bulletCount = 0; bulletCount < mCount; ++bulletCount)
             {
-                aOrientations.z() += bulletCount * (2*pi<Radian<>>/mCount);
-                auto speed = gSpeed * transform::makeOrientationMatrix(aOrientations);
+                auto speed = gSpeed * transform::makeOrientationMatrix(orientations);
 
                 Vec<2> startPosition =
                     aBasePosition + aRemainingTime * Vec<2>{speed.x(), speed.y()};
                 aEngine.addEntity(entities::makeBullet(startPosition,
-                                                       aOrientations.z(),
+                                                       orientations.z(),
                                                        speed,
                                                        mBulletConfig));
+                orientations.z() += (2*pi<Radian<>> / mCount);
             }
 
         });
@@ -269,13 +275,15 @@ public:
 
         mTimer.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
-            aOrientations.z() += mAngleQuant*mRandomizer();
-            auto speed = gSpeed * transform::makeOrientationMatrix(aOrientations);
+            Radian<> randomOffset = mAngleQuant*mRandomizer();
+            auto speed = gSpeed
+                * transform::makeOrientationMatrix(aOrientations)
+                * transform::rotateMatrix_Z(randomOffset);
             Vec<2, GLfloat> startPosition =
                 aBasePosition
                 + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
             aEngine.addEntity(entities::makeBullet(startPosition,
-                                                   aOrientations.z(),
+                                                   aOrientations.z() + randomOffset,
                                                    speed,
                                                    mBulletConfig));
         });

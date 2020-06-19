@@ -38,6 +38,7 @@ constexpr Floating gBoss1ArcCanonBulletCount = 15.f;
 constexpr Floating gBoss1ArcCanonBulletRadius = 1.5*gBoss1TurretBulletRadius;
 constexpr Floating gBoss1ArcCanonBulletVelocity = gBoss1ReferenceBulletVelocity * 1.5f;
 
+constexpr Floating gBoss1TurretLaserRadius = conf::gBulletRadius;
 constexpr Floating gBoss1TurretLaserPeriod = 0.6f;
 constexpr Floating gBoss1TurretLaserVelocity = gBoss1ReferenceBulletVelocity * 0.5f;
 
@@ -66,7 +67,7 @@ namespace detail {
 
         aunteater::Entity satellite;
         satellite
-            .add<Geometry>(Vec<2>::Zero(), gBoss1SatelliteRadius)
+            .add<Geometry>(gBoss1SatelliteRadius)
             .add<SceneGraphComposite>(aLocalPosition,
                                       Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f},
                                       SceneGraphComposite::ResetOrientation)
@@ -84,7 +85,7 @@ namespace detail {
 
         aunteater::Entity turret;
         turret
-            .add<Geometry>(Vec<2>{0.f, 0.f}, gBoss1TurretRadius)
+            .add<Geometry>(gBoss1TurretRadius)
             .add<SceneGraphComposite>(aLocalPosition,
                                       Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f},
                                       SceneGraphComposite::ResetOrientation)
@@ -146,8 +147,9 @@ namespace detail {
         using namespace math::angle_literals;
 
         BulletConfig bulletConfig;
-        bulletConfig.radius = gBoss1TurretBulletRadius;
+        bulletConfig.radius = gBoss1TurretLaserRadius;
         bulletConfig.velocity = gBoss1TurretLaserVelocity;
+        bulletConfig.shape = Shape::Laser;
 
         auto handler = BossEventFunctor{aBossId}
             .on<BossEvent::LaserOn>([bulletConfig](aunteater::LiveEntity & aEntity)
@@ -165,7 +167,7 @@ namespace detail {
         aunteater::Entity canon;
         canon
             .add<EventObserver<BossEvent>>(std::move(handler))
-            .add<Geometry>(Vec<2>{0.f, 0.f})
+            .add<Geometry>()
             .add<SceneGraphComposite>(aLocalPosition)
             .add<SceneGraphParent>(aParent)
             ;
@@ -182,7 +184,7 @@ namespace detail {
         aunteater::Entity canon;
         canon
             .add<EventObserver<BossEvent>>(std::move(aBossEventHandler))
-            .add<Geometry>(Vec<2>{0.f, 0.f})
+            .add<Geometry>()
             .add<SceneGraphComposite>(aLocalPosition)
             .add<SceneGraphParent>(aParent)
             ;
@@ -332,7 +334,7 @@ namespace detail {
         aunteater::Entity boss;
         boss
             //.add<Faction>(Faction::Democrats, Faction::SpaceForce)
-            .add<Geometry>(Vec<2>{0.f, 0.f}, gBoss1BallRadius)
+            .add<Geometry>(gBoss1BallRadius)
             .add<SceneGraphComposite>(Boss1::gStartPosition,
                                       Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f})
             .add<SceneGraphParent>(/*root*/)

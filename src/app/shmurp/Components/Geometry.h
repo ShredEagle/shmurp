@@ -12,19 +12,12 @@ namespace ad {
 
 struct Geometry : public aunteater::Component<Geometry>
 {
-    explicit Geometry(GLfloat aRadius) :
-        radius(aRadius)
-    {}
-
-    explicit Geometry(Vec<2, GLfloat> aPosition = Vec<2>::Zero(), GLfloat aRadius = 0.) :
-        radius(aRadius),
-        position(aPosition)
-    {}
-
-
-    Geometry(GLfloat x, GLfloat y, GLfloat aRadius = 0.) :
-        radius(aRadius),
-        position(x, y)
+    explicit Geometry(GLfloat aRadius = 0.,
+                      Vec<2, GLfloat> aPosition = Vec<2>::Zero(),
+                      Vec<3, Radian<>> aOrientations = Vec<3, Radian<>>::Zero()) :
+        radius{aRadius},
+        orientations{std::move(aOrientations)},
+        position{std::move(aPosition)}
     {}
 
 

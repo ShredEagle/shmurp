@@ -62,7 +62,7 @@ inline aunteater::Entity makeSquare(Vec<2, GLfloat> aPosition,
                                     Vec<3, Radian<>> aRotationSpeed)
 {
     return aunteater::Entity().add<Faction>(Faction::Democrats, Faction::TruthBullet)
-                              .add<Geometry>(aPosition, conf::squareRadius)
+                              .add<Geometry>(conf::squareRadius, aPosition)
                               .add<Shape>(Shape::Square)
                               .add<Speed>(aTranslationSpeed, aRotationSpeed);
 }
@@ -105,7 +105,7 @@ inline void addTrackingPyramid(aunteater::Engine & aEngine,
         aunteater::Entity()
             .add<CustomCallback>(std::move(customBehaviour))
             .add<Faction>(Faction::Democrats, Faction::SpaceForce)
-            .add<Geometry>(Vec<2>{0.f, 0.f}, conf::gPyramidRadius)
+            .add<Geometry>(conf::gPyramidRadius)
             .add<SceneGraphComposite>(aPosition,
                                       Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f})
             .add<SceneGraphParent>(/*root*/)
@@ -115,7 +115,7 @@ inline void addTrackingPyramid(aunteater::Engine & aEngine,
     aEngine.addEntity(
         aunteater::Entity()
             .add<FirePattern>(std::make_unique<Fire::Line<Rythm>>(fourFour))
-            .add<Geometry>(Vec<2>{0.f, 0.f}, 0.f) // The position is handled by SceneGraph system
+            .add<Geometry>() // The position is handled by SceneGraph system
             .add<SceneGraphComposite>(Vec<2>{.5f, 0.f})
             .add<SceneGraphParent>(ship));
 }

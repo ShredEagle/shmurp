@@ -68,17 +68,6 @@ private:
 };
 
 
-// Might make a good component, then fire() virtual method would also take a reference to this component
-// Yet, it would either mean a component whose member is a component (here faction)
-// Or we could use the faction of the composed entity, but then the bullet would always have the same faction as the entity
-struct BulletConfig
-{
-    Faction faction{Faction::LibLies, Faction::SpaceForce};
-    Floating radius{conf::gBulletRadius};
-    Floating velocity{conf::gEnemyBulletSpeed};
-};
-
-
 namespace Fire {
 
 template <class T_timer>
@@ -93,7 +82,7 @@ public:
     void fire(double aDelta,
               aunteater::Engine & aEngine,
               Vec<2, GLfloat> aBasePosition,
-              Vec<3, Radian<>> aOrientation) override
+              Vec<3, Radian<>> aOrientations) override
     {
         mTimer.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
@@ -103,15 +92,15 @@ public:
 #endif
             Vec<4, GLfloat> gSpeed{mBulletConfig.velocity, 0.f, 0.f, 1.f};
 
-            auto speed = gSpeed * transform::makeOrientationMatrix(aOrientation);
+            auto speed = gSpeed * transform::makeOrientationMatrix(aOrientations);
 
             Vec<2, GLfloat> startPosition =
                 aBasePosition
                 + static_cast<GLfloat>(aRemainingTime)*Vec<2>{speed.x(), speed.y()};
-            aEngine.addEntity(entities::makeBullet(mBulletConfig.faction,
-                                                   startPosition,
+            aEngine.addEntity(entities::makeBullet(startPosition,
+                                                   aOrientations.z(),
                                                    speed,
-                                                   mBulletConfig.radius));
+                                                   mBulletConfig));
         });
     }
 
@@ -138,15 +127,16 @@ public:
         mPeriod.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
             static const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
-            auto speed = gSpeed * transform::rotateMatrix_Z(nextAngle());
+            auto angle = nextAngle();
+            auto speed = gSpeed * transform::rotateMatrix_Z(angle);
 
             Vec<2, GLfloat> startPosition =
                 aBasePosition
                 + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
-            aEngine.addEntity(entities::makeBullet(mBulletConfig.faction,
-                                                   startPosition,
+            aEngine.addEntity(entities::makeBullet(startPosition,
+                                                   angle,
                                                    speed,
-                                                   mBulletConfig.radius));
+                                                   mBulletConfig));
         });
     }
 
@@ -180,7 +170,7 @@ public:
     void fire(double aDelta,
               aunteater::Engine & aEngine,
               Vec<2, GLfloat> aBasePosition,
-              Vec<3, Radian<>> aOrientation) override
+              Vec<3, Radian<>> aOrientations) override
     {
         mPeriod.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
@@ -189,17 +179,15 @@ public:
             for (int bulletCount = 0; bulletCount < mCount; ++bulletCount)
             {
                 // There are count-1 intervals
-                auto speed = gSpeed
-                             * transform::rotateMatrix_Z(mStartingAngle
-                                                         + (bulletCount * mAngleIncrement))
-                             * transform::makeOrientationMatrix(aOrientation);
+                aOrientations.z() += mStartingAngle + (bulletCount * mAngleIncrement);
+                auto speed = gSpeed * transform::makeOrientationMatrix(aOrientations);
 
                 Vec<2> startPosition =
                     aBasePosition + aRemainingTime * Vec<2>{speed.x(), speed.y()};
-                aEngine.addEntity(entities::makeBullet(mBulletConfig.faction,
-                                                       startPosition,
+                aEngine.addEntity(entities::makeBullet(startPosition,
+                                                       aOrientations.z(),
                                                        speed,
-                                                       mBulletConfig.radius));
+                                                       mBulletConfig));
             }
 
         });
@@ -226,7 +214,7 @@ public:
     void fire(double aDelta,
               aunteater::Engine & aEngine,
               Vec<2, GLfloat> aBasePosition,
-              Vec<3, Radian<>> aOrientation) override
+              Vec<3, Radian<>> aOrientations) override
     {
         mPeriod.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
@@ -234,16 +222,15 @@ public:
 
             for (int bulletCount = 0; bulletCount < mCount; ++bulletCount)
             {
-                auto speed = gSpeed
-                             * transform::rotateMatrix_Z(bulletCount * (2*pi<Radian<>>/mCount))
-                             * transform::makeOrientationMatrix(aOrientation);
+                aOrientations.z() += bulletCount * (2*pi<Radian<>>/mCount);
+                auto speed = gSpeed * transform::makeOrientationMatrix(aOrientations);
 
                 Vec<2> startPosition =
                     aBasePosition + aRemainingTime * Vec<2>{speed.x(), speed.y()};
-                aEngine.addEntity(entities::makeBullet(mBulletConfig.faction,
-                                                       startPosition,
+                aEngine.addEntity(entities::makeBullet(startPosition,
+                                                       aOrientations.z(),
                                                        speed,
-                                                       mBulletConfig.radius));
+                                                       mBulletConfig));
             }
 
         });
@@ -276,22 +263,21 @@ public:
     void fire(double aDelta,
               aunteater::Engine & aEngine,
               Vec<2, GLfloat> aBasePosition,
-              Vec<3, Radian<>> aOrientation) override
+              Vec<3, Radian<>> aOrientations) override
     {
         static const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
 
         mTimer.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
-            auto speed = gSpeed
-                         * transform::rotateMatrix_Z(mAngleQuant*mRandomizer())
-                         * transform::makeOrientationMatrix(aOrientation);
+            aOrientations.z() += mAngleQuant*mRandomizer();
+            auto speed = gSpeed * transform::makeOrientationMatrix(aOrientations);
             Vec<2, GLfloat> startPosition =
                 aBasePosition
                 + static_cast<GLfloat>(aRemainingTime)*Vec<2, GLfloat>{speed.x(), speed.y()};
-            aEngine.addEntity(entities::makeBullet(mBulletConfig.faction,
-                                                   startPosition,
+            aEngine.addEntity(entities::makeBullet(startPosition,
+                                                   aOrientations.z(),
                                                    speed,
-                                                   mBulletConfig.radius));
+                                                   mBulletConfig));
         });
     }
 

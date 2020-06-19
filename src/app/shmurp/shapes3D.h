@@ -220,6 +220,22 @@ std::vector<vertex3D::Data> makeVertices(GLfloat aRadius)
 
 } // namespace circle3D
 
+
+namespace rectangle3D {
+
+inline std::vector<vertex3D::Data> makeVertices(Size<2> aDimensions)
+{
+    return {
+        { {+aDimensions.width()/2.f, +aDimensions.height()/2.f, 0.f} },
+        { {-aDimensions.width()/2.f, +aDimensions.height()/2.f, 0.f} },
+        { {-aDimensions.width()/2.f, -aDimensions.height()/2.f, 0.f} },
+        { {+aDimensions.width()/2.f, -aDimensions.height()/2.f, 0.f} },
+    };
+}
+
+} // namespace rectangle3D
+
+
 namespace instance3D {
 
 struct Data

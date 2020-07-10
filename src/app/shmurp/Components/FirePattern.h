@@ -5,6 +5,7 @@
 #include "../Entities/Bullets.h"
 #include "../transformations.h"
 
+#include "../Utils/ArcQuantifier.h"
 #include "../Utils/Periodic.h"
 
 #include <aunteater/Component.h>
@@ -14,6 +15,12 @@
 
 
 namespace ad {
+
+inline Floating dampenFactor(int aIteration)
+{
+    return std::pow(0.85f, aIteration);
+}
+
 
 class FirePattern : public aunteater::Component<FirePattern>
 {
@@ -84,7 +91,8 @@ public:
               Vec<2, GLfloat> aBasePosition,
               Vec<3, Radian<>> aOrientations) override
     {
-        mTimer.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
+        // Hardcode the possiblity to use an Iterative timer, with optional aIteration argument
+        mTimer.forEachEvent(aDelta, [&, this](duration_t aRemainingTime, int aIteration = 0)
         {
 #if !defined(__clang__)
             // see: https://stackoverflow.com/q/61060240/1027706
@@ -92,7 +100,9 @@ public:
 #endif
             Vec<4, GLfloat> gSpeed{mBulletConfig.velocity, 0.f, 0.f, 1.f};
 
-            auto speed = gSpeed * transform::makeOrientationMatrix(aOrientations);
+            auto speed = gSpeed * transform::makeOrientationMatrix(aOrientations)
+                            * dampenFactor(aIteration); // Hardcodes dampening iterations
+                                                        // This should be more generic
 
             Vec<2, GLfloat> startPosition =
                 aBasePosition
@@ -126,7 +136,7 @@ public:
     {
         mPeriod.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
-            static const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
+            const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
             auto angle = nextAngle();
             auto speed = gSpeed * transform::rotateMatrix_Z(angle);
 
@@ -161,8 +171,7 @@ public:
     /// yet a negative or zero value will simply not fire, and a value of 1 will fire in front
     Arc(duration_t aPeriod, Radian<> aCoverage, int aCount, BulletConfig aBulletConfig) :
         mPeriod{aPeriod},
-        mStartingAngle{aCount > 1 ? -aCoverage/2. : Radian<>{0}},
-        mAngleIncrement{aCoverage / std::max(1, aCount-1)}, // There are count-1 intervals
+        mArcQuantifier{aCoverage, aCount},
         mCount{aCount},
         mBulletConfig{std::move(aBulletConfig)}
     {}
@@ -172,13 +181,13 @@ public:
               Vec<2, GLfloat> aBasePosition,
               Vec<3, Radian<>> aOrientations) override
     {
-        static const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
+        const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
 
         mPeriod.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
             // Copy orientation, and offset Z by the starting angle
             auto orientations = aOrientations;
-            orientations.z() += mStartingAngle;
+            orientations.z() += mArcQuantifier.startingAngle;
 
             for (int bulletCount = 0; bulletCount < mCount; ++bulletCount)
             {
@@ -190,7 +199,7 @@ public:
                                                        orientations.z(),
                                                        speed,
                                                        mBulletConfig));
-                orientations.z() += mAngleIncrement;
+                orientations.z() += mArcQuantifier.angleIncrement;
             }
 
         });
@@ -198,8 +207,7 @@ public:
 
 private:
     Periodic mPeriod;
-    const Radian<> mStartingAngle;
-    const Radian<> mAngleIncrement;
+    const ArcQuantifier mArcQuantifier;
     const int mCount;
     BulletConfig mBulletConfig;
 };
@@ -219,7 +227,7 @@ public:
               Vec<2, GLfloat> aBasePosition,
               Vec<3, Radian<>> aOrientations) override
     {
-        static const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
+        const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
 
         mPeriod.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
@@ -271,7 +279,7 @@ public:
               Vec<2, GLfloat> aBasePosition,
               Vec<3, Radian<>> aOrientations) override
     {
-        static const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
+        const Vec<4, GLfloat> gSpeed(mBulletConfig.velocity, 0.f, 0.f, 1.f);
 
         mTimer.forEachEvent(aDelta, [&, this](duration_t aRemainingTime)
         {
@@ -302,6 +310,34 @@ private:
 template <int N_divisions, class T_timer>
 std::atomic<int> Spray<N_divisions, T_timer>::gSeed = 0;
 
+
+class Composite : public FirePattern::Base<Composite>
+{
+public:
+    Composite() = default;
+
+    Composite(const Composite & aOther) :
+        components{}
+    {
+        for (auto & component : aOther.components)
+        {
+            components.emplace_back(component->clone());
+        }
+    }
+
+    void fire(double aDelta,
+              aunteater::Engine & aEngine,
+              Vec<2, GLfloat> aBasePosition,
+              Vec<3, Radian<>> aOrientations) override
+    {
+        for (auto & component : components)
+        {
+            component->fire(aDelta, aEngine, std::move(aBasePosition), std::move(aOrientations));
+        }
+    }
+
+    std::vector<std::unique_ptr<FirePattern::Base_impl>> components;
+};
 
 } // namespace Fire
 

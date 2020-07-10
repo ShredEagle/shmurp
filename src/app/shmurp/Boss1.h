@@ -9,12 +9,14 @@
 #include "System/Interpolate.h"
 
 #include "Utils/Delay.h"
+#include "Utils/Iterative.h"
 #include "Utils/Periodic.h"
 #include "Utils/TimedSequence.h"
 
 
 namespace ad {
 
+constexpr duration_t gInfinity = std::numeric_limits<duration_t>::infinity();
 
 constexpr float gBoss1BallRadius = 3.5f;
 constexpr float gBoss1SatelliteRadius = 0.7f * gBoss1BallRadius;
@@ -25,10 +27,13 @@ constexpr Floating gBoss1ReferenceBulletVelocity = conf::gBulletSpeed/8.0;
 constexpr duration_t gBoss1RotationAccelerationDuration = 4.0; //Integral of f(x)=x from 0..4 is 2
 constexpr Radian<> gBoss1RotationTopSpeed = pi<Radian<>>;  // so 2*pi rotation during acceleration and deceleration, i.e. 1 revolution
 constexpr duration_t gBoss1PhaseDuration = 6.0;
+constexpr duration_t gBoss1CompoundFirePeriod = gBoss1PhaseDuration/3.f;
 
 constexpr duration_t gBoss1TurretPeriod = 0.1;
 constexpr Floating gBoss1TurretBulletRadius = 3*conf::gBulletRadius;
 constexpr Floating gBoss1TurretBulletVelocity = gBoss1ReferenceBulletVelocity;
+
+constexpr int gBoss1CompoundIterations = 4;
 
 constexpr duration_t gBoss1CoreCanonPeriod = 1.0;
 constexpr Floating gBoss1CoreCanonBaseYPosition = gBoss1BallRadius/1.5f;
@@ -54,6 +59,9 @@ namespace Boss1 {
     };
 
     constexpr duration_t gDisplacementDuration = 7.f;
+
+    constexpr Radian<> gCircleCoreCanonsCoverage = pi<Radian<>>/3.f;
+    constexpr int gCircleCoreCanonsArcCount = 6;
 
 } // namespace Boss1
 
@@ -177,7 +185,8 @@ namespace detail {
 
     aunteater::Entity makeGenericCanon(aunteater::weak_entity aParent,
                                        BossEventFunctor aBossEventHandler,
-                                       Vec<2> aLocalPosition=Vec<2>::Zero())
+                                       Vec<2> aLocalPosition=Vec<2>::Zero(),
+                                       Vec<3, Radian<>> aLocalOrientation=Vec<3, Radian<>>::Zero())
     {
         using namespace math::angle_literals;
 
@@ -185,7 +194,7 @@ namespace detail {
         canon
             .add<EventObserver<BossEvent>>(std::move(aBossEventHandler))
             .add<Geometry>()
-            .add<SceneGraphComposite>(aLocalPosition)
+            .add<SceneGraphComposite>(aLocalPosition, aLocalOrientation)
             .add<SceneGraphParent>(aParent)
             ;
         return canon;
@@ -246,14 +255,21 @@ namespace detail {
     }
 
 
+    template <BossEvent::Phase N_compoundTrigger>
     aunteater::Entity makeCoreCanon(aunteater::entity_id aBossId,
                                     aunteater::weak_entity aParent,
                                     duration_t aDelay,
-                                    Vec<2> aLocalPosition=Vec<2>::Zero())
+                                    Floating aArcBulletVelocity,
+                                    Radian<> aArcCoverage,
+                                    Vec<2> aLocalPosition=Vec<2>::Zero(),
+                                    Vec<3, Radian<>> aLocalOrientation=Vec<3, Radian<>>::Zero())
     {
         BulletConfig bulletConfig;
         bulletConfig.radius = gBoss1TurretBulletRadius;
         bulletConfig.velocity = gBoss1TurretBulletVelocity;
+
+        BulletConfig arcBulletConfig{bulletConfig};
+        arcBulletConfig.velocity = aArcBulletVelocity;
 
         auto handler = BossEventFunctor{aBossId}
             .on<BossEvent::CoreCanon_1>([bulletConfig, aDelay](aunteater::LiveEntity & aEntity)
@@ -264,34 +280,73 @@ namespace detail {
                                     aDelay,
                                     gBoss1CoreCanonPeriod));
                     })
-            .on<BossEvent::CoreCanonOff>([](aunteater::LiveEntity & aEntity)
+            .template on<BossEvent::CoreCanonOff>([](aunteater::LiveEntity & aEntity)
                     {
                         aEntity.remove<FirePattern>();
                     })
+            .template on<N_compoundTrigger>([bulletConfig, arcBulletConfig, aArcCoverage]
+                    (aunteater::LiveEntity & aEntity)
+                    {
+                        auto compositeFire = std::make_unique<Fire::Composite>();
+
+                        compositeFire->components.emplace_back(
+                            std::make_unique<Fire::Line<Iterative<Periodic>>>(
+                                    Iterative<Periodic>{gBoss1CompoundIterations, gInfinity},
+                                    bulletConfig));
+
+                        compositeFire->components.emplace_back(
+                            std::make_unique<Fire::Arc>(
+                                gInfinity,
+                              aArcCoverage,
+                              Boss1::gCircleCoreCanonsArcCount,
+                              arcBulletConfig));
+
+                        aEntity.add<FirePattern>(std::move(compositeFire));
+                    })
             ;
-        return makeGenericCanon(aParent, std::move(handler), std::move(aLocalPosition));
+        return makeGenericCanon(aParent, std::move(handler),
+                                std::move(aLocalPosition), std::move(aLocalOrientation));
     }
 
 
 
+    template <BossEvent::Phase N_compoundTrigger>
     void addCircleOfCoreCanons(aunteater::entity_id aBossId,
                                aunteater::Engine & aEntityEngine,
                                aunteater::weak_entity aParent,
                                int aCanonCount,
+                               Radian<> aCoverage,
                                Floating aCircleRadius,
+                               Radian<> aAimOffset,
                                Vec<2> aCirclePosition = Vec<2>::Zero())
     {
+        const ArcQuantifier arc{aCoverage, aCanonCount};
         for(int canonId = 0; canonId != aCanonCount; ++canonId)
         {
-            Radian<> polarDirection = pi<Radian<>>/2.f + (canonId*(2*pi<Radian<>>)/aCanonCount);
+            // We need to have the "rear" canon happen in the middle of the sequence
+            // in order for the arc quantizer to apply the cenral value to it
+            Radian<> polarDirection = - pi<Radian<>>/aCanonCount
+                - canonId*(2*pi<Radian<>>)/aCanonCount;
+
             Vec<2> offsetFromCenter{cos(polarDirection), sin(polarDirection)};
             offsetFromCenter *= aCircleRadius;
 
+            auto orientations = Vec<3, Radian<>>::Zero();
+            orientations.z() = arc.getAngleFor(canonId) + aAimOffset;
+
+            Floating arcBulletVelocity = (canonId == (aCanonCount/2)) // only works for odd canon count
+                ? gBoss1TurretBulletVelocity * dampenFactor(gBoss1CompoundIterations/*-1*/) // slower than last line bullet
+                : gBoss1TurretBulletVelocity;
+
             aunteater::Entity canon =
-                makeCoreCanon(aBossId,
+                makeCoreCanon<N_compoundTrigger>
+                             (aBossId,
                               aParent,
                               canonId * gBoss1CoreCanonPeriod/aCanonCount,
-                              aCirclePosition + offsetFromCenter);
+                              arcBulletVelocity,
+                              Boss1::gCircleCoreCanonsCoverage,
+                              aCirclePosition + offsetFromCenter,
+                              orientations);
             aEntityEngine.addEntity(canon);
         }
     }
@@ -386,6 +441,29 @@ namespace detail {
                     postEvent<BossEvent>(aEngine, aEntity, BossEvent::TurretOff);
                 }
             },
+            {
+                3*gBoss1PhaseDuration,
+                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                {
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::LeftCompoundFire);
+                }
+            },
+            {
+                3*gBoss1PhaseDuration + 1*gBoss1CompoundFirePeriod,
+                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                {
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::RightCompoundFire);
+                }
+            },
+            {
+                3*gBoss1PhaseDuration + 2*gBoss1CompoundFirePeriod ,
+                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                {
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::LeftCompoundFire);
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::RightCompoundFire);
+                    postEvent<BossEvent>(aEngine, aEntity, BossEvent::TopCompoundFire);
+                }
+            },
         }};
 
         boss
@@ -398,6 +476,7 @@ namespace detail {
             ;
 
         aunteater::weak_entity liveBoss = aEntityEngine.addEntity(boss);
+        aunteater::entity_id liveBossId = entityIdFrom(*liveBoss);
         {
             //
             // Core Canons
@@ -409,31 +488,41 @@ namespace detail {
             //
             // Left triplet
             //
-            addCircleOfCoreCanons(entityIdFrom(*liveBoss),
+            addCircleOfCoreCanons<BossEvent::LeftCompoundFire>
+                                 (entityIdFrom(*liveBoss),
                                   aEntityEngine,
                                   liveBoss,
                                   3,
+                                  Boss1::gCircleCoreCanonsCoverage,
                                   gBoss1CoreCanonOffset,
+                                  pi<Radian<>>/5.f,
                                   {0.f, -gBoss1CoreCanonBaseYPosition});
 
             //
             // Right triplet
             //
-            addCircleOfCoreCanons(entityIdFrom(*liveBoss),
+            addCircleOfCoreCanons<BossEvent::RightCompoundFire>
+                                 (entityIdFrom(*liveBoss),
                                   aEntityEngine,
                                   liveBoss,
                                   3,
+                                  Boss1::gCircleCoreCanonsCoverage,
                                   gBoss1CoreCanonOffset,
+                                  -pi<Radian<>>/5.f,
                                   {0.f, +gBoss1CoreCanonBaseYPosition});
             //
             // Top triplet
             //
-            addCircleOfCoreCanons(entityIdFrom(*liveBoss),
+            addCircleOfCoreCanons<BossEvent::TopCompoundFire>
+                                 (entityIdFrom(*liveBoss),
                                   aEntityEngine,
                                   liveBoss,
                                   3,
+                                  Boss1::gCircleCoreCanonsCoverage,
                                   gBoss1CoreCanonOffset,
+                                  0._radf,
                                   {-gBoss1CoreCanonBaseYPosition, 0.f});
+
         }
 
         {

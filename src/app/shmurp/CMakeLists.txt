@@ -47,8 +47,10 @@ set(${PROJECT_NAME}_HEADERS
     System/SceneGraph.h
     System/Tracking.h
 
+    Utils/ArcQuantifier.h
     Utils/Delay.h
     Utils/interpolation.h
+    Utils/Iterative.h
     Utils/Periodic.h
     Utils/Rythm.h
     Utils/TimedSequence.h

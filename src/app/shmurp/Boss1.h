@@ -409,14 +409,14 @@ namespace detail {
         { // The map
             { // A pair element of the map
                 0,
-                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                [](aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
                 {
                     postEvent<BossEvent>(aEngine, aEntity, BossEvent::CoreCanon_1);
                 }
             },
             { // A pair element of the map
                 gBoss1PhaseDuration,
-                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                [](aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
                 {
                     postEvent<BossEvent>(aEngine, aEntity, BossEvent::CoreCanonOff);
 
@@ -427,7 +427,7 @@ namespace detail {
             },
             {
                 2*gBoss1PhaseDuration,
-                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                [](aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
                 {
                     postEvent<BossEvent>(aEngine, aEntity, BossEvent::Stabilize);
                     postEvent<BossEvent>(aEngine, aEntity, BossEvent::Turret_1);
@@ -435,7 +435,7 @@ namespace detail {
             },
             {
                 2*gBoss1PhaseDuration + gBoss1RotationAccelerationDuration,
-                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                [](aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
                 {
                     postEvent<BossEvent>(aEngine, aEntity, BossEvent::LaserOff);
                     postEvent<BossEvent>(aEngine, aEntity, BossEvent::TurretOff);
@@ -443,21 +443,21 @@ namespace detail {
             },
             {
                 3*gBoss1PhaseDuration,
-                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                [](aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
                 {
                     postEvent<BossEvent>(aEngine, aEntity, BossEvent::LeftCompoundFire);
                 }
             },
             {
                 3*gBoss1PhaseDuration + 1*gBoss1CompoundFirePeriod,
-                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                [](aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
                 {
                     postEvent<BossEvent>(aEngine, aEntity, BossEvent::RightCompoundFire);
                 }
             },
             {
                 3*gBoss1PhaseDuration + 2*gBoss1CompoundFirePeriod ,
-                [](timepoint_t /*ignored*/, aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
+                [](aunteater::LiveEntity & aEntity, aunteater::Engine & aEngine)
                 {
                     postEvent<BossEvent>(aEngine, aEntity, BossEvent::LeftCompoundFire);
                     postEvent<BossEvent>(aEngine, aEntity, BossEvent::RightCompoundFire);
@@ -465,6 +465,7 @@ namespace detail {
                 }
             },
         }};
+        bossSequence.setRepeat(true);
 
         boss
             .add<CustomCallback>(

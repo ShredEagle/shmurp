@@ -4,6 +4,7 @@ set(${PROJECT_NAME}_HEADERS
     commons.h
     Bloom.h
     BloomShaders.h
+    Boss1.h
     DebugUI.h
     Game.h
     Instancing.h
@@ -11,9 +12,11 @@ set(${PROJECT_NAME}_HEADERS
     shapes.h
     shapes3D.h
 
+    Components/BossEvent.h
     Components/Boundaries.h
     Components/ControlDevice.h
     Components/CustomCallback.h
+    Components/EventObserver.h
     Components/FirePattern.h
     Components/Geometry.h
     Components/SceneGraphComposite.h
@@ -21,6 +24,7 @@ set(${PROJECT_NAME}_HEADERS
     Components/Shape.h
     Components/Speed.h
     Components/TrackerPlayer.h
+    Components/Tweening.h
 
     Entities/Bullets.h
     Entities/Ships.h
@@ -30,17 +34,26 @@ set(${PROJECT_NAME}_HEADERS
     System/Customizer.h
     System/Displace.h
     System/EnemySpawn.h
+    System/EventQueue.h
+    System/EventQueue-impl.h
+    System/Interpolate.h
+    System/Interpolate-impl.h
     System/LimitPosition.h
     System/KeyboardControl.h
+    System/PruneEntities.h
     System/Rendering.h
     System/Rendering3D.h
     System/RenderingShaders.h
     System/SceneGraph.h
     System/Tracking.h
 
-    utils/interpolation.h
-    utils/Periodic.h
-    utils/Rythm.h
+    Utils/ArcQuantifier.h
+    Utils/Delay.h
+    Utils/interpolation.h
+    Utils/Iterative.h
+    Utils/Periodic.h
+    Utils/Rythm.h
+    Utils/TimedSequence.h
 )
 
 set(${PROJECT_NAME}_SOURCES
@@ -53,6 +66,7 @@ set(${PROJECT_NAME}_SOURCES
     System/Displace.cpp
     System/EnemySpawn.cpp
     System/LimitPosition.cpp
+    System/PruneEntities.cpp
     System/Rendering.cpp
     System/Rendering3D.cpp
     System/KeyboardControl.cpp

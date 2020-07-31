@@ -2,6 +2,8 @@
 
 #include "configuration.h"
 
+#include "Components/Boundaries.h"
+#include "Components/ControlDevice.h"
 #include <Components/CustomCallback.h>
 #include <Components/Faction.h>
 #include <Components/FirePattern.h>
@@ -21,12 +23,46 @@ namespace ad {
 namespace entities {
 
 
+inline aunteater::weak_entity addHero(aunteater::Engine & aEngine, Vec<2> aPosition)
+{
+    using namespace math::angle_literals;
+
+    aunteater::weak_entity liveShip = aEngine.addEntity(aunteater::Entity()
+            .add<Boundaries>(conf::gShipBoundingRect)
+            .add<ControlDevice>(0)
+            .add<Faction>(Faction::SpaceForce, Faction::Democrats)
+            .add<Geometry>(conf::gShipRadius)
+            .add<SceneGraphComposite>(aPosition,
+                                      Vec<3, Radian<>>{0._radf, 0._radf, pi<Radian<>>/2.f})
+            .add<SceneGraphParent>(/*root*/)
+            .add<Shape>(Shape::RocketShip)
+            .add<Speed>()
+            );
+
+    aEngine.addEntity(aunteater::Entity()
+            .add<Geometry>(conf::gShipRadius)
+            .add<SceneGraphComposite>()
+            .add<SceneGraphParent>(liveShip)
+            .add<Shape>(Shape::Circle)
+            );
+    // TODO offset the canon to the ship tip. This is complicated by the fact
+    // that currently code in KeyboardControl is adding the firing component to the "movable" ship
+    //aEngine.addEntity(aunteater::Entity()
+    //        .add<Geometry>()
+    //        .add<SceneGraphComposite>(Vec<2>{3.75f, 0.f})
+    //        .add<SceneGraphParent>(liveShip)
+    //        );
+
+    return liveShip;
+}
+
+
 inline aunteater::Entity makeSquare(Vec<2, GLfloat> aPosition,
                                     Vec<2, GLfloat> aTranslationSpeed,
                                     Vec<3, Radian<>> aRotationSpeed)
 {
     return aunteater::Entity().add<Faction>(Faction::Democrats, Faction::TruthBullet)
-                              .add<Geometry>(aPosition, conf::squareRadius)
+                              .add<Geometry>(conf::squareRadius, aPosition)
                               .add<Shape>(Shape::Square)
                               .add<Speed>(aTranslationSpeed, aRotationSpeed);
 }
@@ -47,7 +83,7 @@ inline void addTrackingPyramid(aunteater::Engine & aEngine,
     }
 
     auto customBehaviour = [firing = false, alternator = Periodic{burstSize*firePeriod}]
-        (aunteater::LiveEntity & aSelf, const aunteater::Timer aTimer) mutable
+        (aunteater::LiveEntity & aSelf, const aunteater::Timer aTimer, aunteater::Engine &) mutable
         {
             if (alternator.countEvents(aTimer.delta()))
             {
@@ -69,7 +105,7 @@ inline void addTrackingPyramid(aunteater::Engine & aEngine,
         aunteater::Entity()
             .add<CustomCallback>(std::move(customBehaviour))
             .add<Faction>(Faction::Democrats, Faction::SpaceForce)
-            .add<Geometry>(Vec<2>{0.f, 0.f}, conf::gPyramidRadius)
+            .add<Geometry>(conf::gPyramidRadius)
             .add<SceneGraphComposite>(aPosition,
                                       Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f})
             .add<SceneGraphParent>(/*root*/)
@@ -79,7 +115,7 @@ inline void addTrackingPyramid(aunteater::Engine & aEngine,
     aEngine.addEntity(
         aunteater::Entity()
             .add<FirePattern>(std::make_unique<Fire::Line<Rythm>>(fourFour))
-            .add<Geometry>(Vec<2>{0.f, 0.f}, 0.f) // The position is handled by SceneGraph system
+            .add<Geometry>() // The position is handled by SceneGraph system
             .add<SceneGraphComposite>(Vec<2>{.5f, 0.f})
             .add<SceneGraphParent>(ship));
 }

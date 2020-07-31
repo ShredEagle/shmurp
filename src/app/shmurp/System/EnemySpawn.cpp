@@ -5,13 +5,12 @@
 
 #include <handy/random.h>
 
-#include <math/Rectangle.h>
-
 
 using namespace ad::math::angle_literals;
 
 
 namespace ad {
+
 
 void spawn(aunteater::Engine & aEngine)
 {
@@ -23,10 +22,11 @@ void spawn(aunteater::Engine & aEngine)
                                  {0.4_radf, 1.1_radf, 0._radf}));
 }
 
+
 EnemySpawn::EnemySpawn(aunteater::Engine &aEngine) :
-    mEngine(aEngine),
-    mPrunables(aEngine)
+    mEngine(aEngine)
 {}
+
 
 void EnemySpawn::update(const aunteater::Timer aTimer)
 {
@@ -34,18 +34,7 @@ void EnemySpawn::update(const aunteater::Timer aTimer)
     {
         spawn(mEngine);
     }
-
-    for (const auto candidate : mPrunables)
-    {
-        static const Rectangle<GLfloat> gGameArea{
-            {-conf::gViewportOffset, -conf::gViewportOffset},
-            {conf::gWindowWorldWidth+2*conf::gViewportOffset, conf::gWindowWorldHeight+2*conf::gViewportOffset}};
-
-        if (!gGameArea.contains(candidate->get<Geometry>().position.as<math::Position>()))
-        {
-            mEngine.markToRemove(candidate);
-        }
-    }
 }
+
 
 } // namespace ad

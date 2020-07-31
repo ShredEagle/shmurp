@@ -5,15 +5,23 @@
 namespace ad {
 namespace transform {
 
+
 // TODO Factor that to a dedicated library
 // TODO Constexpr that
-inline Matrix<4, GLfloat> scaleMatrix(GLfloat x, GLfloat y)
+inline Matrix<4, GLfloat> scaleMatrix(GLfloat x, GLfloat y, GLfloat z)
 {
     auto result = Matrix<4, GLfloat>::Identity();
     result[0][0] = x;
     result[1][1] = y;
+    result[2][2] = z;
     return result;
 }
+
+inline Matrix<4, GLfloat> scaleMatrix(GLfloat s)
+{
+    return scaleMatrix(s, s, s);
+}
+
 
 inline Matrix<4, GLfloat> translateMatrix(GLfloat x, GLfloat y)
 {
@@ -68,7 +76,7 @@ inline Radian<> angleBetween(Vec<2> a, Vec<2> b)
 //
 // Ad-hoc helpers, while the transformation system relies on position + 3 orientations
 //
-inline Matrix<4, GLfloat> makeOrientationMatrix(Vec<3, Radian<>> & aOrientations)
+inline Matrix<4, GLfloat> makeOrientationMatrix(const Vec<3, Radian<>> aOrientations)
 {
     return   transform::rotateMatrix_X(aOrientations.x())
            * transform::rotateMatrix_Y(aOrientations.y())

@@ -66,13 +66,33 @@ template <class T_value, class T_interpolant>
 T_value lerp(T_value aStart, T_value aEnd, Clamped<T_interpolant> aInterpolant)
 {
     return (Clamped<T_interpolant>::max_v - aInterpolant) * aStart
-           + aInterpolant.getValue() * aEnd;
+           + aInterpolant * aEnd;
 }
+
+
+/// \brief More general overload, replaces aStart value with a value given at any specified t
+/// \note It requires branching to avoid division by zero when previous value was already at the end
+template <class T_value, class T_interpolant>
+T_value lerp(std::pair<T_value, Clamped<T_interpolant>> aPrevious,
+             T_value aEnd,
+             Clamped<T_interpolant> aInterpolant)
+{
+    if (Clamped<T_interpolant>::max_v == aPrevious.second)
+    {
+        return aEnd;
+    }
+    // see: https://en.wikipedia.org/wiki/Linear_interpolation
+    // Generic formula for y
+    return aPrevious.first
+           + (aInterpolant - aPrevious.second)
+             * ( (aEnd - aPrevious.first) / (Clamped<T_interpolant>::max_v - aPrevious.second) );
+}
+
 
 namespace animate {
 
-template <class T_value>
-Clamped<T_value> linear(T_value aAdvancement)
+template <class T_interpolant>
+Clamped<T_interpolant> linear(Clamped<T_interpolant> aAdvancement)
 {
     return aAdvancement;
 }
@@ -80,15 +100,20 @@ Clamped<T_value> linear(T_value aAdvancement)
 } // namespace animate
 
 template <class T_interpolant>
-using animation_fun = Clamped<T_interpolant>(*)(T_interpolant);
+using animation_fun = Clamped<T_interpolant>(*)(Clamped<T_interpolant>);
 
-template <class T_interpolant, animation_fun<T_interpolant> F_curve=&animate::linear>
+template <class T_interpolant, animation_fun<T_interpolant> F_curve = &animate::linear>
 class Animation
 {
 public:
-    explicit Animation(T_interpolant aFactor=1) :
-        mFactor(std::move(aFactor))
+    explicit Animation(T_interpolant aDuration) :
+        mFactor(std::move(1/aDuration))
     {}
+
+    Clamped<T_interpolant> current() const
+    {
+        return (*F_curve)(mFactor * mAccumulator);
+    }
 
     Clamped<T_interpolant> increment(T_interpolant aIncrement)
     {
@@ -100,41 +125,106 @@ public:
         mAccumulator = 0;
     }
 
+    bool isComplete() const
+    {
+        return (mFactor * mAccumulator) >= Clamped<T_interpolant>::max_v;
+    }
+
 private:
     T_interpolant mFactor;
     T_interpolant mAccumulator{0};
 };
 
-template <class T_value, class T_interpolant, animation_fun<T_interpolant> F_curve=&animate::linear>
+
+/// \brief Functor interpolating values in the range [aStart, aEnd] given at instanciation,
+/// following the curve defined by F_curve.
+/// \note The interpolation range is given at construction.
+template <class T_value, class T_interpolant, animation_fun<T_interpolant> F_curve = &animate::linear>
 class Interpolation
 {
 public:
-    Interpolation(T_value aStart, T_value aEnd, T_interpolant aFactor=1) :
-        mStart(std::move(aStart)),
-        mEnd(std::move(aEnd)),
-        mCurrent(mStart),
-        mAnimation(aFactor)
+    Interpolation(T_value aStart, T_value aEnd, T_interpolant aDuration = 1) :
+        mStart{std::move(aStart)},
+        mEnd{std::move(aEnd)},
+        mAnimation{aDuration}
     {}
 
     T_value operator()(T_interpolant aIncrement)
     {
-        return mCurrent = lerp(mStart, mEnd, mAnimation.increment(aIncrement));
+        return lerp(mStart, mEnd, mAnimation.increment(aIncrement));
     }
 
-    Interpolation & redirect(T_value aEnd)
+    bool isComplete() const
     {
-        mAnimation.reset();
-        mStart = mCurrent;
-        mEnd = std::move(aEnd);
+        return mAnimation.isComplete();
+    }
 
+protected:
+    T_value mStart;
+    T_value mEnd;
+    Animation<T_interpolant, F_curve> mAnimation;
+};
+
+
+/// \brief Functor interpolating values between an explicit previous interpolation result,
+/// and aEnd given at instanciation. Follows the curve defined by F_curve.
+/// \note See Interpolation for a more standard approach.
+template <class T_value, class T_interpolant, animation_fun<T_interpolant> F_curve = &animate::linear>
+class LiveInterpolation
+{
+public:
+    LiveInterpolation(T_value aEnd, T_interpolant aDuration = 1) :
+        mEnd{std::move(aEnd)},
+        mAnimation{aDuration}
+    {}
+
+    T_value operator()(const T_value & aPreviousResult, T_interpolant aIncrement)
+    {
+        return lerp(std::make_pair(aPreviousResult, mAnimation.current()),
+                    mEnd,
+                    mAnimation.increment(aIncrement));
+    }
+
+    bool isComplete() const
+    {
+        return mAnimation.isComplete();
+    }
+
+private:
+    T_value mEnd;
+    Animation<T_interpolant, F_curve> mAnimation;
+};
+
+
+template <class T_value, class T_interpolant, animation_fun<T_interpolant> F_curve = &animate::linear>
+class RedirectableInterpolation : public Interpolation<T_value, T_interpolant, F_curve>
+{
+    using parent_type = Interpolation<T_value, T_interpolant, F_curve>;
+
+public:
+    RedirectableInterpolation(T_value aStart, T_value aEnd, T_interpolant aDuration = 1) :
+        parent_type{aStart, aEnd, aDuration},
+        mCurrent{aStart}
+    {}
+
+    RedirectableInterpolation & redirect(T_value aEnd, T_interpolant aDuration)
+    {
+        this->mAnimation = Animation(std::move(aDuration));
+        this->mStart = mCurrent;
+        this->mEnd = std::move(aEnd);
+        return *this;
+    }
+
+    RedirectableInterpolation & redirect(T_value aEnd)
+    {
+        this->mAnimation.reset();
+        this->mStart = mCurrent;
+        this->mEnd = std::move(aEnd);
         return *this;
     }
 
 private:
-    T_value mStart;
-    T_value mEnd;
     T_value mCurrent;
-    Animation<T_interpolant, F_curve> mAnimation;
 };
 
 

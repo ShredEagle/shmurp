@@ -31,13 +31,23 @@ void SceneGraph::traverse(aunteater::LiveEntity & aNode,
     Vec<4> transPos{node.position.x(), node.position.y(), 0.f, 1.f};
     transPos *= aParentTransform;
     geometry.position = Vec<2>{transPos.x(), transPos.y()};
-    geometry.orientations = node.orientations + aParentOrientation;
+
+    geometry.orientations = node.orientations;
+    auto forwardedOrientationMatrix = transform::makeOrientationMatrix(node.orientations);
+    if (node.relation == SceneGraphComposite::InheritOrientation)
+    {
+        geometry.orientations += aParentOrientation;
+    }
+    else if (node.relation == SceneGraphComposite::ResetOrientation)
+    {
+        forwardedOrientationMatrix *= transform::makeOrientationMatrix(-aParentOrientation);
+    }
 
     for (aunteater::weak_entity child : node.mChildren)
     {
         // IMPORTANT: the separation between local/world transformation has to be deeply refactored
         traverse(*child,
-                 transform::makeOrientationMatrix(node.orientations)
+                 forwardedOrientationMatrix
                     * transform::translateMatrix(node.position.x(), node.position.y())
                     * aParentTransform,
                  geometry.orientations);
@@ -76,13 +86,21 @@ void SceneGraph::addedEntity(aunteater::LiveEntity &aEntity)
 }
 
 
+// A similar function exist in stdlib, starting with C++20
+template <class T>
+void eraseElement(std::vector<T> & aVector, const T & aValue)
+{
+    aVector.erase(std::remove(aVector.begin(), aVector.end(), aValue), aVector.end());
+}
+
+
 void SceneGraph::removedEntity(aunteater::LiveEntity &aEntity)
 {
     // Remove the node from its parent
     const aunteater::weak_entity parent = aEntity.get<SceneGraphParent>().parent;
     if (parent == nullptr)
     {
-        mRootNodes.erase(std::remove(mRootNodes.begin(), mRootNodes.end(), entityRefFrom(aEntity)));
+        eraseElement(mRootNodes, entityRefFrom(aEntity));
     }
     else
     {
@@ -90,7 +108,7 @@ void SceneGraph::removedEntity(aunteater::LiveEntity &aEntity)
         if (foundParent != mNodesFamily.end())
         {
             auto & children = (*foundParent)->get<SceneGraphComposite>().mChildren;
-            std::remove(children.begin(), children.end(), entityRefFrom(aEntity));
+            eraseElement(children, entityRefFrom(aEntity));
         }
         // Else, the parent might have been removed first
         // (causing the current node to be recursively removed)

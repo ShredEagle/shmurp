@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SceneGraph.h"
+
 #include <Components/Boundaries.h>
 #include <Components/Geometry.h>
 
@@ -22,6 +24,7 @@ public:
 
 private:
     const aunteater::FamilyHelp<PositionBound> mPositionBounds;
+    const aunteater::FamilyHelp<SceneGraphNode> mSceneGraphNodes;
 };
 
 

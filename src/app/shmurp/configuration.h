@@ -30,7 +30,7 @@ constexpr float gBulletRadius = 0.1f;
 constexpr float gViewportOffset = 2.f; // how far from the viewport to spawn/discard entities
 
 constexpr float gShipSpeed = 12.5f;
-constexpr float gShipAccelerationFactor = 20.f;
+constexpr float gShipDirectionChangeDuration = 1.f/20.f;
 
 constexpr float gBulletSpeed = 25.f;
 constexpr float gEnemyBulletSpeed = 8.f;
@@ -46,8 +46,10 @@ constexpr Floating gPyramidHeight = gPyramidRadius;
 // TODO should be able to constexpr
 inline Matrix<4, GLfloat> worldToDevice()
 {
+    // TODO the Z factor can be used to control the frustrum near/far
     return transform::scaleMatrix(conf::getWorldToDeviceScale(conf::gWindowWidth),
-                                  conf::getWorldToDeviceScale(conf::gWindowHeight))
+                                  conf::getWorldToDeviceScale(conf::gWindowHeight),
+                                  1)
            * transform::translateMatrix(-1., -1.);
 }
 

@@ -55,6 +55,15 @@ KeyboardControl::KeyboardControl(aunteater::Engine &aEngine) :
     mPlayerMovable{aEngine.getFamily<PlayerMovable>()}
 {}
 
+
+BulletConfig configureBullet()
+{
+    BulletConfig bulletConfig;
+    bulletConfig.faction = Faction{Faction::TruthBullet, Faction::Democrats};
+    return bulletConfig;
+}
+
+
 void KeyboardControl::update(const aunteater::Timer aTimer)
 {
     for (auto & movable : mPlayerMovable)
@@ -89,7 +98,8 @@ void KeyboardControl::update(const aunteater::Timer aTimer)
         switch(mCallback->mFiring)
         {
             case Edge::Press:
-                movable->add<FirePattern>(std::make_unique<Fire::Burst>(0.02f, pi<Radian<>>/180.f*7.5f));
+                static const BulletConfig bulletConfig = configureBullet();
+                movable->add<FirePattern>(std::make_unique<Fire::Spray<30>>(pi<Radian<>>/180.f*7.5f, bulletConfig, 0.02f));
                 mCallback->mFiring = Edge::None;
                 break;
             case Edge::Release:

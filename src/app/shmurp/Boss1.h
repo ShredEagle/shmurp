@@ -3,6 +3,7 @@
 #include "Entities/Ships.h"
 
 #include "Components/BossEvent.h"
+#include "Components/Health.h"
 #include "Components/Tweening.h"
 
 #include "System/EventQueue.h"
@@ -75,7 +76,9 @@ namespace detail {
 
         aunteater::Entity satellite;
         satellite
+            .add<Faction>(Faction::Democrats, Faction::SpaceForce|Faction::TruthBullet)
             .add<Geometry>(gBoss1SatelliteRadius)
+            .add<Health>(500)
             .add<SceneGraphComposite>(aLocalPosition,
                                       Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f},
                                       SceneGraphComposite::ResetOrientation)
@@ -388,8 +391,9 @@ namespace detail {
         //
         aunteater::Entity boss;
         boss
-            //.add<Faction>(Faction::Democrats, Faction::SpaceForce)
+            .add<Faction>(Faction::Democrats, Faction::SpaceForce|Faction::TruthBullet)
             .add<Geometry>(gBoss1BallRadius)
+            .add<Health>(5000)
             .add<SceneGraphComposite>(Boss1::gStartPosition,
                                       Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f})
             .add<SceneGraphParent>(/*root*/)

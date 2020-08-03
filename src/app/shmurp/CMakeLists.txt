@@ -19,6 +19,7 @@ set(${PROJECT_NAME}_HEADERS
     Components/EventObserver.h
     Components/FirePattern.h
     Components/Geometry.h
+    Components/Health.h
     Components/SceneGraphComposite.h
     Components/SceneGraphParent.h
     Components/Shape.h

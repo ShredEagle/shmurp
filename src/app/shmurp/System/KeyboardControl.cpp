@@ -59,7 +59,7 @@ KeyboardControl::KeyboardControl(aunteater::Engine &aEngine) :
 BulletConfig configureBullet()
 {
     BulletConfig bulletConfig;
-    bulletConfig.faction = Faction{Faction::TruthBullet, Faction::Democrats};
+    bulletConfig.faction = Faction{Faction::TruthBullet, Faction::Democrats, 1};
     return bulletConfig;
 }
 

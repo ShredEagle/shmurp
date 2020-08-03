@@ -18,6 +18,7 @@ public:
     Collision(aunteater::Engine &aEngine);
 
     void update(const aunteater::Timer aTimer) override;
+    void handleCollision(aunteater::weak_entity aDefender, const Faction & aFaction);
 
 private:
     aunteater::Engine & mEngine;

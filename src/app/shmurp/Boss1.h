@@ -4,6 +4,7 @@
 
 #include "Components/BossEvent.h"
 #include "Components/Health.h"
+#include "Components/HealthFollower.h"
 #include "Components/ImpactRef.h"
 #include "Components/Tweening.h"
 
@@ -65,7 +66,8 @@ namespace Boss1 {
     constexpr Radian<> gCircleCoreCanonsCoverage = pi<Radian<>>/3.f;
     constexpr int gCircleCoreCanonsArcCount = 6;
 
-    constexpr int gHealth = 1000;
+    constexpr int gHealth = 2000;
+    constexpr int gSatteliteHealth = 600;
 
 } // namespace Boss1
 
@@ -79,29 +81,11 @@ namespace detail {
     aunteater::Entity makeHealthBar(aunteater::entity_id aHealthRef)
     {
         aunteater::Entity healthbar;
-
-        // initializer_list is a non deduced context without this workaround
-        // see: https://stackoverflow.com/a/36488572/1027706
-        auto refList = {aHealthRef};
-
         healthbar
-            .add<CustomCallback>(
-                []
-                (aunteater::LiveEntity & aEntity, const aunteater::Timer & aTimer, aunteater::Engine & aEngine) mutable
-                {
-                    aEntity.get<Geometry>().scale.x()
-                        = 15 * Floating(aEntity.get<Health>().points) / Boss1::gHealth;
-                })
             .add<Geometry>(1.f, healthbar::gPosition)
-            .add<Health>(Boss1::gHealth)
-            .add<ImpactRef>(refList)
+            .add<HealthFollower>(aHealthRef, Vec<2>{15.f, 0.3f})
             .add<Shape>(Shape::FilledRectangle)
         ;
-
-        healthbar.get<Geometry>().scale.y() = 0.3f;
-
-        // todo remove heathbar when boss is done
-
         return healthbar;
     }
 
@@ -114,7 +98,7 @@ namespace detail {
         satellite
             .add<Faction>(Faction::Democrats, Faction::SpaceForce|Faction::TruthBullet)
             .add<Geometry>(gBoss1SatelliteRadius)
-            .add<Health>(500)
+            .add<Health>(Boss1::gSatteliteHealth)
             .add<SceneGraphComposite>(aLocalPosition,
                                       Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f},
                                       SceneGraphComposite::ResetOrientation)
@@ -680,6 +664,13 @@ namespace detail {
                                     liveRightSatellite,
                                     {gBoss1SatelliteRadius, 0.f}));
                 }
+
+                //
+                // Boss' satellite impact influence
+                //
+                auto bossImpactRef =
+                    {entityIdFrom(liveLeftSatellite), entityIdFrom(liveRightSatellite)};
+                liveBoss->add<ImpactRef>(bossImpactRef);
             }
         }
 

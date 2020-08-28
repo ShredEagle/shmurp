@@ -11,9 +11,9 @@
 #include "System/BulletSpawn.h"
 #include "System/Collision.h"
 #include "System/Customizer.h"
+#include "System/Damage.h"
 #include "System/Displace.h"
 #include "System/EnemySpawn.h"
-#include "System/ForwardImpact.h"
 #include "System/KeyboardControl.h"
 #include "System/LimitPosition.h"
 #include "System/PruneEntities.h"
@@ -53,7 +53,7 @@ void Game::setBaseSystems(aunteater::Engine & aEntityEngine, Application & aAppl
 
     aEntityEngine.addSystem<Collision>(mImpactEvents);
 
-    aEntityEngine.addSystem<ForwardImpact>(mImpactEvents);
+    aEntityEngine.addSystem<Damage>(mImpactEvents);
 
     aEntityEngine.addSystem<BulletSpawn>();
 

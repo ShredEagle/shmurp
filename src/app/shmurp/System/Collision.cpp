@@ -37,19 +37,13 @@ void Collision::handleCollision(aunteater::weak_entity aDefender, const Faction 
 {
     if (aDefender->has<Health>())
     {
-        Health & health = aDefender->get<Health>();
-        health.points -= aAttackerFaction.attackValue;
-
         mImpactEvents.emplace_back(entityIdFrom(aDefender),
                                    shmurp::event::Impact{aAttackerFaction.attackValue});
-
-        if (health.points > 0)
-        {
-            return;
-        }
     }
-
-    mEngine.markToRemove(aDefender);
+    else
+    {
+        mEngine.markToRemove(aDefender);
+    }
 }
 
 

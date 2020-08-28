@@ -9,10 +9,12 @@ namespace ad {
 struct Health : public aunteater::Component<Health>
 {
     Health(int aPoints) :
-        points{aPoints}
+        points{aPoints},
+        total{aPoints}
     {}
 
-    int points{0};
+    int points;
+    const int total;
 };
 
 

@@ -72,7 +72,9 @@ namespace Boss1 {
 } // namespace Boss1
 
 namespace healthbar {
-    constexpr Vec<2> gPosition = {conf::gWindowWorldWidth/2.0f, conf::gWindowWorldHeight-2.5f};
+    constexpr Vec<2> gInitialPosition = {conf::gWindowWorldWidth/2.0f, conf::gWindowWorldHeight+2.0f};
+    constexpr Vec<2> gPosition = {conf::gWindowWorldWidth/2.0f, conf::gWindowWorldHeight-1.5f};
+    constexpr Floating gTweeningDuration = 1.0f;
 }
 
 namespace detail {
@@ -82,7 +84,7 @@ namespace detail {
     {
         aunteater::Entity healthbar;
         healthbar
-            .add<Geometry>(1.f, healthbar::gPosition)
+            .add<Geometry>(1.f, healthbar::gInitialPosition)
             .add<HealthFollower>(aHealthRef, Vec<2>{15.f, 0.3f})
             .add<Shape>(Shape::FilledRectangle)
         ;
@@ -677,7 +679,12 @@ namespace detail {
         //
         // Boss' health bar
         //
-        aEntityEngine.addEntity(makeHealthBar(entityIdFrom(liveBoss)));
+        aunteater::Entity healthBar = makeHealthBar(entityIdFrom(liveBoss));
+        healthBar.add<LiveTweening<Geometry, Vec<2>>>(
+                                   [](Geometry & geometry) -> Vec<2> & {return geometry.position;},
+                                   healthbar::gPosition,
+                                   healthbar::gTweeningDuration);
+        aEntityEngine.addEntity(healthBar);
 
         return boss;
     }
@@ -691,6 +698,7 @@ void boss1(aunteater::Engine & aEntityEngine, Application & aApplication)
     /*
      * Systems
      */
+    aEntityEngine.addSystem<Interpolate<Geometry, Vec<2>>>();
     aEntityEngine.addSystem<Interpolate<Speed, Radian<>>>();
     aEntityEngine.addSystem<Interpolate<SceneGraphComposite, Vec<2>>>();
     aEntityEngine.addSystem<EventQueueS<BossEvent>>();

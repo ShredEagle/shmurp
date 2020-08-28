@@ -3,6 +3,9 @@
 #include "Entities/Ships.h"
 
 #include "Components/BossEvent.h"
+#include "Components/Health.h"
+#include "Components/HealthFollower.h"
+#include "Components/ImpactRef.h"
 #include "Components/Tweening.h"
 
 #include "System/EventQueue.h"
@@ -63,10 +66,30 @@ namespace Boss1 {
     constexpr Radian<> gCircleCoreCanonsCoverage = pi<Radian<>>/3.f;
     constexpr int gCircleCoreCanonsArcCount = 6;
 
+    constexpr int gHealth = 2000;
+    constexpr int gSatteliteHealth = 600;
+
 } // namespace Boss1
 
+namespace healthbar {
+    constexpr Vec<2> gInitialPosition = {conf::gWindowWorldWidth/2.0f, conf::gWindowWorldHeight+2.0f};
+    constexpr Vec<2> gPosition = {conf::gWindowWorldWidth/2.0f, conf::gWindowWorldHeight-1.5f};
+    constexpr Floating gTweeningDuration = 1.0f;
+}
 
 namespace detail {
+
+
+    aunteater::Entity makeHealthBar(aunteater::entity_id aHealthRef)
+    {
+        aunteater::Entity healthbar;
+        healthbar
+            .add<Geometry>(1.f, healthbar::gInitialPosition)
+            .add<HealthFollower>(aHealthRef, Vec<2>{15.f, 0.3f})
+            .add<Shape>(Shape::FilledRectangle)
+        ;
+        return healthbar;
+    }
 
 
     aunteater::Entity makeSatellite(aunteater::weak_entity aParent, Vec<2> aLocalPosition)
@@ -75,7 +98,9 @@ namespace detail {
 
         aunteater::Entity satellite;
         satellite
+            .add<Faction>(Faction::Democrats, Faction::SpaceForce|Faction::TruthBullet)
             .add<Geometry>(gBoss1SatelliteRadius)
+            .add<Health>(Boss1::gSatteliteHealth)
             .add<SceneGraphComposite>(aLocalPosition,
                                       Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f},
                                       SceneGraphComposite::ResetOrientation)
@@ -383,13 +408,15 @@ namespace detail {
     {
         using namespace math::angle_literals;
 
+
         //
         // Boss core
         //
         aunteater::Entity boss;
         boss
-            //.add<Faction>(Faction::Democrats, Faction::SpaceForce)
+            .add<Faction>(Faction::Democrats, Faction::SpaceForce|Faction::TruthBullet)
             .add<Geometry>(gBoss1BallRadius)
+            .add<Health>(Boss1::gHealth)
             .add<SceneGraphComposite>(Boss1::gStartPosition,
                                       Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f})
             .add<SceneGraphParent>(/*root*/)
@@ -639,8 +666,26 @@ namespace detail {
                                     liveRightSatellite,
                                     {gBoss1SatelliteRadius, 0.f}));
                 }
+
+                //
+                // Boss' satellite impact influence
+                //
+                auto bossImpactRef =
+                    {entityIdFrom(liveLeftSatellite), entityIdFrom(liveRightSatellite)};
+                liveBoss->add<ImpactRef>(bossImpactRef);
             }
         }
+
+        //
+        // Boss' health bar
+        //
+        aunteater::Entity healthBar = makeHealthBar(entityIdFrom(liveBoss));
+        healthBar.add<LiveTweening<Geometry, Vec<2>>>(
+                                   [](Geometry & geometry) -> Vec<2> & {return geometry.position;},
+                                   healthbar::gPosition,
+                                   healthbar::gTweeningDuration);
+        aEntityEngine.addEntity(healthBar);
+
         return boss;
     }
 
@@ -653,9 +698,10 @@ void boss1(aunteater::Engine & aEntityEngine, Application & aApplication)
     /*
      * Systems
      */
+    aEntityEngine.addSystem<Interpolate<Geometry, Vec<2>>>();
     aEntityEngine.addSystem<Interpolate<Speed, Radian<>>>();
     aEntityEngine.addSystem<Interpolate<SceneGraphComposite, Vec<2>>>();
-    aEntityEngine.addSystem<EventQueue<BossEvent>>();
+    aEntityEngine.addSystem<EventQueueS<BossEvent>>();
 
     /*
      * Entities

@@ -14,9 +14,10 @@ struct Faction : public aunteater::Component<Faction>
         LibLies  = (1 << 3),
     };
 
-    Faction(Bit aSide, short aTargets = 0) :
+    Faction(Bit aSide, short aTargets = 0, int aAttackValue = 0) :
         side(aSide),
-        targets(aTargets)
+        targets(aTargets),
+        attackValue(aAttackValue)
     {}
 
     bool isAttacking(Faction aOther) const
@@ -26,6 +27,7 @@ struct Faction : public aunteater::Component<Faction>
 
     Bit side{0};
     short targets{0};
+    int attackValue{0};
 };
 
 

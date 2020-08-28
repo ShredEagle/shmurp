@@ -11,6 +11,7 @@
 #include "System/BulletSpawn.h"
 #include "System/Collision.h"
 #include "System/Customizer.h"
+#include "System/Damage.h"
 #include "System/Displace.h"
 #include "System/EnemySpawn.h"
 #include "System/KeyboardControl.h"
@@ -31,7 +32,7 @@ namespace ad {
 namespace shmurp {
 
 
-void setBaseSystems(aunteater::Engine & aEntityEngine, Application & aApplication)
+void Game::setBaseSystems(aunteater::Engine & aEntityEngine, Application & aApplication)
 {
     /*
      * Systems
@@ -50,7 +51,9 @@ void setBaseSystems(aunteater::Engine & aEntityEngine, Application & aApplicatio
 
     aEntityEngine.addSystem<SceneGraph>();
 
-    aEntityEngine.addSystem<Collision>();
+    aEntityEngine.addSystem<Collision>(mImpactEvents);
+
+    aEntityEngine.addSystem<Damage>(mImpactEvents);
 
     aEntityEngine.addSystem<BulletSpawn>();
 
@@ -109,6 +112,7 @@ bool Game::update(const aunteater::Timer & aTimer)
 {
     aunteater::UpdateTiming timings;
     mEntityEngine.update(aTimer, timings);
+    mImpactEvents.clear();
 
     mUI.broadcast(timings);
 

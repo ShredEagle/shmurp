@@ -57,10 +57,15 @@ struct LiveTweening : public aunteater::Component<LiveTweening<T_component, T_va
 {
     using Accessor = std::function<T_value &(T_component &)>;
 
+    static void RemoveCallback(AUNTEATER_CB_ARGS)
+    {
+        aEntity.remove<LiveTweening>();
+    }
+
     LiveTweening(Accessor aAccessor,
                  T_value aEnd,
                  Floating aDuration,
-                 CustomCallback::function_type aOnCompletion = & CustomCallback::NullCallback) :
+                 CustomCallback::function_type aOnCompletion = & LiveTweening::RemoveCallback) :
         accessor{std::move(aAccessor)},
         interpolation{aEnd, aDuration},
         onCompletion{std::move(aOnCompletion)}

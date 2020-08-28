@@ -30,6 +30,7 @@ struct Geometry : public aunteater::Component<Geometry>
     GLfloat radius;
     Vec<2> position{Vec<2>::Zero()};
     Vec<3, Radian<>> orientations{Vec<3, Radian<>>::Zero()};
+    Vec<3> scale{1.f, 1.f, 1.f};
 };
 
 

@@ -2,6 +2,7 @@
 
 #include "commons.h"
 #include "DebugUI.h"
+#include "EventQueue.h"
 
 #include <aunteater/Engine.h>
 #include <aunteater/Timer.h>
@@ -11,6 +12,16 @@
 
 namespace ad {
 namespace shmurp {
+
+
+namespace event {
+
+    struct Impact
+    {
+        int damage{0};
+    };
+
+} // namespace event
 
 class Game
 {
@@ -22,7 +33,10 @@ public:
     bool update(const aunteater::Timer & aTimer);
 
 private:
+    void setBaseSystems(aunteater::Engine & aEntityEngine, Application & aApplication);
+
     aunteater::Engine mEntityEngine;
+    EventQueue<event::Impact> mImpactEvents;
     DebugUI mUI;
 };
 

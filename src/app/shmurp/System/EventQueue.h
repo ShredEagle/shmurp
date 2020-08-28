@@ -10,14 +10,14 @@ namespace ad {
 
 
 template <class T_event>
-class EventQueue : public aunteater::System
+class EventQueueS : public aunteater::System
 {
 public:
 
     using Event = aunteater::Archetype<T_event>;
     using Observer = aunteater::Archetype<EventObserver<T_event>>;
 
-    EventQueue(aunteater::Engine &aEngine);
+    EventQueueS(aunteater::Engine &aEngine);
 
     void update(const aunteater::Timer aTimer) override;
 

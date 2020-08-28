@@ -2,14 +2,14 @@ namespace ad {
 
 
 template <class T_event>
-EventQueue<T_event>::EventQueue(aunteater::Engine &aEngine) :
+EventQueueS<T_event>::EventQueueS(aunteater::Engine &aEngine) :
     mEvents{aEngine},
     mObservers{aEngine}
 {}
 
 
 template <class T_event>
-void EventQueue<T_event>::update(const aunteater::Timer aTimer)
+void EventQueueS<T_event>::update(const aunteater::Timer aTimer)
 {
     for(auto & wrapEvent : mEvents)
     {

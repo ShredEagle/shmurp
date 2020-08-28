@@ -20,6 +20,7 @@ set(${PROJECT_NAME}_HEADERS
     Components/FirePattern.h
     Components/Geometry.h
     Components/Health.h
+    Components/ImpactRef.h
     Components/SceneGraphComposite.h
     Components/SceneGraphParent.h
     Components/Shape.h
@@ -37,6 +38,7 @@ set(${PROJECT_NAME}_HEADERS
     System/EnemySpawn.h
     System/EventQueue.h
     System/EventQueue-impl.h
+    System/ForwardImpact.h
     System/Interpolate.h
     System/Interpolate-impl.h
     System/LimitPosition.h
@@ -66,6 +68,7 @@ set(${PROJECT_NAME}_SOURCES
     System/Customizer.cpp
     System/Displace.cpp
     System/EnemySpawn.cpp
+    System/ForwardImpact.cpp
     System/LimitPosition.cpp
     System/PruneEntities.cpp
     System/Rendering.cpp

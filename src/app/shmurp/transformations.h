@@ -22,6 +22,10 @@ inline Matrix<4, GLfloat> scaleMatrix(GLfloat s)
     return scaleMatrix(s, s, s);
 }
 
+inline Matrix<4, GLfloat> scaleMatrix(Vec<3> scales)
+{
+    return scaleMatrix(scales.x(), scales.y(), scales.z());
+}
 
 inline Matrix<4, GLfloat> translateMatrix(GLfloat x, GLfloat y)
 {

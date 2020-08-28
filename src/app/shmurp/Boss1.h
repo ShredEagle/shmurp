@@ -4,6 +4,7 @@
 
 #include "Components/BossEvent.h"
 #include "Components/Health.h"
+#include "Components/ImpactRef.h"
 #include "Components/Tweening.h"
 
 #include "System/EventQueue.h"
@@ -64,10 +65,45 @@ namespace Boss1 {
     constexpr Radian<> gCircleCoreCanonsCoverage = pi<Radian<>>/3.f;
     constexpr int gCircleCoreCanonsArcCount = 6;
 
+    constexpr int gHealth = 1000;
+
 } // namespace Boss1
 
+namespace healthbar {
+    constexpr Vec<2> gPosition = {conf::gWindowWorldWidth/2.0f, conf::gWindowWorldHeight-2.5f};
+}
 
 namespace detail {
+
+
+    aunteater::Entity makeHealthBar(aunteater::entity_id aHealthRef)
+    {
+        aunteater::Entity healthbar;
+
+        // initializer_list is a non deduced context without this workaround
+        // see: https://stackoverflow.com/a/36488572/1027706
+        auto refList = {aHealthRef};
+
+        healthbar
+            .add<CustomCallback>(
+                []
+                (aunteater::LiveEntity & aEntity, const aunteater::Timer & aTimer, aunteater::Engine & aEngine) mutable
+                {
+                    aEntity.get<Geometry>().scale.x()
+                        = 15 * Floating(aEntity.get<Health>().points) / Boss1::gHealth;
+                })
+            .add<Geometry>(1.f, healthbar::gPosition)
+            .add<Health>(Boss1::gHealth)
+            .add<ImpactRef>(refList)
+            .add<Shape>(Shape::FilledRectangle)
+        ;
+
+        healthbar.get<Geometry>().scale.y() = 0.3f;
+
+        // todo remove heathbar when boss is done
+
+        return healthbar;
+    }
 
 
     aunteater::Entity makeSatellite(aunteater::weak_entity aParent, Vec<2> aLocalPosition)
@@ -386,6 +422,7 @@ namespace detail {
     {
         using namespace math::angle_literals;
 
+
         //
         // Boss core
         //
@@ -393,7 +430,7 @@ namespace detail {
         boss
             .add<Faction>(Faction::Democrats, Faction::SpaceForce|Faction::TruthBullet)
             .add<Geometry>(gBoss1BallRadius)
-            .add<Health>(5000)
+            .add<Health>(Boss1::gHealth)
             .add<SceneGraphComposite>(Boss1::gStartPosition,
                                       Vec<3, Radian<>>{0._radf, 0._radf, -pi<Radian<>>/2.f})
             .add<SceneGraphParent>(/*root*/)
@@ -645,6 +682,12 @@ namespace detail {
                 }
             }
         }
+
+        //
+        // Boss' health bar
+        //
+        aEntityEngine.addEntity(makeHealthBar(entityIdFrom(liveBoss)));
+
         return boss;
     }
 
@@ -659,7 +702,7 @@ void boss1(aunteater::Engine & aEntityEngine, Application & aApplication)
      */
     aEntityEngine.addSystem<Interpolate<Speed, Radian<>>>();
     aEntityEngine.addSystem<Interpolate<SceneGraphComposite, Vec<2>>>();
-    aEntityEngine.addSystem<EventQueue<BossEvent>>();
+    aEntityEngine.addSystem<EventQueueS<BossEvent>>();
 
     /*
      * Entities

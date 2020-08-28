@@ -5,8 +5,10 @@
 
 namespace ad {
 
-Collision::Collision(aunteater::Engine &aEngine) :
+Collision::Collision(aunteater::Engine &aEngine,
+                     EventQueue<shmurp::event::Impact> & aImpactEvents) :
     mEngine(aEngine),
+    mImpactEvents(aImpactEvents),
     mColliders(mEngine)
 {}
 
@@ -37,6 +39,10 @@ void Collision::handleCollision(aunteater::weak_entity aDefender, const Faction 
     {
         Health & health = aDefender->get<Health>();
         health.points -= aAttackerFaction.attackValue;
+
+        mImpactEvents.emplace_back(entityIdFrom(aDefender),
+                                   shmurp::event::Impact{aAttackerFaction.attackValue});
+
         if (health.points > 0)
         {
             return;

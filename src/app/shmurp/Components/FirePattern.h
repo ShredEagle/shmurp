@@ -94,10 +94,6 @@ public:
         // Hardcode the possiblity to use an Iterative timer, with optional aIteration argument
         mTimer.forEachEvent(aDelta, [&, this](duration_t aRemainingTime, int aIteration = 0)
         {
-#if !defined(__clang__)
-            // see: https://stackoverflow.com/q/61060240/1027706
-            constexpr
-#endif
             Vec<4, GLfloat> gSpeed{mBulletConfig.velocity, 0.f, 0.f, 1.f};
 
             auto speed = gSpeed * transform::makeOrientationMatrix(aOrientations)

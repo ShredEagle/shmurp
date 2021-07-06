@@ -18,7 +18,7 @@ class ShmurpConan(ConanFile):
     }
 
     requires = (
-        ("glad/0.1.29@bincrafters/stable"),
+        ("glad/0.1.34"),
 
         ("aunteater/local"),
         ("graphics/local"),
@@ -26,9 +26,9 @@ class ShmurpConan(ConanFile):
         ("websocket/local"),
     )
 
-    build_requires = ("cmake_installer/[>=3.16]@conan/stable",)
+    build_requires = ("cmake/3.20.4")
 
-    generators = "cmake_paths", "cmake"
+    generators = "cmake_paths", "cmake", "cmake_find_package"
     build_policy = "missing"
 
     scm = {

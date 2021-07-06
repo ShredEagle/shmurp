@@ -84,7 +84,7 @@ find_package(Graphics CONFIG REQUIRED COMPONENTS engine)
 find_package(Math CONFIG REQUIRED COMPONENTS math)
 find_package(Websocket CONFIG REQUIRED COMPONENTS websocket)
 
-find_package(glad CONFIG REQUIRED)
+find_package(glad REQUIRED)
 
 add_executable(${PROJECT_NAME}
     main.cpp

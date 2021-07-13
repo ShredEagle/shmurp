@@ -1,6 +1,6 @@
-project(shmurp VERSION "${CMAKE_PROJECT_VERSION}")
+set(TARGET_NAME shmurp)
 
-set(${PROJECT_NAME}_HEADERS
+set(${TARGET_NAME}_HEADERS
     commons.h
     Bloom.h
     BloomShaders.h
@@ -60,7 +60,7 @@ set(${PROJECT_NAME}_HEADERS
     Utils/TimedSequence.h
 )
 
-set(${PROJECT_NAME}_SOURCES
+set(${TARGET_NAME}_SOURCES
     DebugUI.cpp
     Game.cpp
 
@@ -86,22 +86,22 @@ find_package(Websocket CONFIG REQUIRED COMPONENTS websocket)
 
 find_package(glad REQUIRED)
 
-add_executable(${PROJECT_NAME}
+add_executable(${TARGET_NAME}
     main.cpp
-    ${${PROJECT_NAME}_SOURCES}
-    ${${PROJECT_NAME}_HEADERS}
+    ${${TARGET_NAME}_SOURCES}
+    ${${TARGET_NAME}_HEADERS}
 )
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    target_compile_options(${PROJECT_NAME}
+    target_compile_options(${TARGET_NAME}
         PRIVATE "-fno-omit-frame-pointer" "-fsanitize=address" "-fsanitize=undefined")
-    target_link_options(${PROJECT_NAME}
+    target_link_options(${TARGET_NAME}
         PRIVATE "-fsanitize=address" "-fsanitize=undefined")
 endif()
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${TARGET_NAME}
     PRIVATE
         ad::aunteater
         ad::engine
@@ -111,7 +111,7 @@ target_link_libraries(${PROJECT_NAME}
         glad::glad
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
+set_target_properties(${TARGET_NAME} PROPERTIES
                       VERSION "${${PROJECT_NAME}_VERSION}"
 )
 
@@ -120,4 +120,4 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 ## Install
 ##
 
-install(TARGETS ${PROJECT_NAME})
+install(TARGETS ${TARGET_NAME})

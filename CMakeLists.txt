@@ -1,11 +1,9 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
 
 project(Shmurp VERSION "${BUILD_VERSION}")
 
 include(cmake/include.cmake)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+cmc_include_conan_configuration()
 
 add_subdirectory(src)

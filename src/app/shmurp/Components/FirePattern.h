@@ -13,6 +13,8 @@
 
 #include <handy/random.h>
 
+#include <atomic>
+
 
 namespace ad {
 

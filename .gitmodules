@@ -1,6 +1,6 @@
 [submodule "cmake"]
 	path = cmake
-	url = https://Ad-Ag@bitbucket.org/agdevs/cmake_helpers.git
+	url = https://github.com/Adnn/cmake_helper.git
 [submodule "media"]
 	path = media
-	url = git@github.com:Adnn/shmurp_media.git
+	url = https://github.com/ShredEagle/shmurp_media.git

@@ -39,33 +39,12 @@ jobs:
         uses: turtlebrowser/get-conan@v1.0
       - name: Configure Conan
         run: conan remote add adnn ${{ secrets.CONAN_REMOTE_URL }}
+      # No build_tests option on shmurp
       - run: >
           conan create
           --build=missing
-          -o ${{ steps.recipe.outputs.name }}:build_tests=True
           -s compiler.cppstd=${{ matrix.cppstd }}
           conan/ ${{ steps.recipe.outputs.reference }}@
-      - name: Prepare virtual run env
-        run: >
-          conan install -g virtualrunenv
-          -o ${{ steps.recipe.outputs.name }}:build_tests=True
-          -s compiler.cppstd=${{ matrix.cppstd }}
-          ${{ steps.recipe.outputs.reference }}@
-      - name: Run tests (bash)
-        if: ${{ runner.os != 'Windows' }}
-        run: |
-          source activate_run.sh
-          tests
-          source deactivate_run.sh
-      - name: Run tests (cmd)
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          ./activate_run.bat
-          tests
-          ./deactivate_run.bat
-        # Powershell does not stop on first error
-        # see: https://github.community/t/multiline-commands-on-windows-do-not-fail-if-individual-commands-fail/16753
-        shell: cmd
       - name: Deploy recipe (develop)
         if: ${{ success() && contains('refs/heads/develop', github.ref) }}
         run: |

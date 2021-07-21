@@ -6,7 +6,6 @@ from os import path
 
 class ShmurpConan(ConanFile):
     name = "shmurp"
-    version = "0.0.0"
     license = "MIT"
     author = "adnn"
     url = "https://github.com/Adnn/shmurp"

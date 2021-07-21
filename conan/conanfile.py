@@ -21,10 +21,10 @@ class ShmurpConan(ConanFile):
     requires = (
         ("glad/0.1.34"),
 
-        ("aunteater/local"),
-        ("graphics/local"),
-        ("math/local"),
-        ("websocket/local"),
+        ("aunteater/6afa38a266@adnn/develop"),
+        ("graphics/d3958e3ec1@adnn/develop"),
+        ("math/4086708c05@adnn/develop"),
+        ("websocket/84bbb84476@adnn/develop"),
     )
 
     build_requires = ("cmake/3.20.4")

@@ -60,7 +60,7 @@ private:
     value_t mValue;
 };
 
-// Expects T_interpolant to be a floating poiht type
+// Expects T_interpolant to be a floating point type
 // TODO revisit parameters semantic if used with more than arithmetic types
 template <class T_value, class T_interpolant>
 T_value lerp(T_value aStart, T_value aEnd, Clamped<T_interpolant> aInterpolant)

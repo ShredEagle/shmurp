@@ -1,6 +1,13 @@
 # Shmurp
 
-A game where you have to shoot them urp
+A game where you have to shoot them urp!
+
+Shmurp is a vertical-scrolling shoot-em-up prototype featuring minimalist geometric 3D graphics
+and a separable bloom filter. \
+It pays tribute to the first boss from one of the most acclaimed bullet-hell games,
+achieved via a continuation-based event-system.
+
+![in-game screenshot](https://adnn.github.io/assets/shmurp/shmurp-window.png)
 
 ## Development
 
